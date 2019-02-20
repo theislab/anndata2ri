@@ -21,13 +21,14 @@ py2rpy = converter.py2rpy
 
 @py2rpy.register(AnnData)
 def py2rpy_anndata(obj) -> RS4:
-    # TODO
+    # TODO: py2r
     return RS4(...)
 
 
 # R to Python
 
 
+# https://bitbucket.org/rpy2/rpy2/issues/518/converting-matrices-is-very-slow
 @numpy2ri.rpy2py.register(Sexp)  # No idea why this is necessary. I’d think the dispatcher catches this earlier
 @rpy2py.register(Matrix)
 def rpy2py_matrix_ad(obj):
@@ -86,6 +87,8 @@ def rpy2py_single_cell_experiment(obj):
     assert isinstance(obs, pd.DataFrame), type(obs)
     var = rpy2py(se.rowData(obj))
     assert isinstance(var, pd.DataFrame), type(var)
+
+    # TODO: se.metadata, se.dimnames
 
     return AnnData(exprs, obs, var, layers=layers)
 
