@@ -1,5 +1,12 @@
 # Python
+/dist/
 __pycache__/
+
+# Jupyter
+/.ipynb_checkpoints/
 
 # IDEs
 /.idea/
+
+# Scanpy
+/data/
