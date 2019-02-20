@@ -6,7 +6,7 @@ from anndata import AnnData
 
 from rpy2.rinterface import NULL, Sexp, RTYPES
 from rpy2.robjects import conversion, default_converter, numpy2ri, pandas2ri
-from rpy2.robjects.vectors import Matrix
+from rpy2.robjects.vectors import Matrix, ListVector
 from rpy2.robjects.methods import RS4
 from rpy2.robjects.packages import importr
 
@@ -21,8 +21,23 @@ py2rpy = converter.py2rpy
 
 @py2rpy.register(AnnData)
 def py2rpy_anndata(obj: AnnData) -> RS4:
-    # TODO: py2r
-    return RS4(...)
+    s4v = importr("S4Vectors")
+    sce = importr("SingleCellExperiment")
+
+    layers = {k: conversion.py2rpy(v.T) for k, v in obj.layers.items()}
+    assays = ListVector({"X": conversion.py2rpy(obj.X.T), **layers})
+
+    row_args = {k: conversion.py2rpy(v) for k, v in obj.var.items()}
+    row_args["row.names"] = conversion.py2rpy(obj.var.index)
+    row_data = s4v.DataFrame(**row_args)
+
+    col_args = {k: conversion.py2rpy(v) for k, v in obj.obs.items()}
+    col_args["row.names"] = conversion.py2rpy(obj.obs.index)
+    col_data = s4v.DataFrame(**col_args)
+
+    metadata = ListVector({k: conversion.py2rpy(v) for k, v in obj.uns.items()})
+
+    return sce.SingleCellExperiment(assays=assays, rowData=row_data, colData=col_data, metadata=metadata)
 
 
 # R to Python
