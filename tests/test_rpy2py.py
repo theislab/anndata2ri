@@ -11,22 +11,22 @@ sc_rna_seq_data = data(importr("scRNAseq"))
 as_ = getattr(importr("methods"), "as")
 
 
-ex_empty = sce.SingleCellExperiment()
-ex_allen = as_(sc_rna_seq_data.fetch("allen")["allen"], "SingleCellExperiment")
+ex_empty = (0, 0), sce.SingleCellExperiment()
+ex_allen = (379, 20908), as_(sc_rna_seq_data.fetch("allen")["allen"], "SingleCellExperiment")
 
 
-@pytest.mark.parametrize("dataset", [ex_empty, ex_allen])
-def test_convert_with(dataset):
+@pytest.mark.parametrize("shape,dataset", [ex_empty, ex_allen])
+def test_convert_with(shape, dataset):
     with conversion.ConversionContext(anndata2ri.create_converter()) as c:
         ad = c.rpy2py(dataset)
-        print(ad)
+        assert ad.shape == shape
 
 
-@pytest.mark.parametrize("dataset", [ex_empty, ex_allen])
-def test_convert_activate(dataset):
+@pytest.mark.parametrize("shape,dataset", [ex_empty, ex_allen])
+def test_convert_activate(shape, dataset):
     try:
         anndata2ri.activate()
         ad = conversion.rpy2py(dataset)
-        print(ad)
+        assert ad.shape == shape
     finally:
         anndata2ri.deactivate()
