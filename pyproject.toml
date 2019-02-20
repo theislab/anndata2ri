@@ -1,0 +1,13 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "anndata2ri"
+author = "Philipp A."
+author-email = "flying-sheep@web.de"
+home-page = "https://github.com/flying-sheep/anndata2ri"
+classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
+
+[tool.black]
+line-length = 120

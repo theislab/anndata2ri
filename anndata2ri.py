@@ -1,0 +1,133 @@
+from typing import Optional
+
+import numpy as np
+import pandas as pd
+from anndata import AnnData
+
+from rpy2.rinterface import NULL, Sexp, RTYPES
+from rpy2.robjects import conversion, default_converter, numpy2ri, pandas2ri
+from rpy2.robjects.vectors import Matrix
+from rpy2.robjects.methods import RS4
+from rpy2.robjects.packages import importr
+
+
+converter = conversion.Converter("original anndata conversion")
+rpy2py = converter.rpy2py
+py2rpy = converter.py2rpy
+
+
+# Python to R
+
+
+@py2rpy.register(AnnData)
+def py2rpy_anndata(obj) -> RS4:
+    # TODO
+    return RS4(...)
+
+
+# R to Python
+
+
+@numpy2ri.rpy2py.register(Sexp)  # No idea why this is necessary. I’d think the dispatcher catches this earlier
+@rpy2py.register(Matrix)
+def rpy2py_matrix_ad(obj):
+    """
+    For some reason the original matrix conversion is dog slow.
+    Using memoryview fixes that.
+    """
+    if obj.typeof in numpy2ri._vectortypes and obj.typeof != RTYPES.VECSXP:
+        if hasattr(obj, "memoryview"):
+            return np.asarray(obj.memoryview())
+        else:
+            return np.asarray(obj)
+    else:  # If i used the pandas converted, this’d be a recursion error
+        return default_converter.rpy2py(obj)
+
+
+@rpy2py.register(RS4)
+def rpy2py_s4(obj):
+    """
+    See here for the slots: https://bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html
+    """
+    if "DataFrame" in obj.rclass:
+        return rpy2py_data_frame(obj)
+    elif "SingleCellExperiment" in obj.rclass:
+        return rpy2py_single_cell_experiment(obj)
+    # else default to None
+
+
+def rpy2py_data_frame(obj):
+    """
+    S4 DataFrame class, not data.frame
+    """
+    columns = {k: rpy2py(v) if isinstance(v, Sexp) else v for k, v in obj.slots["listData"].items()}
+    rownames = obj.slots["rownames"]
+    if rownames is NULL:
+        rownames = None
+
+    return pd.DataFrame(columns, index=rownames)
+
+
+def rpy2py_single_cell_experiment(obj):
+    se = importr("SummarizedExperiment")
+    # sce = importr('SingleCellExperiment')
+
+    assay_names = se.assayNames(obj)
+    if assay_names is not NULL:
+        # The assays can be stored in an env or elsewise so we don’t use obj.slots['assays']
+        assays = [se.assay(obj, str(n)).T for n in assay_names]
+        # There’s SingleCellExperiment with no assays
+        exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:]))
+        assert len(exprs.shape) == 2, exprs.shape
+    else:
+        exprs, layers = None, {}
+
+    obs = rpy2py(se.colData(obj))
+    assert isinstance(obs, pd.DataFrame), type(obs)
+    var = rpy2py(se.rowData(obj))
+    assert isinstance(var, pd.DataFrame), type(var)
+
+    return AnnData(exprs, obs, var, layers=layers)
+
+
+# Activation / deactivation
+
+
+def create_converter():
+    pandas2ri.activate()
+    new_converter = conversion.Converter("anndata conversion", template=conversion.converter)
+    pandas2ri.deactivate()
+
+    for k, v in py2rpy.registry.items():
+        if k is not object:
+            new_converter.py2rpy.register(k, v)
+
+    for k, v in rpy2py.registry.items():
+        if k is not object:
+            new_converter.rpy2py.register(k, v)
+
+    return new_converter
+
+
+original_converter: Optional[conversion.Converter] = None
+
+
+def activate():
+    global original_converter
+
+    if original_converter is not None:
+        return
+
+    new_converter = create_converter()
+    original_converter = conversion.converter
+    conversion.set_conversion(new_converter)
+
+
+def deactivate():
+    global original_converter
+
+    if original_converter is None:
+        return
+
+    conversion.set_conversion(original_converter)
+    original_converter = None
