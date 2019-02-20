@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ py2rpy = converter.py2rpy
 
 
 @py2rpy.register(AnnData)
-def py2rpy_anndata(obj) -> RS4:
+def py2rpy_anndata(obj: AnnData) -> RS4:
     # TODO: py2r
     return RS4(...)
 
@@ -31,7 +31,7 @@ def py2rpy_anndata(obj) -> RS4:
 # https://bitbucket.org/rpy2/rpy2/issues/518/converting-matrices-is-very-slow
 @numpy2ri.rpy2py.register(Sexp)  # No idea why this is necessary. I’d think the dispatcher catches this earlier
 @rpy2py.register(Matrix)
-def rpy2py_matrix_ad(obj):
+def rpy2py_matrix_ad(obj: Sexp):
     """
     For some reason the original matrix conversion is dog slow.
     Using memoryview fixes that.
@@ -46,7 +46,7 @@ def rpy2py_matrix_ad(obj):
 
 
 @rpy2py.register(RS4)
-def rpy2py_s4(obj):
+def rpy2py_s4(obj: RS4) -> Optional[Union[pd.DataFrame, AnnData]]:
     """
     See here for the slots: https://bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html
     """
@@ -57,7 +57,7 @@ def rpy2py_s4(obj):
     # else default to None
 
 
-def rpy2py_data_frame(obj):
+def rpy2py_data_frame(obj: RS4) -> pd.DataFrame:
     """
     S4 DataFrame class, not data.frame
     """
@@ -69,7 +69,7 @@ def rpy2py_data_frame(obj):
     return pd.DataFrame(columns, index=rownames)
 
 
-def rpy2py_single_cell_experiment(obj):
+def rpy2py_single_cell_experiment(obj: RS4) -> AnnData:
     se = importr("SummarizedExperiment")
     # sce = importr('SingleCellExperiment')
 
@@ -96,7 +96,7 @@ def rpy2py_single_cell_experiment(obj):
 # Activation / deactivation
 
 
-def create_converter():
+def create_converter() -> conversion.Converter:
     pandas2ri.activate()
     new_converter = conversion.Converter("anndata conversion", template=conversion.converter)
     pandas2ri.deactivate()
