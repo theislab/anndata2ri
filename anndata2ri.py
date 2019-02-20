@@ -1,8 +1,13 @@
+"""
+Converter between Python’s AnnData and R’s SingleCellExperiment.
+"""
+
 from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
 from anndata import AnnData
+from get_version import get_version
 
 from rpy2.rinterface import NULL, Sexp, RTYPES
 from rpy2.robjects import conversion, default_converter, numpy2ri, pandas2ri
@@ -10,6 +15,8 @@ from rpy2.robjects.vectors import Matrix, ListVector
 from rpy2.robjects.methods import RS4
 from rpy2.robjects.packages import importr
 
+
+__version__ = get_version(__file__)
 
 converter = conversion.Converter("original anndata conversion")
 rpy2py = converter.rpy2py
