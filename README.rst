@@ -1,3 +1,8 @@
+|travis|
+
+.. |travis| image:: https://travis-ci.org/flying-sheep/anndata2ri.svg?branch=master
+   :target: https://travis-ci.org/flying-sheep/anndata2ri
+
 AnnData ↭ SingleCellExperiment
 ==============================
 
