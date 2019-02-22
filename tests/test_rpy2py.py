@@ -28,12 +28,9 @@ def test_convert_manual(shape, dataset):
 
 @pytest.mark.parametrize("shape,dataset", [ex_empty, ex_allen])
 def test_convert_with(shape, dataset):
-    c = Converter("test")
-    # Calling `as` on the SummarizedExperiment wouldn’t work otherwise,
-    # as it requires py2rpy[RS4], py2rpy[str], …
-    overlay_converter(default_converter, c)
-    overlay_converter(anndata2ri.converter, c)
-    with ConversionContext(c):
+    # Needs default_converter to call `as` on the SummarizedExperiment:
+    # Calling a R function returning a S4 object requires py2rpy[RS4], py2rpy[str], …
+    with ConversionContext(default_converter + anndata2ri.converter):
         ad = dataset()
     assert isinstance(ad, AnnData)
     assert ad.shape == shape
