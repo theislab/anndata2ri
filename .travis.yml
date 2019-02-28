@@ -1,19 +1,31 @@
-language: python
+language: r
 dist: xenial
 cache:
-  - pip       # Python
-  - packages  # R
+  packages: true
+  directories:
+    - /home/travis/.cache/pip
+matrix:
+  include:
+  - addons:
+      packages:
+      - python3.6
+  - addons:
+      packages:
+      - python3.7
 python:
   - 3.6
   - 3.7
 install:
-  - R --slave -e 'install.packages("BiocManager")'
-  - R --slave -e 'BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
-  - pip install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
+  - pip3 install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
   - flit install --extras=all
 script:
   - PYTHONPATH=. pytest
 addons:
   apt:
+    sources:
+      - deadsnakes
     packages:
       - r-base
+bioc_packages:
+  - SingleCellExperiment
+  - scRNAseq
