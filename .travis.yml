@@ -1,11 +1,19 @@
 language: python
 dist: xenial
-cache: pip
+cache:
+  - pip       # Python
+  - packages  # R
 python:
   - 3.6
   - 3.7
 install:
+  - R --slave -e 'install.packages("BiocManager")'
+  - R --slave -e 'BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
   - pip install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
   - flit install --extras=all
 script:
   - PYTHONPATH=. pytest
+addons:
+  apt:
+    packages:
+      - r-base
