@@ -83,17 +83,25 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
     with localconverter(default_converter):
         s4v = importr("S4Vectors")
         se = importr("SummarizedExperiment")
-        # sce = importr('SingleCellExperiment')
+        sce = importr('SingleCellExperiment')
 
         assay_names = se.assayNames(obj)
         if not isinstance(assay_names, NULLType):
+            assay_names = [str(a) for a in se.assayNames(obj)]
             # The assays can be stored in an env or elsewise so we don’t use obj.slots['assays']
-            assays = [numpy2ri.rpy2py(assay).T for assay in (se.assay(obj, str(n)) for n in assay_names)]
+            assays = [numpy2ri.rpy2py(assay).T for assay in (se.assay(obj, n) for n in assay_names)]
             # There’s SingleCellExperiment with no assays
             exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:]))
             assert len(exprs.shape) == 2, exprs.shape
         else:
             exprs, layers = None, {}
+
+        rdim_names = [str(t) for t in sce.reducedDimNames(obj)]
+        if rdim_names:
+            reduced_dims = [numpy2ri.rpy2py(rd) for rd in (sce.reducedDim(obj, t) for t in rdim_names)]
+            obsm = dict(zip(rdim_names, reduced_dims))
+        else:
+            obsm = None
 
         col_data = se.colData(obj)
         row_data = se.rowData(obj)
@@ -105,7 +113,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
     with localconverter(create_converter()):
         uns = dict(metadata.items())
 
-    return AnnData(exprs, obs, var, uns, layers=layers)
+    return AnnData(exprs, obs, var, uns, obsm, layers=layers)
 
 
 # Activation / deactivation
