@@ -81,6 +81,7 @@ def rpy2py_data_frame(obj: SexpS4) -> pd.DataFrame:
 
 def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
     with localconverter(default_converter):
+        s4v = importr("S4Vectors")
         se = importr("SummarizedExperiment")
         # sce = importr('SingleCellExperiment')
 
@@ -96,13 +97,15 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
 
         col_data = se.colData(obj)
         row_data = se.rowData(obj)
+        metadata = s4v.metadata(obj)
 
     obs = rpy2py_data_frame(col_data)
     var = rpy2py_data_frame(row_data)
+    # The whole shebang: configured converter, numpy, pandas and ours
+    with localconverter(create_converter()):
+        uns = dict(metadata.items())
 
-    # TODO: se.metadata
-
-    return AnnData(exprs, obs, var, layers=layers)
+    return AnnData(exprs, obs, var, uns, layers=layers)
 
 
 # Activation / deactivation
