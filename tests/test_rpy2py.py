@@ -15,19 +15,23 @@ as_ = getattr(importr("methods"), "as")
 
 
 def check_allen(adata):
-    assert adata.uns.keys() == {'SuppInfo', 'which_qc'}
-    assert set(adata.obs.keys()) > {'NREADS', 'NALIGNED', 'Animal.ID', 'passes_qc_checks_s'}
+    assert adata.uns.keys() == {"SuppInfo", "which_qc"}
+    assert set(adata.obs.keys()) > {"NREADS", "NALIGNED", "Animal.ID", "passes_qc_checks_s"}
 
 
 def check_example(adata):
-    assert set(adata.obsm.keys()) == {'PCA', 'tSNE'}
-    assert adata.obsm['PCA'].shape == (100, 5)
+    assert set(adata.obsm.keys()) == {"PCA", "tSNE"}
+    assert adata.obsm["PCA"].shape == (100, 5)
 
 
 sumex_allen = sc_rna_seq_data.fetch("allen")["allen"]
 ex_allen = check_allen, (379, 20908), lambda: as_(sumex_allen, "SingleCellExperiment")
-ex_empty = lambda x: None, (0, 0), lambda: sce.SingleCellExperiment()
-ex_exmpl = check_example, (100, 200), lambda: r("""
+ex_empty = lambda x: None, (0, 0), sce.SingleCellExperiment
+ex_exmpl = (
+    check_example,
+    (100, 200),
+    lambda: r(
+        """
     local({
         ncells <- 100
         u <- matrix(rpois(20000, 5), ncol=ncells)
@@ -38,7 +42,9 @@ ex_exmpl = check_example, (100, 200), lambda: r("""
             reducedDims = S4Vectors::SimpleList(PCA = p, tSNE = t)
         )
     })
-    """)
+    """
+    ),
+)
 
 
 @pytest.mark.parametrize("check,shape,dataset", [ex_empty, ex_allen, ex_exmpl])
