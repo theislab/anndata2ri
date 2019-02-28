@@ -6,6 +6,6 @@ python:
   - 3.7
 install:
   - pip install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
-  - flit install
+  - flit install --extras=all
 script:
   - PYTHONPATH=. pytest

@@ -10,7 +10,7 @@ from get_version import get_version
 
 from rpy2.rinterface import NULLType, SexpS4
 from rpy2.robjects import conversion, pandas2ri, numpy2ri, default_converter
-from rpy2.robjects.conversion import ConversionContext
+from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 from rpy2.robjects.vectors import ListVector
 from rpy2.robjects.methods import RS4
@@ -29,7 +29,7 @@ py2rpy = converter.py2rpy
 
 @py2rpy.register(AnnData)
 def py2rpy_anndata(obj: AnnData) -> RS4:
-    with ConversionContext(default_converter):
+    with localconverter(default_converter):
         s4v = importr("S4Vectors")
         sce = importr("SingleCellExperiment")
         # TODO: sparse
@@ -57,49 +57,50 @@ def rpy2py_s4(obj: SexpS4) -> Optional[Union[pd.DataFrame, AnnData]]:
     """
     See here for the slots: https://bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html
     """
-    with ConversionContext(default_converter):
-        if "DataFrame" in obj.rclass:
-            return rpy2py_data_frame(obj)
-        elif "SingleCellExperiment" in obj.rclass:
-            return rpy2py_single_cell_experiment(obj)
-        else:
-            return default_converter.rpy2py(obj)
+    if "DataFrame" in obj.rclass:
+        return rpy2py_data_frame(obj)
+    elif "SingleCellExperiment" in obj.rclass:
+        return rpy2py_single_cell_experiment(obj)
+    else:
+        return default_converter.rpy2py(obj)
 
 
 def rpy2py_data_frame(obj: SexpS4) -> pd.DataFrame:
     """
     S4 DataFrame class, not data.frame
     """
-    slots = RSlots(obj)
-    columns = dict(slots["listData"].items())
-    rownames = slots["rownames"]
-    if isinstance(rownames, NULLType):
-        rownames = pd.RangeIndex(slots["nrows"][0])
+    with localconverter(default_converter):
+        slots = RSlots(obj)
+        columns = dict(slots["listData"].items())
+        rownames = slots["rownames"]
+        if isinstance(rownames, NULLType):
+            rownames = pd.RangeIndex(slots["nrows"][0])
 
     return pd.DataFrame(columns, index=rownames)
 
 
 def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
-    se = importr("SummarizedExperiment")
-    # sce = importr('SingleCellExperiment')
+    with localconverter(default_converter):
+        se = importr("SummarizedExperiment")
+        # sce = importr('SingleCellExperiment')
 
-    assay_names = se.assayNames(obj)
-    if not isinstance(assay_names, NULLType):
-        # The assays can be stored in an env or elsewise so we don’t use obj.slots['assays']
-        assays = [
-            numpy2ri.rpy2py(assay).T
-            for assay in (se.assay(obj, str(n)) for n in assay_names)
-        ]
-        # There’s SingleCellExperiment with no assays
-        exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:]))
-        assert len(exprs.shape) == 2, exprs.shape
-    else:
-        exprs, layers = None, {}
+        assay_names = se.assayNames(obj)
+        if not isinstance(assay_names, NULLType):
+            # The assays can be stored in an env or elsewise so we don’t use obj.slots['assays']
+            assays = [numpy2ri.rpy2py(assay).T for assay in (se.assay(obj, str(n)) for n in assay_names)]
+            # There’s SingleCellExperiment with no assays
+            exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:]))
+            assert len(exprs.shape) == 2, exprs.shape
+        else:
+            exprs, layers = None, {}
 
-    obs = rpy2py_data_frame(se.colData(obj))
-    var = rpy2py_data_frame(se.rowData(obj))
+        col_data = se.colData(obj)
+        row_data = se.rowData(obj)
 
-    # TODO: se.metadata, se.dimnames
+    obs = rpy2py_data_frame(col_data)
+    var = rpy2py_data_frame(row_data)
+
+    # TODO: se.metadata
 
     return AnnData(exprs, obs, var, layers=layers)
 

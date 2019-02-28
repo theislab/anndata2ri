@@ -1,8 +1,8 @@
 import pytest
 import pandas as pd
 from anndata import AnnData
-from rpy2.robjects import r, RS4, default_converter
-from rpy2.robjects.conversion import ConversionContext, Converter, overlay_converter
+from rpy2.robjects import r, default_converter
+from rpy2.robjects.conversion import ConversionContext
 from rpy2.robjects.packages import importr, data
 
 import anndata2ri

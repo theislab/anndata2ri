@@ -20,9 +20,15 @@ classifiers = [
 requires-python = '>= 3.6'
 requires = [
     'get_version',
-    'rpy2 >= 3.0.0.dev0',
+    'rpy2 >= 3.0.0.dev',  # 3.0.1 fixes crashes!
     'tzlocal',  # for pandas2ri
     'anndata',
+]
+
+[tool.flit.metadata.requires-extra]
+test = [
+    'pytest',
+    'pytest-faulthandler'
 ]
 
 [tool.black]
