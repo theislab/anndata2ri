@@ -82,6 +82,6 @@ def test_convert_empty_df_with_rows():
     df = r("S4Vectors::DataFrame(a=1:10)[, -1]")
     assert df.slots["nrows"][0] == 10
 
-    c = anndata2ri.create_converter()
+    c = anndata2ri.conv.full_converter()
     df_py = c.rpy2py(df)
     assert isinstance(df_py, pd.DataFrame)
