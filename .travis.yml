@@ -7,16 +7,18 @@ cache:
 matrix:
   include:
   - addons:
+      env: PYTHON=3.6
       packages:
       - python3.6
   - addons:
+      env: PYTHON=3.7
       packages:
       - python3.7
 python:
   - 3.6
   - 3.7
 install:
-  - pip3 install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
+  - pip install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
   - flit install --extras=all
 script:
   - PYTHONPATH=. pytest
