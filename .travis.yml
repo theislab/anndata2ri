@@ -16,7 +16,7 @@ install:
   - sudo apt-get install -y python$PYTHON python$PYTHON-venv
   - sudo python$PYTHON -m ensurepip
   - sudo python$PYTHON -m pip install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
-  - sudo flit install --extras=all
+  - sudo FLIT_ROOT_INSTALL=1 flit install --extras=all
 script:
   - PYTHONPATH=. pytest
 bioc_packages:
