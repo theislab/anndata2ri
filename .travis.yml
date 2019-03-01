@@ -15,7 +15,7 @@ install:
   - sudo apt-get update -q  -o Dir::Etc::sourcelist="sources.list.d/deadsnakes-ubuntu-ppa-xenial.list" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
   - sudo apt-get install -y python$PYTHON python$PYTHON-venv
   - sudo python$PYTHON -m ensurepip
-  - sudo python$PYTHON -m pip install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
+  - sudo python$PYTHON -m pip install flit future-fstrings get_version hg+https://bitbucket.org/rpy2/rpy2
   - sudo FLIT_ROOT_INSTALL=1 flit install --extras=all
 script:
   - PYTHONPATH=. pytest
