@@ -18,6 +18,7 @@ install:
   - sudo python$PYTHON -m pip install flit future-fstrings get_version hg+https://bitbucket.org/rpy2/rpy2
   - sudo FLIT_ROOT_INSTALL=1 flit install --extras=all
 script:
+  - python$PYTHON -m rpy2.situation
   - PYTHONPATH=. pytest
 bioc_packages:
   - SingleCellExperiment
