@@ -4,30 +4,25 @@ cache:
   packages: true
   directories:
     - /home/travis/.cache/pip
-r:
-  - release
-  - devel
 matrix:
   include:
-  - name: Python 3.6
+  - r: release
     env: PYTHON=3.6
-    addons:
-      packages:
-      - python3.6
-  - name: Python 3.7
+    addons: {packages: [python3.6], sources: [deadsnakes]}
+  - r: devel
+    env: PYTHON=3.6
+    addons: {packages: [python3.6], sources: [deadsnakes]}
+  - r: release
     env: PYTHON=3.7
-    addons:
-      packages:
-      - python3.7
+    addons: {packages: [python3.7], sources: [deadsnakes]}
+  - r: devel
+    env: PYTHON=3.7
+    addons: {packages: [python3.7], sources: [deadsnakes]}
 install:
   - python$PYTHON -m pip install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
   - flit install --extras=all
 script:
   - PYTHONPATH=. pytest
-addons:
-  apt:
-    sources:
-      - deadsnakes
 bioc_packages:
   - SingleCellExperiment
   - scRNAseq
