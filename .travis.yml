@@ -22,7 +22,3 @@ script:
 bioc_packages:
   - SingleCellExperiment
   - scRNAseq
-addons:
-  apt:
-    sources:
-      - deadsnakes
