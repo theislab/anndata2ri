@@ -11,7 +11,9 @@ env:
   - PYTHON=3.6
   - PYTHON=3.7
 install:
-  - sudo apt install python$PYTHON
+  - sudo add-apt-repository ppa:deadsnakes/ppa -y
+  - sudo apt-get update -q
+  - sudo apt-get install python$PYTHON -y
   - python$PYTHON -m pip install flit future-fstrings hg+https://bitbucket.org/rpy2/rpy2
   - flit install --extras=all
 script:
