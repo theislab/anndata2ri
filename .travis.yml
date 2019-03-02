@@ -1,30 +1,31 @@
-language: r
+language: python
 dist: xenial
 cache:
-  packages: true
+  pip: true
   directories:
-    - /home/travis/.cache/pip
+    - /home/travis/R/Library
+env:
+  - R_LIB_USER=/home/travis/R/Library
 
 # matrix
-r:
-  - release
-  - devel
-env:
-  - PYTHON=3.6
-  - PYTHON=3.7
+python:
+  - python3.6
+  - python3.7
 
-bioc_packages: # install R packages
-  - SingleCellExperiment
-  - scRNAseq
-before_install: # install python
-  - sudo add-apt-repository -y ppa:deadsnakes/ppa
-  - sudo apt-get update -q  -o Dir::Etc::sourcelist="sources.list.d/deadsnakes-ubuntu-ppa-xenial.list" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
-  - sudo apt-get install -y python$PYTHON python$PYTHON-venv
-  - sudo -H python$PYTHON -m ensurepip
-install: # install test packages
-  - sudo -H python$PYTHON -m pip install flit future-fstrings get_version hg+https://bitbucket.org/rpy2/rpy2
-  - python$PYTHON -m rpy2.situation
-  - sudo -H FLIT_ROOT_INSTALL=1 flit install --extras=all
-
+# packages
+addons:
+  apt:
+    packages:
+      - r-base
+# install basic requirements
+before_install:
+  - R --slave -c 'install.packages("BiocManager")'
+  - R --slave -c 'BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
+  - pip install flit future-fstrings get_version hg+https://bitbucket.org/rpy2/rpy2
+# install package
+install:
+  - python -m rpy2.situation
+  - flit install --extras=all
+# test
 script:
   - PYTHONPATH=. pytest
