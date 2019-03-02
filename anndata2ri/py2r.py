@@ -51,4 +51,9 @@ def py2rpy_anndata(obj: AnnData) -> RS4:
         with localconverter(full_converter() + dict_converter):
             metadata = ListVector(obj.uns.items())
 
-        return sce.SingleCellExperiment(assays=assays, rowData=row_data, colData=col_data, metadata=metadata)
+        rd_args = {k: numpy2ri.py2rpy(obj.obsm[k]) for k in obj.obsm.keys()}
+        reduced_dims = s4v.SimpleList(**rd_args)
+
+        return sce.SingleCellExperiment(
+            assays=assays, rowData=row_data, colData=col_data, metadata=metadata, reducedDims=reduced_dims
+        )
