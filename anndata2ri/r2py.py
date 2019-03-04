@@ -9,6 +9,7 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 from rpy2.robjects.packages import importr
 
+from . import conv_name
 from .conv import converter, full_converter
 
 
@@ -59,7 +60,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         rdim_names = [str(t) for t in sce.reducedDimNames(obj)]
         if rdim_names:
             reduced_dims = [numpy2ri.rpy2py(rd) for rd in (sce.reducedDim(obj, t) for t in rdim_names)]
-            obsm = dict(zip(rdim_names, reduced_dims))
+            obsm = {conv_name.sce2scanpy(n): d for n, d in zip(rdim_names, reduced_dims)}
         else:
             obsm = None
 

@@ -19,8 +19,8 @@ def mk_ad_simple():
 
 def check_simple(ex):
     sce = importr("SingleCellExperiment")
-    assert [str(n) for n in sce.reducedDimNames(ex)] == ["X_pca"]
-    pca = sce.reducedDim(ex, "X_pca")
+    assert [str(n) for n in sce.reducedDimNames(ex)] == ["PCA"]
+    pca = sce.reducedDim(ex, "PCA")
     assert tuple(baseenv["dim"](pca)) == (2, 4)
 
 

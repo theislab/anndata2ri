@@ -20,8 +20,8 @@ def check_allen(adata):
 
 
 def check_example(adata):
-    assert set(adata.obsm.keys()) == {"PCA", "tSNE"}
-    assert adata.obsm["PCA"].shape == (100, 5)
+    assert set(adata.obsm.keys()) == {"X_pca", "X_tsne"}
+    assert adata.obsm["X_pca"].shape == (100, 5)
 
 
 sumex_allen = sc_rna_seq_data.fetch("allen")["allen"]
