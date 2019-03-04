@@ -22,7 +22,7 @@ def rpy2py_s4(obj: SexpS4) -> Optional[Union[pd.DataFrame, AnnData]]:
         return rpy2py_data_frame(obj)
     elif "SingleCellExperiment" in obj.rclass:
         return rpy2py_single_cell_experiment(obj)
-    else:
+    else:  # Don’t use the registered one, it would lead to recursion.
         return default_converter.rpy2py(obj)
 
 

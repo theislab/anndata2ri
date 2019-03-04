@@ -17,11 +17,19 @@ dict_converter = conversion.Converter("Converter handling dicts")
 
 
 @dict_converter.py2rpy.register(dict)
-def py2rpy_dict(obj):
-    return ListVector({str(k): v for k, v in obj.items()})
+def py2rpy_dict(obj: dict) -> ListVector:
+    """Try converting everything. For nested dicts, this needs itself to be registered"""
+    converted = {}
+    for k, v in obj.items():
+        try:
+            converted[str(k)] = conversion.py2rpy(v)
+        except NotImplementedError as e:
+            warn(str(e))
+    # This tries to convert everything again. This works because py2rpy(Sexp) is the identity function
+    return ListVector(converted)
 
 
-def check_no_dupes(idx: pd.Index, name: str):
+def check_no_dupes(idx: pd.Index, name: str) -> bool:
     dupes = idx.duplicated().any()
     if dupes:
         warn(f"Duplicated {name}: {idx[idx.duplicated(False)].sort_values()}")
