@@ -9,8 +9,8 @@ env:
 
 # matrix
 python:
-  - python3.6
-  - python3.7
+  - 3.6
+  - 3.7
 
 # packages
 addons:
