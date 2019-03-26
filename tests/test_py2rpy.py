@@ -1,3 +1,6 @@
+from warnings import catch_warnings, simplefilter, WarningMessage
+from typing import List
+
 import numpy as np
 import pytest
 import scanpy as sc
@@ -7,6 +10,7 @@ from rpy2.robjects.conversion import ConversionContext
 from rpy2.robjects.packages import importr
 
 import anndata2ri
+from anndata2ri.py2r import NotConvertedWarning
 
 
 def mk_ad_simple():
@@ -55,3 +59,18 @@ def test_py2rpy_activate(check, shape, dataset):
     ex = globalenv["adata"]
     assert tuple(baseenv["dim"](ex)[::-1]) == shape
     check(ex)
+
+
+def test_py2rpy2_numpy_pbmc68k():
+    """This has some weird metadata"""
+    from scanpy.datasets import pbmc68k_reduced
+    try:
+        anndata2ri.activate()
+        with catch_warnings(record=True) as logs:  # type: List[WarningMessage]
+            simplefilter('ignore', DeprecationWarning)
+            globalenv["adata"] = pbmc68k_reduced()
+        assert len(logs) == 1, [m.message for m in logs]
+        assert logs[0].category is NotConvertedWarning
+        assert 'scipy.sparse.csr.csr_matrix' in str(logs[0].message)
+    finally:
+        anndata2ri.deactivate()

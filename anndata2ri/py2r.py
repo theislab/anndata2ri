@@ -1,5 +1,6 @@
 from warnings import warn
 
+import numpy as np
 import pandas as pd
 from anndata import AnnData
 
@@ -13,7 +14,16 @@ from . import conv_name
 from .conv import converter, full_converter
 
 
+class NotConvertedWarning(Warning):
+    pass
+
+
 dict_converter = conversion.Converter("Converter handling dicts")
+dict_converter.py2rpy.register(np.bool_, lambda x: conversion.py2rpy(bool(x)))
+dict_converter.py2rpy.register(np.int_, lambda x: conversion.py2rpy(int(x)))
+dict_converter.py2rpy.register(np.float_, lambda x: conversion.py2rpy(float(x)))
+dict_converter.py2rpy.register(np.bytes_, lambda x: conversion.py2rpy(bytes(x)))
+dict_converter.py2rpy.register(np.str_, lambda x: conversion.py2rpy(str(x)))
 
 
 @dict_converter.py2rpy.register(dict)
@@ -24,7 +34,7 @@ def py2rpy_dict(obj: dict) -> ListVector:
         try:
             converted[str(k)] = conversion.py2rpy(v)
         except NotImplementedError as e:
-            warn(str(e))
+            warn(str(e), NotConvertedWarning)
     # This tries to convert everything again. This works because py2rpy(Sexp) is the identity function
     return ListVector(converted)
 
