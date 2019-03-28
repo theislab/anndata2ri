@@ -1,21 +1,9 @@
 from typing import Optional
 
-from rpy2.robjects import conversion, pandas2ri
-from rpy2.robjects.conversion import overlay_converter
-
+from rpy2.robjects import conversion, numpy2ri
 
 original_converter: Optional[conversion.Converter] = None
-converter = conversion.Converter("original anndata conversion")
-
-
-def full_converter() -> conversion.Converter:
-    pandas2ri.activate()
-    new_converter = conversion.Converter("anndata conversion", template=conversion.converter)
-    pandas2ri.deactivate()
-
-    overlay_converter(converter, new_converter)
-
-    return new_converter
+converter = conversion.Converter("original scipy conversion")
 
 
 def activate():
@@ -25,8 +13,12 @@ def activate():
     if original_converter is not None:
         return
 
-    new_converter = full_converter()
     original_converter = conversion.converter
+
+    numpy2ri.activate()
+    new_converter = conversion.Converter("scipy conversion", template=conversion.converter)
+    numpy2ri.deactivate()
+
     conversion.set_conversion(new_converter)
 
 
