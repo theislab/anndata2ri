@@ -19,7 +19,11 @@ def full_converter() -> conversion.Converter:
 
 
 def activate():
-    """Activate!"""
+    """
+    Activate conversion for :class:`~anndata.AnnData` objects
+    as well as :doc:`numpy` arrays and :class:`pandas.DataFrame`\ s
+    via ``rpy2.robjects.numpy2ri`` and ``rpy2.robjects.pandas2ri``.
+    """
     global original_converter
 
     if original_converter is not None:
