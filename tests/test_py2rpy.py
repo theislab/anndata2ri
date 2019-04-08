@@ -21,16 +21,21 @@ def mk_ad_simple():
     )
 
 
-def check_simple(ex):
+def check_empty(ex):
+    pass
+
+
+def check_pca(ex):
     sce = importr("SingleCellExperiment")
     assert [str(n) for n in sce.reducedDimNames(ex)] == ["PCA"]
     pca = sce.reducedDim(ex, "PCA")
     assert tuple(baseenv["dim"](pca)) == (2, 4)
 
 
-ad_empty = lambda x: None, (0, 0), AnnData
-ad_simple = check_simple, (2, 3), mk_ad_simple
-ad_krumsi = lambda x: None, (640, 11), sc.datasets.krumsiek11
+ad_empty = check_empty, (0, 0), AnnData
+ad_simple = check_pca, (2, 3), mk_ad_simple
+ad_krumsi = check_empty, (640, 11), sc.datasets.krumsiek11
+ad_paul15 = check_empty, (1, 1), sc.datasets.paul15
 
 
 @pytest.mark.parametrize("check,shape,dataset", [ad_empty, ad_simple, ad_krumsi])

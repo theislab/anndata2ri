@@ -75,4 +75,5 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
     with localconverter(full_converter()):
         uns = dict(metadata.items())
 
-    return AnnData(exprs, obs, var, uns, obsm, layers=layers)
+    # TODO: Once the AnnData bug is fixed, remove the “or None”
+    return AnnData(exprs, obs, var, uns, obsm or None, layers=layers)
