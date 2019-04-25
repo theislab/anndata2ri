@@ -1,19 +1,28 @@
 from functools import wraps
+from typing import Optional, Any, Callable, Tuple
 
 import numpy as np
-from rpy2.robjects import default_converter, numpy2ri  # , baseenv as base
+from rpy2.rinterface import Sexp
+from rpy2.robjects import default_converter, numpy2ri, baseenv
+from rpy2.robjects import BoolVector, IntVector, FloatVector
 from rpy2.robjects.conversion import localconverter
-from rpy2.robjects.packages import importr
+from rpy2.robjects.packages import importr, Package
 from scipy import sparse
 
 from .conv import converter
 
 
-def get_type_letter(dtype: np.dtype):
+methods: Optional[Package] = None
+as_logical: Optional[Callable[[Any], BoolVector]] = None
+as_integer: Optional[Callable[[Any], IntVector]] = None
+as_double: Optional[Callable[[Any], FloatVector]] = None
+
+
+def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp]]:
     if np.issubdtype(dtype, np.floating):
-        return "d"
+        return "d", as_double
     elif np.issubdtype(dtype, bool):
-        return "l"
+        return "l", as_logical
     else:
         raise ValueError(f"Unknown dtype {dtype!r} cannot be converted to ?gRMatrix.")
 
@@ -21,45 +30,71 @@ def get_type_letter(dtype: np.dtype):
 def py2r_context(f):
     @wraps(f)
     def wrapper(obj):
-        importr("Matrix")  # make class available
+        global methods, as_logical, as_integer, as_double
+        if methods is None:
+            importr("Matrix")  # make class available
+            methods = importr("methods")
+            as_logical = baseenv["as.logical"]
+            as_integer = baseenv["as.integer"]
+            as_double = baseenv["as.double"]
+
         with localconverter(default_converter + numpy2ri.converter):
             return f(obj)
 
     return wrapper
 
 
-@converter.rpy2py.register(sparse.csr_matrix)
-@py2r_context
-def csr_to_rmat(csr: sparse.csr_matrix):
-    methods = importr("methods")
-    t = get_type_letter(csr.dtype)
-    return methods.new(f"{t}gRMatrix", i=csr.indices, p=csr.indptr, x=csr.data, Dim=list(csr.shape))
-
-
-@converter.rpy2py.register(sparse.csc_matrix)
+@converter.py2rpy.register(sparse.csc_matrix)
 @py2r_context
 def csc_to_rmat(csc: sparse.csc_matrix):
-    methods = importr("methods")
-    t = get_type_letter(csc.dtype)
-    return methods.new(f"{t}gCMatrix", j=csc.indices, p=csc.indptr, x=csc.data, Dim=list(csc.shape))
+    t, conv_data = get_type_conv(csc.dtype)
+    return methods.new(
+        f"{t}gCMatrix",
+        i=as_integer(csc.indices),
+        p=as_integer(csc.indptr),
+        x=conv_data(csc.data),
+        Dim=as_integer(list(csc.shape)),
+    )
 
 
-@converter.rpy2py.register(sparse.coo_matrix)
+@converter.py2rpy.register(sparse.csr_matrix)
+@py2r_context
+def csr_to_rmat(csr: sparse.csr_matrix):
+    t, conv_data = get_type_conv(csr.dtype)
+    return methods.new(
+        f"{t}gRMatrix",
+        j=as_integer(csr.indices),
+        p=as_integer(csr.indptr),
+        x=conv_data(csr.data),
+        Dim=as_integer(list(csr.shape)),
+    )
+
+
+@converter.py2rpy.register(sparse.coo_matrix)
 @py2r_context
 def coo_to_rmat(coo: sparse.coo_matrix):
-    methods = importr("methods")
-    t = get_type_letter(coo.dtype)
-    return methods.new(f"{t}gTMatrix", i=coo.row, j=coo.col, x=coo.data, Dim=list(coo.shape))
+    t, conv_data = get_type_conv(coo.dtype)
+    return methods.new(
+        f"{t}gTMatrix",
+        i=as_integer(coo.row),
+        j=as_integer(coo.col),
+        x=conv_data(coo.data),
+        Dim=as_integer(list(coo.shape)),
+    )
 
 
-@converter.rpy2py.register(sparse.dia_matrix)
+@converter.py2rpy.register(sparse.dia_matrix)
 @py2r_context
 def dia_to_rmat(dia: sparse.dia_matrix):
-    methods = importr("methods")
-    t = get_type_letter(dia.dtype)
+    t, conv_data = get_type_conv(dia.dtype)
     if len(dia.offsets) > 1:
         raise ValueError(
             "Cannot convert a dia_matrix with more than 1 diagonal to a *diMatrix. "
             f"R diagonal matrices only support 1 diagonal, but this has {len(dia.offsets)}."
         )
-    return methods.new(f"{t}gTMatrix", x=dia.data, diag="U" if np.all(dia.data == 1) else "N", Dim=list(dia.shape))
+    return methods.new(
+        f"{t}gTMatrix",
+        x=conv_data(dia.data),
+        diag="U" if np.all(dia.data == 1) else "N",
+        Dim=as_integer(list(dia.shape)),
+    )

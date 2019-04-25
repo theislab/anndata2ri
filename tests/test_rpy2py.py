@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from anndata import AnnData
 from rpy2.robjects import r, default_converter
-from rpy2.robjects.conversion import ConversionContext
+from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.packages import importr, data
 
 import anndata2ri
@@ -59,7 +59,7 @@ def test_convert_manual(check, shape, dataset):
 def test_convert_with(check, shape, dataset):
     # Needs default_converter to call `as` on the SummarizedExperiment:
     # Calling a R function returning a S4 object requires py2rpy[RS4], py2rpy[str], …
-    with ConversionContext(default_converter + anndata2ri.converter):
+    with localconverter(default_converter + anndata2ri.converter):
         ad = dataset()
     assert isinstance(ad, AnnData)
     assert ad.shape == shape

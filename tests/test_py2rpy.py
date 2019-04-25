@@ -5,12 +5,12 @@ import numpy as np
 import pytest
 import scanpy as sc
 from anndata import AnnData
-from rpy2.robjects import baseenv, globalenv, r
-from rpy2.robjects.conversion import ConversionContext
+from rpy2.robjects import baseenv, globalenv
 from rpy2.robjects.packages import importr
 
 import anndata2ri
 from anndata2ri.py2r import NotConvertedWarning
+from anndata2ri.test_utils import conversions_py2rpy
 
 
 def mk_ad_simple():
@@ -35,33 +35,13 @@ def check_pca(ex):
 ad_empty = check_empty, (0, 0), AnnData
 ad_simple = check_pca, (2, 3), mk_ad_simple
 ad_krumsi = check_empty, (640, 11), sc.datasets.krumsiek11
-ad_paul15 = check_empty, (1, 1), sc.datasets.paul15
+# ad_paul15 = check_empty, (2730, 3451), sc.datasets.paul15
 
 
-@pytest.mark.parametrize("check,shape,dataset", [ad_empty, ad_simple, ad_krumsi])
-def test_py2rpy_manual(check, shape, dataset):
-    ex = anndata2ri.converter.py2rpy(dataset())
-    assert tuple(baseenv["dim"](ex)[::-1]) == shape
-    check(ex)
-
-
-@pytest.mark.parametrize("check,shape,dataset", [ad_empty, ad_simple, ad_krumsi])
-def test_py2rpy_with(check, shape, dataset):
-    with ConversionContext(anndata2ri.converter):
-        globalenv["adata"] = dataset()
-    ex = globalenv["adata"]
-    assert tuple(baseenv["dim"](ex)[::-1]) == shape
-    check(ex)
-
-
-@pytest.mark.parametrize("check,shape,dataset", [ad_empty, ad_simple, ad_krumsi])
-def test_py2rpy_activate(check, shape, dataset):
-    try:
-        anndata2ri.activate()
-        globalenv["adata"] = dataset()
-    finally:
-        anndata2ri.deactivate()
-    ex = globalenv["adata"]
+@pytest.mark.parametrize("conversion", conversions_py2rpy)
+@pytest.mark.parametrize("check,shape,dataset", [ad_empty, ad_simple, ad_krumsi])  # , ad_paul15])
+def test_py2rpy_manual(conversion, check, shape, dataset):
+    ex = conversion(anndata2ri, dataset())
     assert tuple(baseenv["dim"](ex)[::-1]) == shape
     check(ex)
 
@@ -75,8 +55,6 @@ def test_py2rpy2_numpy_pbmc68k():
         with catch_warnings(record=True) as logs:  # type: List[WarningMessage]
             simplefilter("ignore", DeprecationWarning)
             globalenv["adata"] = pbmc68k_reduced()
-        assert len(logs) == 1, [m.message for m in logs]
-        assert logs[0].category is NotConvertedWarning
-        assert "scipy.sparse.csr.csr_matrix" in str(logs[0].message)
+        assert len(logs) == 0, [m.message for m in logs]
     finally:
         anndata2ri.deactivate()
