@@ -1,10 +1,10 @@
 from functools import wraps
-from typing import Optional, Any, Callable, Tuple
+from typing import Optional, Any, Callable, Tuple, Type
 
 import numpy as np
 from rpy2.rinterface import Sexp
 from rpy2.robjects import default_converter, numpy2ri, baseenv
-from rpy2.robjects import BoolVector, IntVector, FloatVector
+from rpy2.robjects import Vector, BoolVector, IntVector, FloatVector
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.packages import importr, Package
 from scipy import sparse
@@ -18,11 +18,11 @@ as_integer: Optional[Callable[[Any], IntVector]] = None
 as_double: Optional[Callable[[Any], FloatVector]] = None
 
 
-def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp]]:
+def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp], Type[Vector]]:
     if np.issubdtype(dtype, np.floating):
-        return "d", as_double
+        return "d", as_double, FloatVector
     elif np.issubdtype(dtype, bool):
-        return "l", as_logical
+        return "l", as_logical, BoolVector
     else:
         raise ValueError(f"Unknown dtype {dtype!r} cannot be converted to ?gRMatrix.")
 
@@ -47,7 +47,7 @@ def py2r_context(f):
 @converter.py2rpy.register(sparse.csc_matrix)
 @py2r_context
 def csc_to_rmat(csc: sparse.csc_matrix):
-    t, conv_data = get_type_conv(csc.dtype)
+    t, conv_data, _ = get_type_conv(csc.dtype)
     return methods.new(
         f"{t}gCMatrix",
         i=as_integer(csc.indices),
@@ -60,7 +60,7 @@ def csc_to_rmat(csc: sparse.csc_matrix):
 @converter.py2rpy.register(sparse.csr_matrix)
 @py2r_context
 def csr_to_rmat(csr: sparse.csr_matrix):
-    t, conv_data = get_type_conv(csr.dtype)
+    t, conv_data, _ = get_type_conv(csr.dtype)
     return methods.new(
         f"{t}gRMatrix",
         j=as_integer(csr.indices),
@@ -73,7 +73,7 @@ def csr_to_rmat(csr: sparse.csr_matrix):
 @converter.py2rpy.register(sparse.coo_matrix)
 @py2r_context
 def coo_to_rmat(coo: sparse.coo_matrix):
-    t, conv_data = get_type_conv(coo.dtype)
+    t, conv_data, _ = get_type_conv(coo.dtype)
     return methods.new(
         f"{t}gTMatrix",
         i=as_integer(coo.row),
@@ -86,7 +86,7 @@ def coo_to_rmat(coo: sparse.coo_matrix):
 @converter.py2rpy.register(sparse.dia_matrix)
 @py2r_context
 def dia_to_rmat(dia: sparse.dia_matrix):
-    t, conv_data = get_type_conv(dia.dtype)
+    t, conv_data, vec_cls = get_type_conv(dia.dtype)
     if len(dia.offsets) > 1:
         raise ValueError(
             "Cannot convert a dia_matrix with more than 1 diagonal to a *diMatrix. "
@@ -95,7 +95,7 @@ def dia_to_rmat(dia: sparse.dia_matrix):
     is_unit = np.all(dia.data == 1)
     return methods.new(
         f"{t}diMatrix",
-        x=FloatVector([]) if is_unit else conv_data(dia.data),
+        x=vec_cls([]) if is_unit else conv_data(dia.data),
         diag="U" if is_unit else "N",
         Dim=as_integer(list(dia.shape)),
     )
