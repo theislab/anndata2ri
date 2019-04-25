@@ -8,6 +8,7 @@ from anndata2ri.test_utils import conversions_py2rpy
 
 
 mats = [
+    pytest.param((0, 0), sparse.csr_matrix((0, 0)), "gR", id="csr-empty"),
     pytest.param((2, 3), sparse.csr_matrix([[2.0, 0.0, 1.0], [0.0, 0.1, 0.0]]), "gR", id="csr"),
     pytest.param((3, 2), sparse.csc_matrix([[2.0, 0.0], [1.0, 0.0], [0.1, 0.0]]), "gC", id="csc"),
     pytest.param((2, 4), sparse.coo_matrix([[2.0, 0.0, 1.0, 0.0], [0.0, 0.1, 0.0, 3.0]]), "gT", id="coo"),
