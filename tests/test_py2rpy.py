@@ -9,7 +9,6 @@ from rpy2.robjects import baseenv, globalenv
 from rpy2.robjects.packages import importr
 
 import anndata2ri
-from anndata2ri.py2r import NotConvertedWarning
 from anndata2ri.test_utils import conversions_py2rpy
 
 
