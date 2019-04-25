@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from types import ModuleType
 from typing import List, Callable, Any
 
+import pytest
 from rpy2.rinterface import Sexp
 from rpy2.robjects import globalenv
 from rpy2.robjects.conversion import localconverter, Converter
@@ -42,7 +43,7 @@ def conversion_py2rpy_activate(conv_mod: ConversionModule, dataset: Any) -> Sexp
 
 
 conversions_py2rpy: List[Callable[[ConversionModule, Any], Sexp]] = [
-    conversion_py2rpy_manual,
-    conversion_py2rpy_localconv,
-    conversion_py2rpy_activate,
+    pytest.param(conversion_py2rpy_manual, id="manual"),
+    pytest.param(conversion_py2rpy_localconv, id="local"),
+    pytest.param(conversion_py2rpy_activate, id="activate"),
 ]

@@ -32,15 +32,17 @@ def check_pca(ex):
     assert tuple(baseenv["dim"](pca)) == (2, 4)
 
 
-ad_empty = check_empty, (0, 0), AnnData
-ad_simple = check_pca, (2, 3), mk_ad_simple
-ad_krumsi = check_empty, (640, 11), sc.datasets.krumsiek11
-# ad_paul15 = check_empty, (2730, 3451), sc.datasets.paul15
+datasets = [
+    pytest.param(check_empty, (0, 0), AnnData, id="empty"),
+    pytest.param(check_pca, (2, 3), mk_ad_simple, id="simple"),
+    pytest.param(check_empty, (640, 11), sc.datasets.krumsiek11, id="krumsiek"),
+    # pytest.param(check_empty, (2730, 3451), sc.datasets.paul15, id="paul"),
+]
 
 
 @pytest.mark.parametrize("conversion", conversions_py2rpy)
-@pytest.mark.parametrize("check,shape,dataset", [ad_empty, ad_simple, ad_krumsi])  # , ad_paul15])
-def test_py2rpy_manual(conversion, check, shape, dataset):
+@pytest.mark.parametrize("check,shape,dataset", datasets)
+def test_py2rpy(conversion, check, shape, dataset):
     ex = conversion(anndata2ri, dataset())
     assert tuple(baseenv["dim"](ex)[::-1]) == shape
     check(ex)

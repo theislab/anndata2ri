@@ -93,7 +93,7 @@ def dia_to_rmat(dia: sparse.dia_matrix):
             f"R diagonal matrices only support 1 diagonal, but this has {len(dia.offsets)}."
         )
     return methods.new(
-        f"{t}gTMatrix",
+        f"{t}diMatrix",
         x=conv_data(dia.data),
         diag="U" if np.all(dia.data == 1) else "N",
         Dim=as_integer(list(dia.shape)),
