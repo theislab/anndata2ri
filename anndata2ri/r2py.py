@@ -11,7 +11,7 @@ from rpy2.robjects.packages import importr
 
 from . import conv_name
 from .conv import converter, full_converter
-from .scipy2ri.support import supported_r_matrix_classes
+from .scipy2ri import supported_r_matrix_classes
 from .scipy2ri.r2py import rmat_to_spmat
 
 

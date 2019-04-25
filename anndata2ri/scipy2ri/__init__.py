@@ -22,8 +22,7 @@ R                                                    Python
 ===================================================  ======================================================
 """
 
-from typing import Union, Iterable, FrozenSet
-
+from .support import supported_r_matrix_types, supported_r_matrix_storage, supported_r_matrix_classes
 from .conv import converter, activate, deactivate
 from . import py2r, r2py
 
