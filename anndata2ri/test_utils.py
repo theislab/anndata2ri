@@ -54,7 +54,7 @@ def conversion_rpy2py_manual(conv_mod: ConversionModule, dataset: Callable[[], S
 
 
 def conversion_rpy2py_local(conv_mod: ConversionModule, dataset: Callable[[], Sexp]) -> Any:
-    # Needs default_converter to call `as` on the SummarizedExperiment:
+    # Needs default_converter to e.g. call `as` on a SummarizedExperiment:
     # Calling a R function returning a S4 object requires py2rpy[RS4], py2rpy[str], …
     with localconverter(default_converter + conv_mod.converter):
         return dataset()

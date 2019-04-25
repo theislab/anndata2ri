@@ -1,9 +1,10 @@
 """
 Converter between Python’s AnnData and R’s SingleCellExperiment.
 """
-
+from typing import Any
 
 from get_version import get_version
+from rpy2.rinterface import Sexp
 
 __author__ = "Philipp Angerer"
 __version__ = get_version(__file__)
@@ -15,7 +16,7 @@ try:  # This is so that flit can import this. There must be a better way.
     from .conv import converter, activate, deactivate
     from . import py2r, r2py
 
-    def py2rpy(obj: object):
+    def py2rpy(obj: Any) -> Sexp:
         """
         Convert Python objects to R interface objects. Supports:
 
@@ -23,7 +24,7 @@ try:  # This is so that flit can import this. There must be a better way.
         """
         return converter.py2rpy(obj)
 
-    def rpy2py(obj: object):
+    def rpy2py(obj: Any) -> Sexp:
         """
         Convert R interface objects to Python objects. Supports:
 

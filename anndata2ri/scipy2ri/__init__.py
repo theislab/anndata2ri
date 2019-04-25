@@ -21,13 +21,16 @@ R                                                    Python
 :rcls:`Matrix::ldiMatrix`                            :class:`~scipy.sparse.dia_matrix`\ ``(dtype=bool)``
 ===================================================  ======================================================
 """
+from typing import Any
+
+from rpy2.rinterface import Sexp
 
 from .support import supported_r_matrix_types, supported_r_matrix_storage, supported_r_matrix_classes
 from .conv import converter, activate, deactivate
 from . import py2r, r2py
 
 
-def py2rpy(obj: object):
+def py2rpy(obj: Any) -> Sexp:
     """
     Convert scipy sparse matrices objects to R sparse matrices. Supports:
 
@@ -43,7 +46,7 @@ def py2rpy(obj: object):
     return converter.py2rpy(obj)
 
 
-def rpy2py(obj: object):
+def rpy2py(obj: Any) -> Sexp:
     """
     Convert R sparse matrices to scipy sparse matrices. Supports:
 
