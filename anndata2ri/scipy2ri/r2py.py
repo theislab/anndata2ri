@@ -18,7 +18,7 @@ def rmat_to_spmat(rmat: SexpS4):
             ("C", sparse.csc_matrix, lambda: [slots["i"], slots["p"]]),
             ("R", sparse.csr_matrix, lambda: [slots["j"], slots["p"]]),
             ("T", sparse.coo_matrix, lambda: [(slots["i"], slots["j"])]),
-            ("di", sparse.coo_matrix, lambda: []),
+            ("di", sparse.coo_matrix, lambda: [[0]]),
         ]:
             if supported_r_matrix_classes(storage=storage) in r_classes:
                 return mat_cls((slots["x"], *idx()), shape=shape)
