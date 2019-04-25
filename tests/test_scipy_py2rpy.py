@@ -12,6 +12,8 @@ mats = [
     pytest.param((3, 2), sparse.csc_matrix([[2.0, 0.0], [1.0, 0.0], [0.1, 0.0]]), id="csc"),
     pytest.param((2, 4), sparse.coo_matrix([[2.0, 0.0, 1.0, 0.0], [0.0, 0.1, 0.0, 3.0]]), id="coo"),
     pytest.param((4, 4), sparse.dia_matrix(([2.0, 0.4, 1.0, 0.0], [0]), (4, 4)), id="dia"),
+    pytest.param((3, 3), sparse.dia_matrix(([0.0, 0.0, 0.0], [0]), (3, 3)), id="dia_empty"),
+    pytest.param((4, 4), sparse.dia_matrix(([1.0, 1.0, 1.0, 1.0], [0]), (4, 4)), id="dia_unit"),
 ]
 
 

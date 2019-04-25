@@ -92,9 +92,10 @@ def dia_to_rmat(dia: sparse.dia_matrix):
             "Cannot convert a dia_matrix with more than 1 diagonal to a *diMatrix. "
             f"R diagonal matrices only support 1 diagonal, but this has {len(dia.offsets)}."
         )
+    is_unit = np.all(dia.data == 1)
     return methods.new(
         f"{t}diMatrix",
-        x=conv_data(dia.data),
-        diag="U" if np.all(dia.data == 1) else "N",
+        x=FloatVector([]) if is_unit else conv_data(dia.data),
+        diag="U" if is_unit else "N",
         Dim=as_integer(list(dia.shape)),
     )
