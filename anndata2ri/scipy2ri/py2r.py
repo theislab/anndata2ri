@@ -57,4 +57,9 @@ def coo_to_rmat(coo: sparse.coo_matrix):
 def dia_to_rmat(dia: sparse.dia_matrix):
     methods = importr("methods")
     t = get_type_letter(dia.dtype)
+    if len(dia.offsets) > 1:
+        raise ValueError(
+            "Cannot convert a dia_matrix with more than 1 diagonal to a *diMatrix. "
+            f"R diagonal matrices only support 1 diagonal, but this has {len(dia.offsets)}."
+        )
     return methods.new(f"{t}gTMatrix", x=dia.data, diag="U" if np.all(dia.data == 1) else "N", Dim=list(dia.shape))
