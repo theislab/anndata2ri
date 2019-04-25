@@ -15,7 +15,6 @@ try:  # This is so that flit can import this. There must be a better way.
     from .conv import converter, activate, deactivate
     from . import py2r, r2py
 
-
     def py2rpy(obj: object):
         """
         Convert Python objects to R interface objects. Supports:
@@ -23,7 +22,6 @@ try:  # This is so that flit can import this. There must be a better way.
         - :class:`~anndata.AnnData` → :rcls:`SingleCellExperiment::SingleCellExperiment`
         """
         return converter.py2rpy(obj)
-
 
     def rpy2py(obj: object):
         """
@@ -33,6 +31,8 @@ try:  # This is so that flit can import this. There must be a better way.
         - :rcls:`S4Vectors::DataFrame` → :class:`~pandas.DataFrame`
         """
         return converter.rpy2py(obj)
+
+
 except ImportError as e:
     import warnings
 

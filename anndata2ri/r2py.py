@@ -11,6 +11,8 @@ from rpy2.robjects.packages import importr
 
 from . import conv_name
 from .conv import converter, full_converter
+from .scipy2ri.support import supported_r_matrix_classes
+from .scipy2ri.r2py import rmat_to_spmat
 
 
 @converter.rpy2py.register(SexpS4)
@@ -18,10 +20,13 @@ def rpy2py_s4(obj: SexpS4) -> Optional[Union[pd.DataFrame, AnnData]]:
     """
     See here for the slots: https://bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html
     """
-    if "DataFrame" in obj.rclass:
+    r_classes = set(obj.rclass)
+    if "DataFrame" in r_classes:
         return rpy2py_data_frame(obj)
-    elif "SingleCellExperiment" in obj.rclass:
+    elif "SingleCellExperiment" in r_classes:
         return rpy2py_single_cell_experiment(obj)
+    elif supported_r_matrix_classes() & r_classes:
+        return rmat_to_spmat(obj)
     else:  # Don’t use the registered one, it would lead to recursion.
         return default_converter.rpy2py(obj)
 

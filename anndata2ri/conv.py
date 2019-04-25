@@ -3,6 +3,8 @@ from typing import Optional
 from rpy2.robjects import conversion, pandas2ri
 from rpy2.robjects.conversion import overlay_converter
 
+from . import scipy2ri
+
 
 original_converter: Optional[conversion.Converter] = None
 converter = conversion.Converter("original anndata conversion")
@@ -13,6 +15,8 @@ def full_converter() -> conversion.Converter:
     new_converter = conversion.Converter("anndata conversion", template=conversion.converter)
     pandas2ri.deactivate()
 
+    overlay_converter(scipy2ri.converter, new_converter)
+    # overwrite the scipy2ri Sexp4 converter and add our others
     overlay_converter(converter, new_converter)
 
     return new_converter

@@ -22,6 +22,8 @@ R                                                    Python
 ===================================================  ======================================================
 """
 
+from typing import Union, Iterable, FrozenSet
+
 from .conv import converter, activate, deactivate
 from . import py2r, r2py
 
