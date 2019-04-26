@@ -8,7 +8,11 @@ converter = conversion.Converter("original scipy conversion")
 
 
 def activate():
-    """Activate!"""
+    """
+    Activate conversion between sparse matrices from Scipy and R’s Matrix package.
+
+    Does nothing if this is the active conversion.
+    """
     global original_converter
 
     if original_converter is not None:
@@ -26,7 +30,7 @@ def activate():
 
 
 def deactivate():
-    """Deactivate!"""
+    """Deactivate the conversion described above if it is active."""
     global original_converter
 
     if original_converter is None:

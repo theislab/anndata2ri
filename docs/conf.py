@@ -69,6 +69,9 @@ intersphinx_mapping = dict(
 
 
 html_theme = "sphinx_rtd_theme"
+html_theme_options = dict(
+    collapse_navigation=True,
+)
 html_context = dict(
     display_github=True,
     github_user="theislab",

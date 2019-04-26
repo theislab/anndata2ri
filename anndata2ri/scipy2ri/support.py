@@ -1,6 +1,7 @@
 from typing import Union, Iterable, FrozenSet
 
 
+# these are documented in __init__.py because of sphinx limitations
 supported_r_matrix_types = frozenset({"d", "l", "p"})
 supported_r_matrix_storage = frozenset({"C", "R", "T", "di"})
 

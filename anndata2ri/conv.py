@@ -27,6 +27,8 @@ def activate():
     Activate conversion for :class:`~anndata.AnnData` objects
     as well as :doc:`numpy` arrays and :class:`pandas.DataFrame`\ s
     via ``rpy2.robjects.numpy2ri`` and ``rpy2.robjects.pandas2ri``.
+
+    Does nothing if this is the active converter.
     """
     global original_converter
 
@@ -39,7 +41,7 @@ def activate():
 
 
 def deactivate():
-    """Deactivate!"""
+    """Deactivate the conversion described above if it is active."""
     global original_converter
 
     if original_converter is None:

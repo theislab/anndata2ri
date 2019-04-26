@@ -1,10 +1,14 @@
 """
 Converter between Python’s AnnData and R’s SingleCellExperiment.
 """
+__all__ = ["activate", "deactivate", "py2rpy", "rpy2py", "converter"]
+
+
 from typing import Any
 
 from get_version import get_version
 from rpy2.rinterface import Sexp
+
 
 __author__ = "Philipp Angerer"
 __version__ = get_version(__file__)

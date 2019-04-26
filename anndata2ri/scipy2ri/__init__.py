@@ -21,6 +21,18 @@ R                                                    Python
 :rcls:`Matrix::ldiMatrix`                            :class:`~scipy.sparse.dia_matrix`\ ``(dtype=bool)``
 ===================================================  ======================================================
 """
+__all__ = [
+    "activate",
+    "deactivate",
+    "py2rpy",
+    "rpy2py",
+    "converter",
+    "supported_r_matrix_types",
+    "supported_r_matrix_storage",
+    "supported_r_matrix_classes",
+]
+
+
 from typing import Any
 
 from rpy2.rinterface import Sexp
@@ -28,6 +40,13 @@ from rpy2.rinterface import Sexp
 from .support import supported_r_matrix_types, supported_r_matrix_storage, supported_r_matrix_classes
 from .conv import converter, activate, deactivate
 from . import py2r, r2py
+
+
+supported_r_matrix_types = supported_r_matrix_types
+"""The Matrix data types supported by this module; Double, Logical, and Pattern."""
+
+supported_r_matrix_storage = supported_r_matrix_storage
+"""The Matrix storage types supported by this module; Column-sparse, Row-Sparse, Triplets, and DIagonal."""
 
 
 def py2rpy(obj: Any) -> Sexp:
