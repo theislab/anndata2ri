@@ -13,8 +13,8 @@ def supported_r_matrix_classes(
     """
     Get supported classes, possibly limiting data types or storage types.
 
-    :param types: Data type character(s) from ``supported_r_matrix_types``
-    :param storage: Storage mode(s) from ``supported_r_matrix_storage``
+    :param types: Data type character(s) from :data:`supported_r_matrix_types`
+    :param storage: Storage mode(s) from :data:`supported_r_matrix_storage`
     :return: All supported classes with those characters
     """
     types = {types} if isinstance(types, str) else set(types)

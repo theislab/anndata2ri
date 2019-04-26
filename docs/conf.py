@@ -39,7 +39,6 @@ pygments_style = "sphinx"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx_autodoc_typehints",
     "scanpydoc",
@@ -81,6 +80,9 @@ html_context = dict(
 )
 
 
+# -- Add R links ----------------------------------------------------------
+
+
 class RManRefRole(XRefRole):
     nodeclass = nodes.reference
 
@@ -109,6 +111,13 @@ class RManRefRole(XRefRole):
 def setup(app: Sphinx):
     app.add_role("rman", RManRefRole())
     app.add_role("rcls", RManRefRole(cls=True))
+
+# -- Quick fixes ---------------------------------------------------------------
+
+
+from rpy2.rinterface import Sexp
+
+Sexp.__module__ = "rpy2.rinterface"
 
 
 # -- Options for other output formats ------------------------------------------
