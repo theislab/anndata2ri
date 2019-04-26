@@ -9,8 +9,8 @@ env:
 
 # matrix
 python:
-  - 3.6
-  - 3.7
+  - '3.6'
+  - '3.7'
 
 # packages
 addons:
@@ -19,8 +19,8 @@ addons:
       - r-base
 # install basic requirements
 before_install:
-  - R --slave -e 'install.packages("BiocManager")'
-  - R --slave -e 'BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
+  - sudo R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'
+  - sudo R --slave -e 'BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
   - pip install flit future-fstrings get_version hg+https://bitbucket.org/rpy2/rpy2
 # install package
 install:
