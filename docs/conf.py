@@ -68,9 +68,7 @@ intersphinx_mapping = dict(
 
 
 html_theme = "sphinx_rtd_theme"
-html_theme_options = dict(
-    collapse_navigation=True,
-)
+html_theme_options = dict(collapse_navigation=True)
 html_context = dict(
     display_github=True,
     github_user="theislab",
@@ -111,6 +109,7 @@ class RManRefRole(XRefRole):
 def setup(app: Sphinx):
     app.add_role("rman", RManRefRole())
     app.add_role("rcls", RManRefRole(cls=True))
+
 
 # -- Quick fixes ---------------------------------------------------------------
 

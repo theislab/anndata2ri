@@ -2,7 +2,7 @@ from typing import Union, Iterable, FrozenSet
 
 
 # these are documented in __init__.py because of sphinx limitations
-supported_r_matrix_types = frozenset({"d", "l", "p"})
+supported_r_matrix_types = frozenset({"d", "l", "n"})
 supported_r_matrix_storage = frozenset({"C", "R", "T", "di"})
 
 
@@ -29,5 +29,5 @@ def supported_r_matrix_classes(
 
     classes = {f"{t}g{s}Matrix" for t in types for s in storage - {"di"}}
     if "di" in storage:
-        classes |= {f"{t}diMatrix" for t in types - {"p"}}
+        classes |= {f"{t}diMatrix" for t in types - {"n"}}
     return frozenset(classes)

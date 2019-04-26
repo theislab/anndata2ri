@@ -1,5 +1,6 @@
 from warnings import warn
 
+import numpy as np
 from rpy2.rinterface import SexpS4
 from rpy2.robjects import default_converter, numpy2ri, baseenv
 from rpy2.robjects.conversion import localconverter
@@ -16,14 +17,20 @@ def rmat_to_spmat(rmat: SexpS4):
     with localconverter(default_converter + numpy2ri.converter):
         shape = tuple(baseenv["dim"](rmat))
         r_classes = set(rmat.rclass)
-        for storage, mat_cls, idx in [
-            ("C", sparse.csc_matrix, lambda: [slots["i"], slots["p"]]),
-            ("R", sparse.csr_matrix, lambda: [slots["j"], slots["p"]]),
-            ("T", sparse.coo_matrix, lambda: [(slots["i"], slots["j"])]),
-            ("di", sparse.dia_matrix, lambda: [[0]]),
+        for storage, mat_cls, idx, nnz in [
+            ("C", sparse.csc_matrix, lambda: [slots["i"], slots["p"]], lambda c: len(c[0])),
+            ("R", sparse.csr_matrix, lambda: [slots["j"], slots["p"]], lambda c: len(c[0])),
+            ("T", sparse.coo_matrix, lambda: [(slots["i"], slots["j"])], lambda c: len(c[0][0])),
+            ("di", sparse.dia_matrix, lambda: [[0]], None),
         ]:
             if supported_r_matrix_classes(storage=storage) & r_classes:
-                return mat_cls((slots["x"], *idx()), shape=shape)
+                coord_spec = idx()
+                if supported_r_matrix_classes(types="n") & r_classes:
+                    # we have pattern matrix without data (but always i and j!)
+                    data = np.repeat(True, nnz(coord_spec))
+                else:
+                    data = slots["x"]
+                return mat_cls((data, *coord_spec), shape=shape)
     if any(c.endswith("Matrix") for c in r_classes):
         warn(f"Encountered Matrix class that is not supported: {r_classes}")
     return rmat
