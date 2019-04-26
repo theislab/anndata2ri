@@ -23,7 +23,7 @@ def full_converter() -> conversion.Converter:
 
 
 def activate():
-    """
+    r"""
     Activate conversion for :class:`~anndata.AnnData` objects
     as well as :doc:`numpy` arrays and :class:`pandas.DataFrame`\ s
     via ``rpy2.robjects.numpy2ri`` and ``rpy2.robjects.pandas2ri``.

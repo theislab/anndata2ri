@@ -42,7 +42,11 @@ datasets = [
 @pytest.mark.parametrize("conversion", conversions_py2rpy)
 @pytest.mark.parametrize("check,shape,dataset", datasets)
 def test_py2rpy(conversion, check, shape, dataset):
-    ex = conversion(anndata2ri, dataset())
+    if dataset is sc.datasets.krumsiek11:
+        with pytest.warns(UserWarning, match=r"Duplicated obs_names"):
+            ex = conversion(anndata2ri, dataset())
+    else:
+        ex = conversion(anndata2ri, dataset())
     assert tuple(baseenv["dim"](ex)[::-1]) == shape
     check(ex)
 

@@ -1,4 +1,4 @@
-"""
+r"""
 Convert scipy.sparse matrices between Python and R.
 
 For a detailed comparison between the two languages‘,

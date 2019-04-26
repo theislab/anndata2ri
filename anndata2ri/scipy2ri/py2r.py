@@ -21,7 +21,7 @@ as_double: Optional[Callable[[Any], FloatVector]] = None
 def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp], Type[Vector]]:
     if np.issubdtype(dtype, np.floating):
         return "d", as_double, FloatVector
-    elif np.issubdtype(dtype, bool):
+    elif np.issubdtype(dtype, np.bool_):
         return "l", as_logical, BoolVector
     else:
         raise ValueError(f"Unknown dtype {dtype!r} cannot be converted to ?gRMatrix.")

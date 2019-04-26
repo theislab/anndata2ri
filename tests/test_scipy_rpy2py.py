@@ -21,7 +21,7 @@ mats = [
 
 @pytest.mark.parametrize("conversion", conversions_rpy2py)
 @pytest.mark.parametrize("shape,dataset,cls", mats)
-def test_py2rpy(conversion, shape, dataset,cls):
+def test_py2rpy(conversion, shape, dataset, cls):
     sm = conversion(scipy2ri, dataset)
     assert isinstance(sm, cls)
     assert sm.shape == shape
