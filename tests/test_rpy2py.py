@@ -1,12 +1,11 @@
 import pytest
 import pandas as pd
 from anndata import AnnData
-from rpy2.robjects import r, default_converter
-from rpy2.robjects.conversion import ConversionContext
+from rpy2.robjects import r
 from rpy2.robjects.packages import importr, data
 
 import anndata2ri
-
+from anndata2ri.test_utils import conversions_rpy2py
 
 se = importr("SummarizedExperiment")
 sce = importr("SingleCellExperiment")
@@ -25,54 +24,30 @@ def check_example(adata):
 
 
 sumex_allen = sc_rna_seq_data.fetch("allen")["allen"]
-ex_allen = check_allen, (379, 20908), lambda: as_(sumex_allen, "SingleCellExperiment")
-ex_empty = lambda x: None, (0, 0), sce.SingleCellExperiment
-ex_exmpl = (
-    check_example,
-    (100, 200),
-    lambda: r(
-        """
-    local({
-        ncells <- 100
-        u <- matrix(rpois(20000, 5), ncol=ncells)
-        p <- matrix(runif(ncells*5), ncells)
-        t <- matrix(rnorm(ncells*2), ncells)
-        SingleCellExperiment::SingleCellExperiment(
-            assays = list(counts = u, logcounts = log2(u + 1)),
-            reducedDims = S4Vectors::SimpleList(PCA = p, tSNE = t)
-        )
-    })
-    """
-    ),
-)
+code_example = """
+local({
+    ncells <- 100
+    u <- matrix(rpois(20000, 5), ncol=ncells)
+    p <- matrix(runif(ncells*5), ncells)
+    t <- matrix(rnorm(ncells*2), ncells)
+    SingleCellExperiment::SingleCellExperiment(
+        assays = list(counts = u, logcounts = log2(u + 1)),
+        reducedDims = S4Vectors::SimpleList(PCA = p, tSNE = t)
+    )
+})
+"""
+
+expression_sets = [
+    pytest.param(check_allen, (379, 20908), lambda: as_(sumex_allen, "SingleCellExperiment"), id="allen"),
+    pytest.param(lambda x: None, (0, 0), sce.SingleCellExperiment, id="empty"),
+    pytest.param(check_example, (100, 200), lambda: r(code_example), id="example"),
+]
 
 
-@pytest.mark.parametrize("check,shape,dataset", [ex_empty, ex_allen, ex_exmpl])
-def test_convert_manual(check, shape, dataset):
-    ad = anndata2ri.converter.rpy2py(dataset())
-    assert isinstance(ad, AnnData)
-    assert ad.shape == shape
-    check(ad)
-
-
-@pytest.mark.parametrize("check,shape,dataset", [ex_empty, ex_allen, ex_exmpl])
-def test_convert_with(check, shape, dataset):
-    # Needs default_converter to call `as` on the SummarizedExperiment:
-    # Calling a R function returning a S4 object requires py2rpy[RS4], py2rpy[str], …
-    with ConversionContext(default_converter + anndata2ri.converter):
-        ad = dataset()
-    assert isinstance(ad, AnnData)
-    assert ad.shape == shape
-    check(ad)
-
-
-@pytest.mark.parametrize("check,shape,dataset", [ex_empty, ex_allen, ex_exmpl])
-def test_convert_activate(check, shape, dataset):
-    try:
-        anndata2ri.activate()
-        ad = dataset()
-    finally:
-        anndata2ri.deactivate()
+@pytest.mark.parametrize("conversion", conversions_rpy2py)
+@pytest.mark.parametrize("check,shape,dataset", expression_sets)
+def test_convert_manual(conversion, check, shape, dataset):
+    ad = conversion(anndata2ri, dataset)
     assert isinstance(ad, AnnData)
     assert ad.shape == shape
     check(ad)
