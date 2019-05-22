@@ -4,13 +4,13 @@ import pandas as pd
 from anndata import AnnData
 
 from rpy2.rinterface import NULLType, SexpS4
-from rpy2.robjects import numpy2ri, default_converter
+from rpy2.robjects import default_converter
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 from rpy2.robjects.packages import importr
 
 from . import conv_name
-from .conv import converter, full_converter
+from .conv import converter, mat_converter, full_converter
 from .scipy2ri import supported_r_matrix_classes
 from .scipy2ri.r2py import rmat_to_spmat
 
@@ -55,7 +55,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         if not isinstance(assay_names, NULLType):
             assay_names = [str(a) for a in se.assayNames(obj)]
             # The assays can be stored in an env or elsewise so we don’t use obj.slots['assays']
-            assays = [numpy2ri.rpy2py(assay).T for assay in (se.assay(obj, n) for n in assay_names)]
+            assays = [mat_converter.rpy2py(assay).T for assay in (se.assay(obj, n) for n in assay_names)]
             # There’s SingleCellExperiment with no assays
             exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:]))
             assert len(exprs.shape) == 2, exprs.shape
@@ -65,7 +65,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         rdim_names = sce.reducedDimNames(obj)
         if not isinstance(rdim_names, NULLType):
             rdim_names = [str(t) for t in rdim_names]
-            reduced_dims = [numpy2ri.rpy2py(rd) for rd in (sce.reducedDim(obj, t) for t in rdim_names)]
+            reduced_dims = [mat_converter.rpy2py(rd) for rd in (sce.reducedDim(obj, t) for t in rdim_names)]
             obsm = {conv_name.sce2scanpy(n): d for n, d in zip(rdim_names, reduced_dims)}
         else:
             obsm = None
