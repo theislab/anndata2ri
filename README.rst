@@ -6,7 +6,15 @@
 AnnData ↭ SingleCellExperiment
 ==============================
 
-RPy2 converter from AnnData to SCE and back.
+RPy2 converter from AnnData_ to SingleCellExperiment_ and back.
+
+You can for for example use it to process your data using both Scanpy_ and Seurat_, as described in this `example notebook`_
+
+.. _AnnData: https://anndata.readthedocs.io/en/latest/
+.. _SingleCellExperiment: http://bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html
+.. _Scanpy: https://scanpy.readthedocs.io/en/stable/
+.. _Seurat: https://satijalab.org/seurat/
+.. _`example notebook`: https://github.com/LuckyMD/Code_snippets/blob/master/Seurat_to_anndata.ipynb
 
 Installation
 ------------
