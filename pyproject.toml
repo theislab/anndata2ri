@@ -7,7 +7,7 @@ module = 'anndata2ri'
 author = 'Philipp A.'
 author-email = 'flying-sheep@web.de'
 home-page = 'https://github.com/flying-sheep/anndata2ri'
-description-file='README.rst'
+description-file = 'README.rst'
 classifiers = [
     'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
     'Development Status :: 4 - Beta',
@@ -20,7 +20,7 @@ classifiers = [
 requires-python = '>= 3.6'
 requires = [
     'get_version',
-    'rpy2 >= 3.0.0.dev',  # 3.0.1 fixes crashes!
+    'rpy2 >= 3.0.1',
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
