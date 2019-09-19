@@ -1,4 +1,7 @@
-|travis|
+|pypi| |travis|
+
+.. |pypi| image:: https://img.shields.io/pypi/v/anndata2ri
+   :target: https://pypi.org/project/anndata2ri/
 
 .. |travis| image:: https://travis-ci.org/flying-sheep/anndata2ri.svg?branch=master
    :target: https://travis-ci.org/flying-sheep/anndata2ri
