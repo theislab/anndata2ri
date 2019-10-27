@@ -51,7 +51,7 @@ Either use the converter manually …
    from rpy2.robjects import r
    from rpy2.robjects.conversion import localconverter
 
-   with localconverter(anndata2ri.create_converter()):
+   with localconverter(anndata2ri.converter):
        adata = r('as(some_data, "SingleCellExperiment")')
 
 … or activate it globally:
