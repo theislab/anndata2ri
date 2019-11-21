@@ -21,7 +21,7 @@ def rpy2py_s4(obj: SexpS4) -> Optional[Union[pd.DataFrame, AnnData]]:
     See here for the slots: https://bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html
     """
     r_classes = set(obj.rclass)
-    if "DataFrame" in r_classes:
+    if {"DataFrame", "DFrame"} & r_classes:
         return rpy2py_data_frame(obj)
     elif "SingleCellExperiment" in r_classes:
         return rpy2py_single_cell_experiment(obj)
