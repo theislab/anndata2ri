@@ -1,11 +1,11 @@
 language: python
-dist: xenial
+dist: bionic
 cache:
   pip: true
   directories:
     - /home/travis/R/Library
 env:
-  - R_LIB_USER=/home/travis/R/Library
+  - R_LIBS_SITE=/home/travis/R/Library
 
 # matrix
 python:
@@ -15,13 +15,17 @@ python:
 # packages
 addons:
   apt:
+    sources:
+      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'
+        key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE298A3A825C0D65DFD57CBB651716619E084DAB9'
+    update: true
     packages:
       - r-base
 # install basic requirements
 before_install:
   - sudo R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'
-  - sudo R --slave -e 'BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
-  - pip install flit future-fstrings get_version hg+https://bitbucket.org/rpy2/rpy2
+  - sudo R --slave -e 'options(warn = 2); BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
+  - pip install flit get_version rpy2 h5py==2.9.0  # h5py because of https://github.com/theislab/scanpy/issues/832
 # install package
 install:
   - python -m rpy2.situation
