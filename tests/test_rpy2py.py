@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from anndata import AnnData
-from rpy2.robjects import r
+from rpy2.robjects import r, conversion
 from rpy2.robjects.packages import importr, data
 
 import anndata2ri
@@ -44,19 +44,19 @@ expression_sets = [
 ]
 
 
-@pytest.mark.parametrize("conversion", conversions_rpy2py)
+@pytest.mark.parametrize("convert", conversions_rpy2py)
 @pytest.mark.parametrize("check,shape,dataset", expression_sets)
-def test_convert_manual(conversion, check, shape, dataset):
-    ad = conversion(anndata2ri, dataset)
+def test_convert_manual(convert, check, shape, dataset):
+    ad = convert(anndata2ri, dataset)
     assert isinstance(ad, AnnData)
     assert ad.shape == shape
     check(ad)
 
 
-def test_convert_empty_df_with_rows():
+@pytest.mark.parametrize("convert", conversions_rpy2py)
+def test_convert_empty_df_with_rows(convert):
     df = r("S4Vectors::DataFrame(a=1:10)[, -1]")
     assert df.slots["nrows"][0] == 10
 
-    c = anndata2ri.conv.full_converter()
-    df_py = c.rpy2py(df)
+    df_py = convert(anndata2ri, lambda: conversion.rpy2py(df))
     assert isinstance(df_py, pd.DataFrame)

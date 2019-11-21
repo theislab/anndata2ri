@@ -28,7 +28,8 @@ requires = [
 [tool.flit.metadata.requires-extra]
 test = [
     'pytest',
-    'pytest-faulthandler'
+    'pytest-faulthandler',
+    'scanpy',
 ]
 
 [tool.black]

@@ -6,8 +6,8 @@
 .. |conda| image:: https://img.shields.io/conda/vn/bioconda/anndata2ri
    :target: https://anaconda.org/bioconda/anndata2ri
 
-.. |travis| image:: https://travis-ci.org/flying-sheep/anndata2ri.svg?branch=master
-   :target: https://travis-ci.org/flying-sheep/anndata2ri
+.. |travis| image:: https://travis-ci.org/theislab/anndata2ri.svg?branch=master
+   :target: https://travis-ci.org/theislab/anndata2ri
 
 AnnData ↭ SingleCellExperiment
 ==============================
