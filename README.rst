@@ -25,20 +25,11 @@ You can for example use it to process your data using both Scanpy_ and Seurat_, 
 Installation
 ------------
 
-Install it directly from GitHub via ``pip`` (version 19.0 or higher).
-
 .. code-block:: bash
 
-   pip install git+https://github.com/flying-sheep/anndata2ri.git
-
-You can install a locally checked out version with ``pip`` or ``flit``:
-
-.. code-block:: bash
-
-   cd anndata2ri
-   pip install .
+   pip install anndata2ri
    # or
-   flit install
+   conda install -c bioconda anndata2ri 
 
 Usage from Python
 -----------------
