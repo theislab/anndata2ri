@@ -29,6 +29,7 @@ requires = [
 test = [
     'pytest',
     'pytest-faulthandler',
+    'pygments',
     'scanpy',
 ]
 
