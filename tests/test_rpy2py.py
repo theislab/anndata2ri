@@ -2,15 +2,15 @@ import pytest
 import pandas as pd
 from anndata import AnnData
 from rpy2.robjects import r, conversion
-from rpy2.robjects.packages import importr, data
 
 import anndata2ri
+from anndata2ri.rpy2_ext import importr, data
 from anndata2ri.test_utils import conversions_rpy2py
 
+as_ = getattr(importr("methods"), "as")
 se = importr("SummarizedExperiment")
 sce = importr("SingleCellExperiment")
-sc_rna_seq_data = data(importr("scRNAseq"))
-as_ = getattr(importr("methods"), "as")
+sumex_allen = data("scRNAseq", "allen")["allen"]
 
 
 def check_allen(adata):
@@ -23,7 +23,6 @@ def check_example(adata):
     assert adata.obsm["X_pca"].shape == (100, 5)
 
 
-sumex_allen = sc_rna_seq_data.fetch("allen")["allen"]
 code_example = """
 local({
     ncells <- 100
@@ -60,3 +59,16 @@ def test_convert_empty_df_with_rows(convert):
 
     df_py = convert(anndata2ri, lambda: conversion.rpy2py(df))
     assert isinstance(df_py, pd.DataFrame)
+
+
+@pytest.mark.parametrize("convert", conversions_rpy2py)
+def test_convert_factor(convert):
+    code = """
+    SingleCellExperiment::SingleCellExperiment(
+        assays = list(counts = matrix(rpois(6*4, 5), ncol=4)),
+        colData = S4Vectors::DataFrame(a_factor = factor(c(rep('A', 3), rep('B', 1))))
+    )
+    """
+    ad = convert(anndata2ri, lambda: r(code))
+    assert isinstance(ad.obs["a_factor"].values, pd.Categorical)
+    assert all(ad.obs["a_factor"].values == pd.Categorical.from_codes([0, 0, 0, 1], ["A", "B"]))

@@ -5,10 +5,10 @@ import numpy as np
 import pytest
 from rpy2.rinterface import Sexp
 from rpy2.robjects import baseenv, r, numpy2ri
-from rpy2.robjects.packages import importr
 from scipy import sparse
 
 from anndata2ri import scipy2ri
+from anndata2ri.rpy2_ext import importr
 from anndata2ri.test_utils import conversions_rpy2py, ConversionModule
 
 
