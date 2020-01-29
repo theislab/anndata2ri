@@ -8,10 +8,10 @@ from rpy2.robjects import conversion, pandas2ri, default_converter
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.vectors import ListVector
 from rpy2.robjects.methods import RS4
-from rpy2.robjects.packages import importr
 
 from . import conv_name
 from .conv import converter, mat_converter, full_converter
+from .rpy2_ext import importr
 
 
 class NotConvertedWarning(Warning):

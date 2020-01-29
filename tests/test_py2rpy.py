@@ -6,9 +6,9 @@ import pytest
 import scanpy as sc
 from anndata import AnnData
 from rpy2.robjects import baseenv, globalenv
-from rpy2.robjects.packages import importr
 
 import anndata2ri
+from anndata2ri.rpy2_ext import importr
 from anndata2ri.test_utils import conversions_py2rpy
 
 
