@@ -1,4 +1,4 @@
-|pypi| |conda| |travis|
+|pypi| |conda| |travis| |doi|
 
 .. |pypi| image:: https://img.shields.io/pypi/v/anndata2ri
    :target: https://pypi.org/project/anndata2ri/
@@ -8,6 +8,9 @@
 
 .. |travis| image:: https://travis-ci.org/theislab/anndata2ri.svg?branch=master
    :target: https://travis-ci.org/theislab/anndata2ri
+
+.. |doi| image:: https://zenodo.org/badge/171714778.svg
+   :target: https://zenodo.org/badge/latestdoi/171714778
 
 AnnData ↭ SingleCellExperiment
 ==============================
