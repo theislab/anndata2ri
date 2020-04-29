@@ -34,6 +34,22 @@ Installation
    # or
    conda install -c bioconda anndata2ri 
 
+Troubleshooting
+---------------
+
+If you have problems installing or importing anndata2ri,
+please make sure you first:
+
+1. Check the stack trace:
+   If the error happens while installing or importing a dependency such as rpy2_,
+   report your problem in that project’s bug tracker.
+2. Search the issues_.
+   At the time of writing 17 of the 29 bugs (60%) are invalid or rpy2 bugs / install problems.
+3. Make sure you have a compatible R version: rpy2 requires R ≥ 3.6.
+
+.. _rpy2: https://github.com/rpy2/rpy2#readme
+.. _issues: https://github.com/theislab/anndata2ri/issues
+
 Usage from Python
 -----------------
 
