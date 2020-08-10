@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from warnings import warn
 
 import numpy as np
@@ -26,8 +27,8 @@ dict_converter.py2rpy.register(np.bytes_, lambda x: conversion.py2rpy(bytes(x)))
 dict_converter.py2rpy.register(np.str_, lambda x: conversion.py2rpy(str(x)))
 
 
-@dict_converter.py2rpy.register(dict)
-def py2rpy_dict(obj: dict) -> ListVector:
+@dict_converter.py2rpy.register(Mapping)
+def py2rpy_dict(obj: Mapping) -> ListVector:
     """Try converting everything. For nested dicts, this needs itself to be registered"""
     converted = {}
     for k, v in obj.items():
