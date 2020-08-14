@@ -74,7 +74,7 @@ Either use the converter manually …
 
    adata = r('as(some_data, "SingleCellExperiment")')
 
-Usage from IPython
+Usage from Jupyter
 ------------------
 Activate the conversion before you load the extension:
 
