@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Union, Iterable, FrozenSet
 
 
@@ -6,6 +7,7 @@ supported_r_matrix_types = frozenset({"d", "l", "n"})
 supported_r_matrix_storage = frozenset({"C", "R", "T", "di"})
 
 
+@lru_cache(maxsize=None)
 def supported_r_matrix_classes(
     types: Union[Iterable[str], str] = supported_r_matrix_types,
     storage: Union[Iterable[str], str] = supported_r_matrix_storage,
