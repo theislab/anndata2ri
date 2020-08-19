@@ -48,6 +48,7 @@ def py2r_context(f):
 @converter.py2rpy.register(sparse.csc_matrix)
 @py2r_context
 def csc_to_rmat(csc: sparse.csc_matrix):
+    csc.sort_indices()
     t, conv_data, _ = get_type_conv(csc.dtype)
     return methods.new(
         f"{t}gCMatrix",
@@ -61,6 +62,7 @@ def csc_to_rmat(csc: sparse.csc_matrix):
 @converter.py2rpy.register(sparse.csr_matrix)
 @py2r_context
 def csr_to_rmat(csr: sparse.csr_matrix):
+    csr.sort_indices()
     t, conv_data, _ = get_type_conv(csr.dtype)
     return methods.new(
         f"{t}gRMatrix",
