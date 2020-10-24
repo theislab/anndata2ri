@@ -1,5 +1,18 @@
-"""
+r"""
 Converter between Python’s AnnData and R’s SingleCellExperiment.
+
+
+==========================================================  =====  ================================================
+:rcls:`~SingleCellExperiment::SingleCellExperiment`                :class:`~anndata.AnnData`
+==========================================================  =====  ================================================
+:rman:`~SummarizedExperiment::assay`\ ``(d, 'X')``          ⇄      :attr:`~anndata.AnnData.X`
+:rman:`~SummarizedExperiment::assay`\ ``(d, 'counts')``     ⇄      :attr:`~anndata.AnnData.layers`\ ``['counts']``
+:rman:`~SummarizedExperiment::colData`\ ``(d)``             ⇄      :attr:`~anndata.AnnData.obs`
+:rman:`~SummarizedExperiment::rowData`\ ``(d)``             ⇄      :attr:`~anndata.AnnData.var`
+:rman:`~S4Vectors::metadata`\ ``(d)``                       ⇄      :attr:`~anndata.AnnData.uns`
+:rman:`~SingleCellExperiment::reducedDim`\ ``(d, 'PCA')``   ⇄      :attr:`~anndata.AnnData.obsm`\ ``['X_pca']``
+:rman:`~SingleCellExperiment::reducedDim`\ ``(d, 'DM')``    ⇄      :attr:`~anndata.AnnData.obsm`\ ``['X_diffmap']``
+==========================================================  =====  ================================================
 """
 __all__ = ["activate", "deactivate", "py2rpy", "rpy2py", "converter"]
 

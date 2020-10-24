@@ -2,29 +2,34 @@
 
 .. |pypi| image:: https://img.shields.io/pypi/v/anndata2ri
    :target: https://pypi.org/project/anndata2ri/
+   :alt: PyPI Version
 
 .. |conda| image:: https://img.shields.io/conda/vn/bioconda/anndata2ri
    :target: https://anaconda.org/bioconda/anndata2ri
+   :alt: Bioconda Version
 
 .. |rtd| image:: https://readthedocs.com/projects/icb-anndata2ri/badge/?version=latest&token=ee358f7efe36cbbd7d04db1b708fa81cefc44634ae7f3f8e0afcd03a1f0b1158
-   :target: https://icb-anndata2ri.readthedocs-hosted.com/en/latest/?badge=latest
+   :target: docs_
    :alt: Documentation Status
 
 .. |travis| image:: https://travis-ci.org/theislab/anndata2ri.svg?branch=master
    :target: https://travis-ci.org/theislab/anndata2ri
+   :alt: Travis CI Status
 
 .. |doi| image:: https://zenodo.org/badge/171714778.svg
    :target: https://zenodo.org/badge/latestdoi/171714778
+   :alt: Publication DOI
 
 AnnData ↭ SingleCellExperiment
 ==============================
 
-RPy2 converter from AnnData_ to SingleCellExperiment_ and back.
+RPy2 converter from AnnData_ to SingleCellExperiment_ and back. (For **details about conversion** see the docs_)
 
 You can for example use it to process your data using both Scanpy_ and Seurat_, as described in this `example notebook`_
 
 .. _AnnData: https://anndata.readthedocs.io/en/latest/
 .. _SingleCellExperiment: http://bioconductor.org/packages/release/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html
+.. _docs: https://icb-anndata2ri.readthedocs-hosted.com/en/latest/
 .. _Scanpy: https://scanpy.readthedocs.io/en/stable/
 .. _Seurat: https://satijalab.org/seurat/
 .. _`example notebook`: https://github.com/LuckyMD/Code_snippets/blob/master/Seurat_to_anndata.ipynb
