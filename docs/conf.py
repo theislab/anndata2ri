@@ -1,4 +1,5 @@
 from typing import Tuple
+from unittest.mock import MagicMock
 
 from docutils import nodes
 from sphinx.application import Sphinx
@@ -9,6 +10,10 @@ from sphinx.roles import XRefRole
 import sys
 from pathlib import Path
 from datetime import datetime
+
+
+# Can’t use autodoc_mock_imports as we import anndata2ri
+sys.modules["rpy2.rinterface_lib.openrlib"] = MagicMock()
 
 
 HERE = Path(__file__).parent
@@ -47,7 +52,6 @@ extensions = [
 # Generate the API documentation when building
 autosummary_generate = True
 autodoc_member_order = "bysource"
-autodoc_mock_imports = ["rpy2.rinterface_lib"]
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = False
