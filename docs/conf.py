@@ -1,4 +1,5 @@
 from typing import Tuple
+from unittest.mock import MagicMock
 
 from docutils import nodes
 from sphinx.application import Sphinx
@@ -12,6 +13,21 @@ from datetime import datetime
 
 
 HERE = Path(__file__).parent
+
+
+# Can’t use autodoc_mock_imports as we import anndata2ri
+sys.modules["rpy2.rinterface_lib"] = MagicMock()
+submods = ["embedded", "conversion", "memorymanagement", "sexp", "bufferprotocol", "callbacks", "_rinterface_capi"]
+sys.modules.update({f"rpy2.rinterface_lib.{sub}": MagicMock() for sub in submods})
+sexp = sys.modules["rpy2.rinterface_lib.sexp"]
+sexp.Sexp = sexp.SexpVector = sexp.SexpEnvironment = sexp.StrSexpVector = MagicMock
+sexp.SexpVector.from_iterable = MagicMock()
+
+import rpy2.rinterface
+
+rpy2.rinterface._MissingArgType = object
+
+# now we can import it!
 sys.path.insert(0, str(HERE.parent))
 import anndata2ri.scipy2ri  # noqa
 
@@ -59,7 +75,7 @@ intersphinx_mapping = dict(
     numpy=("https://docs.scipy.org/doc/numpy/", None),
     pandas=("http://pandas.pydata.org/pandas-docs/stable/", None),
     python=("https://docs.python.org/3", None),
-    rpy2=("https://rpy2.readthedocs.io/en/latest/", None),
+    rpy2=("https://rpy2.github.io/doc/latest/html/", None),
     scipy=("https://docs.scipy.org/doc/scipy/reference/", None),
 )
 
@@ -91,8 +107,12 @@ class RManRefRole(XRefRole):
     def process_link(
         self, env: BuildEnvironment, refnode: nodes.reference, has_explicit_title: bool, title: str, target: str
     ) -> Tuple[str, str]:
-        package, title = target.split("::")
-        topic = title
+        qualified = not target.startswith("~")
+        if not qualified:
+            target = target[1:]
+        package, symbol = target.split("::")
+        title = target if qualified else symbol
+        topic = symbol
         if self.cls:
             topic += "-class"
         target = f"https://www.rdocumentation.org/packages/{package}/topics/{topic}"

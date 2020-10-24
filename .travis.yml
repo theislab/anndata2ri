@@ -1,35 +1,36 @@
 language: python
-dist: bionic
+dist: focal
 cache:
   pip: true
   directories:
-    - /home/travis/R/Library
+  - /home/travis/R/Library
 env:
-  - R_LIBS_SITE=/home/travis/R/Library
+- R_LIBS_SITE=/home/travis/R/Library
 
 # matrix
 python:
-  - '3.6'
-  - '3.7'
+- '3.6'
+- '3.7'
+- '3.8'
 
 # packages
 addons:
   apt:
     sources:
-      - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'
-        key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE298A3A825C0D65DFD57CBB651716619E084DAB9'
+    - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'
+      key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE298A3A825C0D65DFD57CBB651716619E084DAB9'
     update: true
     packages:
-      - r-base
+    - r-base
 # install basic requirements
 before_install:
-  - sudo R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'
-  - sudo R --slave -e 'options(warn = 2); BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
-  - pip install flit get_version rpy2 pygments h5py==2.9.0  # h5py because of https://github.com/theislab/scanpy/issues/832
+- sudo R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'
+- sudo R --slave -e 'options(warn = 2); BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
+- pip install flit get_version rpy2 pygments h5py==2.9.0  # h5py because of https://github.com/theislab/scanpy/issues/832
 # install package
 install:
-  - python -m rpy2.situation
-  - flit install --extras=all
+- python -m rpy2.situation
+- flit install --extras=all
 # test
 script:
-  - PYTHONPATH=. pytest
+- PYTHONPATH=. pytest

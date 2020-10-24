@@ -1,12 +1,11 @@
 [build-system]
-requires = ['flit', 'future-fstrings', 'get_version']
-build-backend = 'flit.buildapi'
+requires = ['flit_core >=2,<4', 'get_version']
+build-backend = 'flit_core.buildapi'
 
 [tool.flit.metadata]
 module = 'anndata2ri'
 author = 'Philipp A.'
 author-email = 'flying-sheep@web.de'
-home-page = 'https://github.com/flying-sheep/anndata2ri'
 description-file = 'README.rst'
 classifiers = [
     'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
@@ -32,6 +31,16 @@ test = [
     'pygments',
     'scanpy',
 ]
+doc = [
+    'sphinx>=3.0',
+    'sphinx-autodoc-typehints',
+    'scanpydoc',
+]
+
+[tool.flit.metadata.urls]
+'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
+'Source Code' = 'https://github.com/theislab/anndata2ri'
+'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
 
 [tool.black]
 line-length = 120
