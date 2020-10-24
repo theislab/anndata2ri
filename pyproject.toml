@@ -32,6 +32,11 @@ test = [
     'pygments',
     'scanpy',
 ]
+doc = [
+    'sphinx>=3.0',
+    'sphinx-autodoc-typehints',
+    'scanpydoc',
+]
 
 [tool.black]
 line-length = 120

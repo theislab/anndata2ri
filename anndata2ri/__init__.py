@@ -24,7 +24,7 @@ try:  # This is so that flit can import this. There must be a better way.
         """
         Convert Python objects to R interface objects. Supports:
 
-        - :class:`~anndata.AnnData` → :rcls:`SingleCellExperiment::SingleCellExperiment`
+        - :class:`~anndata.AnnData` → :rcls:`~SingleCellExperiment::SingleCellExperiment`
         """
         return converter.py2rpy(obj)
 
@@ -32,8 +32,8 @@ try:  # This is so that flit can import this. There must be a better way.
         """
         Convert R interface objects to Python objects. Supports:
 
-        - :rcls:`SingleCellExperiment::SingleCellExperiment` → :class:`~anndata.AnnData`
-        - :rcls:`S4Vectors::DataFrame` → :class:`~pandas.DataFrame`
+        - :rcls:`~SingleCellExperiment::SingleCellExperiment` → :class:`~anndata.AnnData`
+        - :rcls:`S4Vectors::DataFrame` → :class:`pandas.DataFrame`
         """
         return converter.rpy2py(obj)
 

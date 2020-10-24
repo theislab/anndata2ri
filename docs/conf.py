@@ -59,7 +59,7 @@ intersphinx_mapping = dict(
     numpy=("https://docs.scipy.org/doc/numpy/", None),
     pandas=("http://pandas.pydata.org/pandas-docs/stable/", None),
     python=("https://docs.python.org/3", None),
-    rpy2=("https://rpy2.readthedocs.io/en/latest/", None),
+    rpy2=("https://rpy2.github.io/doc/latest/html/", None),
     scipy=("https://docs.scipy.org/doc/scipy/reference/", None),
 )
 
@@ -91,8 +91,12 @@ class RManRefRole(XRefRole):
     def process_link(
         self, env: BuildEnvironment, refnode: nodes.reference, has_explicit_title: bool, title: str, target: str
     ) -> Tuple[str, str]:
-        package, title = target.split("::")
-        topic = title
+        qualified = not target.startswith("~")
+        if not qualified:
+            target = target[1:]
+        package, symbol = target.split("::")
+        title = target if qualified else symbol
+        topic = symbol
         if self.cls:
             topic += "-class"
         target = f"https://www.rdocumentation.org/packages/{package}/topics/{topic}"
