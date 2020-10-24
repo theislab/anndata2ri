@@ -12,11 +12,22 @@ from pathlib import Path
 from datetime import datetime
 
 
-# Can’t use autodoc_mock_imports as we import anndata2ri
-sys.modules["rpy2.rinterface_lib.openrlib"] = MagicMock()
-
-
 HERE = Path(__file__).parent
+
+
+# Can’t use autodoc_mock_imports as we import anndata2ri
+sys.modules["rpy2.rinterface_lib"] = MagicMock()
+submods = ["embedded", "conversion", "memorymanagement", "sexp", "bufferprotocol", "callbacks", "_rinterface_capi"]
+sys.modules.update({f"rpy2.rinterface_lib.{sub}": MagicMock() for sub in submods})
+sexp = sys.modules["rpy2.rinterface_lib.sexp"]
+sexp.Sexp = sexp.SexpVector = sexp.SexpEnvironment = sexp.StrSexpVector = MagicMock
+sexp.SexpVector.from_iterable = MagicMock()
+
+import rpy2.rinterface
+
+rpy2.rinterface._MissingArgType = object
+
+# now we can import it!
 sys.path.insert(0, str(HERE.parent))
 import anndata2ri.scipy2ri  # noqa
 
