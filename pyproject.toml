@@ -1,6 +1,6 @@
 [build-system]
-requires = ['flit', 'future-fstrings', 'get_version']
-build-backend = 'flit.buildapi'
+requires = ['flit_core >=2,<4', 'get_version']
+build-backend = 'flit_core.buildapi'
 
 [tool.flit.metadata]
 module = 'anndata2ri'
