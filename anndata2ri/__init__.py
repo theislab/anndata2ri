@@ -7,7 +7,6 @@ import traceback
 from typing import Any
 
 from get_version import get_version
-from rpy2.rinterface import Sexp
 
 
 __author__ = "Philipp Angerer"
@@ -22,6 +21,8 @@ def within_flit():
 
 
 if not within_flit():
+    from rpy2.rinterface import Sexp
+
     from .conv import converter, activate, deactivate
     from . import py2r, r2py
 
