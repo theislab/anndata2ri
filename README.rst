@@ -6,7 +6,7 @@
 .. |conda| image:: https://img.shields.io/conda/vn/bioconda/anndata2ri
    :target: https://anaconda.org/bioconda/anndata2ri
 
-.. |rtd| image:: https://readthedocs.com/projects/icb-anndata2ri/badge/?version=latest
+.. |rtd| image:: https://readthedocs.com/projects/icb-anndata2ri/badge/?version=latest&token=ee358f7efe36cbbd7d04db1b708fa81cefc44634ae7f3f8e0afcd03a1f0b1158
    :target: https://icb-anndata2ri.readthedocs-hosted.com/en/latest/?badge=latest
    :alt: Documentation Status
 
