@@ -1,10 +1,14 @@
-|pypi| |conda| |travis| |doi|
+|pypi| |conda| |rtd| |travis| |doi|
 
 .. |pypi| image:: https://img.shields.io/pypi/v/anndata2ri
    :target: https://pypi.org/project/anndata2ri/
 
 .. |conda| image:: https://img.shields.io/conda/vn/bioconda/anndata2ri
    :target: https://anaconda.org/bioconda/anndata2ri
+
+.. |rtd| image:: https://readthedocs.com/projects/icb-anndata2ri/badge/?version=latest
+   :target: https://icb-anndata2ri.readthedocs-hosted.com/en/latest/?badge=latest
+   :alt: Documentation Status
 
 .. |travis| image:: https://travis-ci.org/theislab/anndata2ri.svg?branch=master
    :target: https://travis-ci.org/theislab/anndata2ri
