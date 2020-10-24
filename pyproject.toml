@@ -38,9 +38,9 @@ doc = [
 ]
 
 [tool.flit.metadata.urls]
-Documentation = 'https://icb-anndata2ri.readthedocs-hosted.com/'
-'Source code' = 'https://github.com/theislab/anndata2ri'
-'Issue tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
+'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
+'Source Code' = 'https://github.com/theislab/anndata2ri'
+'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
 
 [tool.black]
 line-length = 120
