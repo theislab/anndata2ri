@@ -47,7 +47,7 @@ extensions = [
 # Generate the API documentation when building
 autosummary_generate = True
 autodoc_member_order = "bysource"
-autodoc_mock_imports = ["_rinterface_cffi_abi", "_rinterface_cffi_api"]
+autodoc_mock_imports = ["rpy2.rinterface_lib.openrlib"]
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = False
