@@ -35,6 +35,7 @@ doc = [
     'sphinx>=3.0',
     'sphinx-autodoc-typehints',
     'scanpydoc',
+    'sphinx-rtd-theme>=0.5',  # Already a dep but 0.5 is prettier
     'lxml',  # For scraping the R link info
 ]
 
