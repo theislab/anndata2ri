@@ -1,16 +1,23 @@
+from pathlib import Path
+
 import pytest
 import pandas as pd
 from anndata import AnnData
 from rpy2.robjects import r, conversion
 
 import anndata2ri
-from anndata2ri.rpy2_ext import importr, data
+from anndata2ri.rpy2_ext import importr
 from anndata2ri.test_utils import conversions_rpy2py
 
 as_ = getattr(importr("methods"), "as")
 se = importr("SummarizedExperiment")
 sce = importr("SingleCellExperiment")
-sumex_allen = data("scRNAseq", "allen")["allen"]
+eh = importr("ExperimentHub")
+seq = importr("scRNAseq")
+
+
+# avoid prompt
+Path(eh.getExperimentHubOption("CACHE")[0]).mkdir(parents=True, exist_ok=True)
 
 
 def check_allen(adata):
@@ -37,7 +44,12 @@ local({
 """
 
 expression_sets = [
-    pytest.param(check_allen, (379, 20908), lambda: as_(sumex_allen, "SingleCellExperiment"), id="allen"),
+    pytest.param(
+        check_allen,
+        (379, 20908),
+        lambda: as_(seq.ReprocessedAllenData(assays="tophat_counts"), "SingleCellExperiment"),
+        id="allen",
+    ),
     pytest.param(lambda x: None, (0, 0), sce.SingleCellExperiment, id="empty"),
     pytest.param(check_example, (100, 200), lambda: r(code_example), id="example"),
 ]

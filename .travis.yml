@@ -4,6 +4,7 @@ cache:
   pip: true
   directories:
   - /home/travis/R/Library
+  - /home/travis/.cache/ExperimentHub
 env:
 - R_LIBS_SITE=/home/travis/R/Library
 
@@ -26,7 +27,8 @@ addons:
 before_install:
 - sudo R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'
 - sudo R --slave -e 'options(warn = 2); BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
-- pip install flit get_version rpy2 pygments h5py==2.9.0  # h5py because of https://github.com/theislab/scanpy/issues/832
+- mkdir -p ~/.cache/ExperimentHub
+- pip install flit get_version 'rpy2<3.4' pygments
 # install package
 install:
 - python -m rpy2.situation
