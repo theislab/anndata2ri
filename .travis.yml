@@ -7,6 +7,9 @@ cache:
   - /home/travis/.cache/ExperimentHub
 env:
 - R_LIBS_SITE=/home/travis/R/Library
+branches:
+  only:
+  - master  # All other branches should become (draft) PRs and be build that way
 
 # matrix
 python:
