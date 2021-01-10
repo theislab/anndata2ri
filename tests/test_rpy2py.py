@@ -46,7 +46,7 @@ local({
 expression_sets = [
     pytest.param(
         check_allen,
-        (379, 20908),
+        (379, 20816),
         lambda: as_(seq.ReprocessedAllenData(assays="tophat_counts"), "SingleCellExperiment"),
         id="allen",
     ),

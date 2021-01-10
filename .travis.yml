@@ -31,7 +31,7 @@ before_install:
 - sudo R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'
 - sudo R --slave -e 'options(warn = 2); BiocManager::install(c("SingleCellExperiment", "scRNAseq"))'
 - mkdir -p ~/.cache/ExperimentHub
-- pip install flit get_version 'rpy2<3.4' pygments
+- pip install flit get_version 'rpy2>=3.4' pygments
 # install package
 install:
 - python -m rpy2.situation

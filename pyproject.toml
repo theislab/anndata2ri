@@ -19,7 +19,7 @@ classifiers = [
 requires-python = '>= 3.6'
 requires = [
     'get_version',
-    'rpy2 >= 3.0.1',
+    'rpy2 >= 3.4',
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
