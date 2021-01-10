@@ -21,7 +21,7 @@ python:
 addons:
   apt:
     sources:
-    - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'
+    - sourceline: 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/'
       key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE298A3A825C0D65DFD57CBB651716619E084DAB9'
     update: true
     packages:
