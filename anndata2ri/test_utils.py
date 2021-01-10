@@ -49,6 +49,11 @@ conversions_py2rpy: List[Callable[[ConversionModule, Any], Sexp]] = [
 ]
 
 
+@pytest.fixture(params=conversions_py2rpy)
+def py2r(request) -> Callable[[ConversionModule, Any], Sexp]:
+    return request.param
+
+
 def conversion_rpy2py_manual(conv_mod: ConversionModule, dataset: Callable[[], Sexp]) -> Any:
     return conv_mod.converter.rpy2py(dataset())
 
@@ -73,3 +78,8 @@ conversions_rpy2py: List[Callable[[ConversionModule, Callable[[], Sexp]], Any]] 
     pytest.param(conversion_rpy2py_local, id="local"),
     pytest.param(conversion_rpy2py_activate, id="activate"),
 ]
+
+
+@pytest.fixture(params=conversions_rpy2py)
+def r2py(request) -> Callable[[ConversionModule, Callable[[], Sexp]], Any]:
+    return request.param
