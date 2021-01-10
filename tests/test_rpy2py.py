@@ -7,7 +7,8 @@ from rpy2.robjects import r, conversion
 
 import anndata2ri
 from anndata2ri.rpy2_ext import importr
-from anndata2ri.test_utils import conversions_rpy2py
+from anndata2ri.test_utils import r2py  # noqa
+
 
 as_ = getattr(importr("methods"), "as")
 se = importr("SummarizedExperiment")
@@ -23,6 +24,8 @@ Path(eh.getExperimentHubOption("CACHE")[0]).mkdir(parents=True, exist_ok=True)
 def check_allen(adata):
     assert adata.uns.keys() == {"SuppInfo", "which_qc"}
     assert set(adata.obs.keys()) > {"NREADS", "NALIGNED", "Animal.ID", "passes_qc_checks_s"}
+    assert adata.obs["Secondary.Type"][:4].tolist() == ["L4 Ctxn3", "", "L5a Batf3", None], "NAs not conserved?"
+    assert adata.obs["Animal.ID"][:4].tolist() == [133632, 133632, 151560, pd.NA], "NAs not conserved?"
 
 
 def check_example(adata):
@@ -55,32 +58,29 @@ expression_sets = [
 ]
 
 
-@pytest.mark.parametrize("convert", conversions_rpy2py)
 @pytest.mark.parametrize("check,shape,dataset", expression_sets)
-def test_convert_manual(convert, check, shape, dataset):
-    ad = convert(anndata2ri, dataset)
+def test_convert_manual(r2py, check, shape, dataset):
+    ad = r2py(anndata2ri, dataset)
     assert isinstance(ad, AnnData)
     assert ad.shape == shape
     check(ad)
 
 
-@pytest.mark.parametrize("convert", conversions_rpy2py)
-def test_convert_empty_df_with_rows(convert):
+def test_convert_empty_df_with_rows(r2py):
     df = r("S4Vectors::DataFrame(a=1:10)[, -1]")
     assert df.slots["nrows"][0] == 10
 
-    df_py = convert(anndata2ri, lambda: conversion.rpy2py(df))
+    df_py = r2py(anndata2ri, lambda: conversion.rpy2py(df))
     assert isinstance(df_py, pd.DataFrame)
 
 
-@pytest.mark.parametrize("convert", conversions_rpy2py)
-def test_convert_factor(convert):
+def test_convert_factor(r2py):
     code = """
     SingleCellExperiment::SingleCellExperiment(
         assays = list(counts = matrix(rpois(6*4, 5), ncol=4)),
-        colData = S4Vectors::DataFrame(a_factor = factor(c(rep('A', 3), rep('B', 1))))
+        colData = S4Vectors::DataFrame(a_factor = factor(c(rep('A', 2), NA, rep('B', 1))))
     )
     """
-    ad = convert(anndata2ri, lambda: r(code))
+    ad = r2py(anndata2ri, lambda: r(code))
     assert isinstance(ad.obs["a_factor"].values, pd.Categorical)
-    assert all(ad.obs["a_factor"].values == pd.Categorical.from_codes([0, 0, 0, 1], ["A", "B"]))
+    assert ad.obs["a_factor"].values.tolist() == pd.Categorical.from_codes([0, 0, -1, 1], ["A", "B"]).tolist()

@@ -1,9 +1,10 @@
 from typing import Optional, Union
 
+import numpy as np
 import pandas as pd
 from anndata import AnnData
 
-from rpy2.rinterface import NULLType, Sexp, SexpS4
+from rpy2.rinterface import NULLType, Sexp, SexpS4, IntSexpVector, baseenv
 from rpy2.robjects import default_converter, pandas2ri
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
@@ -31,13 +32,30 @@ def rpy2py_s4(obj: SexpS4) -> Optional[Union[pd.DataFrame, AnnData]]:
         return default_converter.rpy2py(obj)
 
 
+def rpy2py_vector(v):
+    """
+    Converts vectors. Also handles NA in int vectors: https://github.com/rpy2/rpy2/issues/376
+    """
+    if not isinstance(v, Sexp):
+        return v
+    if isinstance(v, IntSexpVector):
+        assert v._R_SIZEOF_ELT == 4, "R integer size changed away from 32 bit"
+        if "factor" in v.rclass:
+            r = pandas2ri.rpy2py(v)
+        else:
+            r = pd.array(v, dtype=pd.Int32Dtype())
+        r[np.array(baseenv["is.na"](v), dtype=bool)] = pd.NA
+        return r
+    return pandas2ri.rpy2py(v)
+
+
 def rpy2py_data_frame(obj: SexpS4) -> pd.DataFrame:
     """
     S4 DataFrame class, not data.frame
     """
     slots = RSlots(obj)
     with localconverter(default_converter):
-        columns = {k: pandas2ri.rpy2py(v) if isinstance(v, Sexp) else v for k, v in slots["listData"].items()}
+        columns = {k: rpy2py_vector(v) for k, v in slots["listData"].items()}
         rownames = slots["rownames"]
         if isinstance(rownames, NULLType):
             rownames = pd.RangeIndex(slots["nrows"][0])
