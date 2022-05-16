@@ -28,6 +28,16 @@ def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp], T
         raise ValueError(f"Unknown dtype {dtype!r} cannot be converted to ?gRMatrix.")
 
 
+def _py2r(x):
+    import rpy2.robjects as ro
+    with localconverter(
+        default_converter
+        + numpy2ri.converter
+    ):
+        x = ro.conversion.py2rpy(x)
+    return x
+
+
 def py2r_context(f):
     @wraps(f)
     def wrapper(obj):
@@ -35,12 +45,11 @@ def py2r_context(f):
         if methods is None:
             importr("Matrix")  # make class available
             methods = importr("methods")
-            as_logical = baseenv["as.logical"]
-            as_integer = baseenv["as.integer"]
-            as_double = baseenv["as.double"]
+            as_logical = lambda x: baseenv["as.logical"](_py2r(x))
+            as_integer = lambda x: baseenv["as.integer"](_py2r(x))
+            as_double = lambda x: baseenv["as.double"](_py2r(x))
 
-        with localconverter(default_converter + numpy2ri.converter):
-            return f(obj)
+        return f(obj)
 
     return wrapper
 
