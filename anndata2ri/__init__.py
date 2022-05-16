@@ -1,22 +1,41 @@
-"""
+r"""
 Converter between Python’s AnnData and R’s SingleCellExperiment.
+
+
+==========================================================  =  ========================================================
+:rcls:`~SingleCellExperiment::SingleCellExperiment`            :class:`~anndata.AnnData`
+==========================================================  =  ========================================================
+:rman:`~SummarizedExperiment::assay`\ ``(d, 'X')``          ⇄  ``d.``\ :attr:`~anndata.AnnData.X`
+:rman:`~SummarizedExperiment::assay`\ ``(d, 'counts')``     ⇄  ``d.``\ :attr:`~anndata.AnnData.layers`\ ``['counts']``
+:rman:`~SummarizedExperiment::colData`\ ``(d)``             ⇄  ``d.``\ :attr:`~anndata.AnnData.obs`
+:rman:`~SummarizedExperiment::rowData`\ ``(d)``             ⇄  ``d.``\ :attr:`~anndata.AnnData.var`
+:rman:`~S4Vectors::metadata`\ ``(d)``                       ⇄  ``d.``\ :attr:`~anndata.AnnData.uns`
+:rman:`~SingleCellExperiment::reducedDim`\ ``(d, 'PCA')``   ⇄  ``d.``\ :attr:`~anndata.AnnData.obsm`\ ``['X_pca']``
+:rman:`~SingleCellExperiment::reducedDim`\ ``(d, 'DM')``    ⇄  ``d.``\ :attr:`~anndata.AnnData.obsm`\ ``['X_diffmap']``
+==========================================================  =  ========================================================
 """
 __all__ = ["activate", "deactivate", "py2rpy", "rpy2py", "converter"]
 
-
+import traceback
 from typing import Any
 
 from get_version import get_version
-from rpy2.rinterface import Sexp
 
 
 __author__ = "Philipp Angerer"
 __version__ = get_version(__file__)
 
-del get_version
+
+def within_flit():
+    for frame in traceback.extract_stack():
+        if frame.name == "get_docstring_and_version_via_import":
+            return True
+    return False
 
 
-try:  # This is so that flit can import this. There must be a better way.
+if not within_flit():
+    from rpy2.rinterface import Sexp
+
     from .conv import converter, activate, deactivate
     from . import py2r, r2py
 
@@ -24,7 +43,7 @@ try:  # This is so that flit can import this. There must be a better way.
         """
         Convert Python objects to R interface objects. Supports:
 
-        - :class:`~anndata.AnnData` → :rcls:`SingleCellExperiment::SingleCellExperiment`
+        - :class:`~anndata.AnnData` → :rcls:`~SingleCellExperiment::SingleCellExperiment`
         """
         return converter.py2rpy(obj)
 
@@ -32,13 +51,7 @@ try:  # This is so that flit can import this. There must be a better way.
         """
         Convert R interface objects to Python objects. Supports:
 
-        - :rcls:`SingleCellExperiment::SingleCellExperiment` → :class:`~anndata.AnnData`
-        - :rcls:`S4Vectors::DataFrame` → :class:`~pandas.DataFrame`
+        - :rcls:`~SingleCellExperiment::SingleCellExperiment` → :class:`~anndata.AnnData`
+        - :rcls:`S4Vectors::DataFrame` → :class:`pandas.DataFrame`
         """
         return converter.rpy2py(obj)
-
-
-except ImportError as e:
-    import warnings
-
-    warnings.warn(str(e), ImportWarning)

@@ -1,0 +1,15 @@
+/* Make things like :func:`foo`\\ ``bar`` have no visible gap */
+table a.reference + code.literal,
+table code.literal + a.reference {
+    margin-left: -6px;
+}
+table a.reference + code.literal,
+table code.literal + a.reference > code {
+    border-left: 0;
+    padding-left: 0;
+}
+
+/* Make sure columns don’t wrongly derive width from rst code */
+table.docutils col {
+    width: auto !important;
+}

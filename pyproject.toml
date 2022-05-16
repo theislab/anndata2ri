@@ -1,6 +1,6 @@
 [build-system]
-requires = ['flit>=3.2,<4', 'future-fstrings', 'get_version']
-build-backend = 'flit.buildapi'
+requires = ['flit>=3.2,<4', 'get_version']
+build-backend = 'flit_core.buildapi'
 
 [project]
 name = 'anndata2ri'
@@ -20,7 +20,7 @@ classifiers = [
 requires-python = '>= 3.6'
 dependencies = [
     'get_version',
-    'rpy2 >= 3.0.1',
+    'rpy2 >= 3.4',
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
@@ -33,6 +33,18 @@ test = [
     'pygments',
     'scanpy',
 ]
+doc = [
+    'sphinx>=3.0',
+    'sphinx-autodoc-typehints',
+    'scanpydoc',
+    'sphinx-rtd-theme>=0.5',  # Already a dep but 0.5 is prettier
+    'lxml',  # For scraping the R link info
+]
+
+[tool.flit.metadata.urls]
+'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
+'Source Code' = 'https://github.com/theislab/anndata2ri'
+'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
 
 [project.urls]
 Source = 'https://github.com/flying-sheep/anndata2ri'

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from rpy2.robjects import conversion, numpy2ri, pandas2ri, default_converter, SexpVector
+from rpy2.robjects import conversion, numpy2ri, pandas2ri
 from rpy2.robjects.conversion import overlay_converter
 
 from . import scipy2ri
@@ -9,9 +9,7 @@ from . import scipy2ri
 original_converter: Optional[conversion.Converter] = None
 converter = conversion.Converter("original anndata conversion")
 
-mat_converter = default_converter + numpy2ri.converter + scipy2ri.converter
-# default_converter has SexpVector registered, so we need to overwrite it.
-mat_converter.rpy2py.register(SexpVector, numpy2ri.rpy2py_sexp)
+mat_converter = numpy2ri.converter + scipy2ri.converter
 
 
 def full_converter() -> conversion.Converter:
@@ -29,7 +27,7 @@ def full_converter() -> conversion.Converter:
 def activate():
     r"""
     Activate conversion for :class:`~anndata.AnnData` objects
-    as well as :doc:`numpy` arrays and :class:`pandas.DataFrame`\ s
+    as well as :ref:`numpy:arrays` and :class:`pandas.DataFrame`\ s
     via ``rpy2.robjects.numpy2ri`` and ``rpy2.robjects.pandas2ri``.
 
     Does nothing if this is the active converter.
