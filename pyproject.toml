@@ -1,13 +1,13 @@
 [build-system]
-requires = ['flit', 'future-fstrings', 'get_version']
+requires = ['flit>=3.2,<4', 'future-fstrings', 'get_version']
 build-backend = 'flit.buildapi'
 
-[tool.flit.metadata]
-module = 'anndata2ri'
-author = 'Philipp A.'
-author-email = 'flying-sheep@web.de'
-home-page = 'https://github.com/flying-sheep/anndata2ri'
-description-file = 'README.rst'
+[project]
+name = 'anndata2ri'
+authors = [
+    {name = 'Philipp A.', email = 'flying-sheep@web.de'},
+]
+readme = 'README.rst'
 classifiers = [
     'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
     'Development Status :: 4 - Beta',
@@ -18,20 +18,25 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Bio-Informatics',
 ]
 requires-python = '>= 3.6'
-requires = [
+dependencies = [
     'get_version',
     'rpy2 >= 3.0.1',
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
+dynamic = ["version", "description"]
 
-[tool.flit.metadata.requires-extra]
+[project.optional-dependencies]
 test = [
     'pytest',
     'pytest-faulthandler',
     'pygments',
     'scanpy',
 ]
+
+[project.urls]
+Source = 'https://github.com/flying-sheep/anndata2ri'
+Documentation = 'https://icb-anndata2ri.readthedocs-hosted.com/en/latest/'
 
 [tool.black]
 line-length = 120
