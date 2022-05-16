@@ -88,7 +88,7 @@ jobs:
 
     - name: Install anndata2ri
       run: |
-        python -m build --wheel --no-isolation
+        python -m build --wheel
         pip install ./dist/anndata2ri-*.whl
         python -c "import anndata2ri"
 
