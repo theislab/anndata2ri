@@ -89,7 +89,7 @@ jobs:
     - name: Install anndata2ri
       run: |
         python -m build --wheel
-        pip install ./dist/anndata2ri-*.whl
+        pip install $(ls -1 dist/anndata2ri*.whl)[test]
         python -c "import anndata2ri"
 
     - name: Run tests
