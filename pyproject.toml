@@ -41,14 +41,10 @@ doc = [
     'lxml',  # For scraping the R link info
 ]
 
-[tool.flit.metadata.urls]
+[project.urls]
 'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
 'Source Code' = 'https://github.com/theislab/anndata2ri'
 'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
-
-[project.urls]
-Source = 'https://github.com/flying-sheep/anndata2ri'
-Documentation = 'https://icb-anndata2ri.readthedocs-hosted.com/en/latest/'
 
 [tool.black]
 line-length = 120
