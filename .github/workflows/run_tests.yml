@@ -19,10 +19,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
+        - {name: '3.10', os: ubuntu-latest, python: '3.9', r: 'release'}
         - {name: '3.9', os: ubuntu-latest, python: '3.9', r: 'release'}
         - {name: '3.8', os: ubuntu-latest, python: '3.8', r: 'release'}
-        - {name: '3.7', os: ubuntu-latest, python: '3.7', r: 'release'}
-        - {name: '3.6', os: ubuntu-latest, python: '3.6', r: 'oldrel'}
+        - {name: '3.7', os: ubuntu-latest, python: '3.7', r: 'oldrel'}
 
     steps:
     - name: Cancel Previous Runs
