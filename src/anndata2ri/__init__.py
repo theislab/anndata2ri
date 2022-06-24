@@ -36,7 +36,7 @@ except (ImportError, LookupError):
     try:
         from ._version import __version__
     except ImportError:
-        raise ImportError('') from None
+        raise ImportError('Cannot infer version. Make sure to `pip install` the project or install `setuptools-scm`.')
 
 
 def py2rpy(obj: Any) -> Sexp:

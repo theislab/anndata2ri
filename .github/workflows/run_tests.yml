@@ -12,6 +12,9 @@ jobs:
   run_tester:
     runs-on: ${{ matrix.config.os }}
     if: "!contains(github.event.head_commit.message, 'ci skip')"
+    defaults:
+      run:
+        shell: bash -e {0} # -e to fail on error
     env:
       RENV_PATHS_ROOT: ~/.local/share/renv
 
@@ -70,7 +73,7 @@ jobs:
 
     - name: Install python tools
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip wheel
         pip install --upgrade build
 
     - name: Set up rpy2
