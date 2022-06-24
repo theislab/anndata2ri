@@ -1,4 +1,4 @@
-|pypi| |conda| |rtd| |travis| |doi|
+|pypi| |conda| |rtd| |tests| |doi|
 
 .. |pypi| image:: https://img.shields.io/pypi/v/anndata2ri
    :target: https://pypi.org/project/anndata2ri/
@@ -12,9 +12,9 @@
    :target: docs_
    :alt: Documentation Status
 
-.. |travis| image:: https://travis-ci.org/theislab/anndata2ri.svg?branch=master
-   :target: https://travis-ci.org/theislab/anndata2ri
-   :alt: Travis CI Status
+.. |tests| image:: https://github.com/theislab/anndata2ri/actions/workflows/run_tests.yml/badge.svg
+   :target: https://github.com/theislab/anndata2ri/actions/workflows/run_tests.yml
+   :alt: Unit Tests
 
 .. |doi| image:: https://zenodo.org/badge/171714778.svg
    :target: https://zenodo.org/badge/latestdoi/171714778
@@ -41,7 +41,7 @@ Installation
 
    pip install anndata2ri
    # or
-   conda install -c bioconda anndata2ri 
+   conda install -c bioconda anndata2ri
 
 Troubleshooting
 ---------------

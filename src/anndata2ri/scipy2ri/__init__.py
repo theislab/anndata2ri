@@ -22,14 +22,14 @@ R                                                      Python
 =====================================================  ======================================================
 """
 __all__ = [
-    "activate",
-    "deactivate",
-    "py2rpy",
-    "rpy2py",
-    "converter",
-    "supported_r_matrix_types",
-    "supported_r_matrix_storage",
-    "supported_r_matrix_classes",
+    'activate',
+    'deactivate',
+    'py2rpy',
+    'rpy2py',
+    'converter',
+    'supported_r_matrix_types',
+    'supported_r_matrix_storage',
+    'supported_r_matrix_classes',
 ]
 
 
@@ -37,9 +37,9 @@ from typing import Any
 
 from rpy2.rinterface import Sexp
 
-from .support import supported_r_matrix_types, supported_r_matrix_storage, supported_r_matrix_classes
-from .conv import converter, activate, deactivate
 from . import py2r, r2py
+from .conv import activate, converter, deactivate
+from .support import supported_r_matrix_classes, supported_r_matrix_storage, supported_r_matrix_types
 
 
 supported_r_matrix_types = supported_r_matrix_types
