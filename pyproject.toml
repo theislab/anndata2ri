@@ -1,5 +1,5 @@
 [build-system]
-requires = ['flit>=3.2,<4', 'get_version']
+requires = ['flit_core >=3.2,<4', 'get_version']
 build-backend = 'flit_core.buildapi'
 
 [project]
