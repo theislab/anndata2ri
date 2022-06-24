@@ -1,5 +1,5 @@
-from warnings import catch_warnings, simplefilter, WarningMessage
 from typing import List
+from warnings import WarningMessage, catch_warnings, simplefilter
 
 import numpy as np
 import pytest
@@ -25,28 +25,28 @@ def check_empty(ex):
 
 
 def check_pca(ex):
-    sce = importr("SingleCellExperiment")
-    assert [str(n) for n in sce.reducedDimNames(ex)] == ["PCA"]
-    pca = sce.reducedDim(ex, "PCA")
-    assert tuple(baseenv["dim"](pca)) == (2, 4)
+    sce = importr('SingleCellExperiment')
+    assert [str(n) for n in sce.reducedDimNames(ex)] == ['PCA']
+    pca = sce.reducedDim(ex, 'PCA')
+    assert tuple(baseenv['dim'](pca)) == (2, 4)
 
 
 datasets = [
-    pytest.param(check_empty, (0, 0), AnnData, id="empty"),
-    pytest.param(check_pca, (2, 3), mk_ad_simple, id="simple"),
-    pytest.param(check_empty, (640, 11), sc.datasets.krumsiek11, id="krumsiek"),
+    pytest.param(check_empty, (0, 0), AnnData, id='empty'),
+    pytest.param(check_pca, (2, 3), mk_ad_simple, id='simple'),
+    pytest.param(check_empty, (640, 11), sc.datasets.krumsiek11, id='krumsiek'),
     # pytest.param(check_empty, (2730, 3451), sc.datasets.paul15, id="paul"),
 ]
 
 
-@pytest.mark.parametrize("check,shape,dataset", datasets)
+@pytest.mark.parametrize('check,shape,dataset', datasets)
 def test_py2rpy(py2r, check, shape, dataset):
     if dataset is sc.datasets.krumsiek11:
-        with pytest.warns(UserWarning, match=r"Duplicated obs_names"):
+        with pytest.warns(UserWarning, match=r'Duplicated obs_names'):
             ex = py2r(anndata2ri, dataset())
     else:
         ex = py2r(anndata2ri, dataset())
-    assert tuple(baseenv["dim"](ex)[::-1]) == shape
+    assert tuple(baseenv['dim'](ex)[::-1]) == shape
     check(ex)
 
 
@@ -57,8 +57,8 @@ def test_py2rpy2_numpy_pbmc68k():
     try:
         anndata2ri.activate()
         with catch_warnings(record=True) as logs:  # type: List[WarningMessage]
-            simplefilter("ignore", DeprecationWarning)
-            globalenv["adata"] = pbmc68k_reduced()
+            simplefilter('ignore', DeprecationWarning)
+            globalenv['adata'] = pbmc68k_reduced()
         assert len(logs) == 0, [m.message for m in logs]
     finally:
         anndata2ri.deactivate()

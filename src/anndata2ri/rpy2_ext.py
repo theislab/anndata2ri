@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Optional, Union
 
-from rpy2.robjects import packages, Environment
+from rpy2.robjects import Environment, packages
 
 
 @lru_cache()
