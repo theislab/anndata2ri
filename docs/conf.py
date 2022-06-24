@@ -20,6 +20,7 @@ import rpy2.rinterface
 
 
 rpy2.rinterface._MissingArgType = object
+rpy2.rinterface.initr_simple = lambda *_, **__: None
 
 # now we can import it!
 sys.path[:0] = [str(HERE.parent), str(HERE / 'ext')]
