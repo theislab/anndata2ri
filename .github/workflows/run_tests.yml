@@ -2,11 +2,11 @@ name: Unit Tests
 
 on:
   push:
-    branches-ignore:
-      - 'test_deploy'
+    branches:
+    - 'master'
   pull_request:
     branches:
-      - '*'
+    - '*'
 
 jobs:
   run_tester:
