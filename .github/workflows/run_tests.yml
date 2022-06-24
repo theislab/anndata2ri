@@ -1,0 +1,16 @@
+name: Unit Tests
+
+on:
+  push:
+    branches-ignore:
+      - 'test_deploy'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  run_tester:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
