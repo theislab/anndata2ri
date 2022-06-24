@@ -1,11 +1,7 @@
-[build-system]
-requires = ['flit_core >=3.2,<4', 'get_version']
-build-backend = 'flit_core.buildapi'
-
 [project]
 name = 'anndata2ri'
 authors = [
-    {name = 'Philipp A.', email = 'flying-sheep@web.de'},
+    { name = 'Philipp A.', email = 'flying-sheep@web.de' },
 ]
 readme = 'README.rst'
 classifiers = [
@@ -17,16 +13,20 @@ classifiers = [
     'Programming Language :: R',
     'Topic :: Scientific/Engineering :: Bio-Informatics',
 ]
-requires-python = '>= 3.6'
+urls.'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
+urls.'Source Code' = 'https://github.com/theislab/anndata2ri'
+urls.'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
+dynamic = ['version']
+requires-python = '>= 3.7'
 dependencies = [
     'get_version',
     'rpy2 >= 3.4, < 3.4.3',
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
-dynamic = ["version", "description"]
 
 [project.optional-dependencies]
+dev = ['pre-commit']
 test = [
     'pytest',
     'pytest-faulthandler',
@@ -41,10 +41,22 @@ doc = [
     'lxml',  # For scraping the R link info
 ]
 
-[project.urls]
-'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
-'Source Code' = 'https://github.com/theislab/anndata2ri'
-'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
+[tool.hatch.version]
+source = 'vcs'
+
+[tool.hatch.build.hooks.vcs]
+version-file = 'src/anndata2ri/_version.py'
 
 [tool.black]
 line-length = 120
+skip-string-normalization = true
+
+[tool.isort]
+profile = 'black'
+line_length = 120
+lines_after_imports = 2
+length_sort_straight = true
+
+[build-system]
+requires = ['hatchling', 'hatch-vcs']
+build-backend = 'hatchling.build'

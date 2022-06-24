@@ -2,16 +2,19 @@ name: Unit Tests
 
 on:
   push:
-    branches-ignore:
-      - 'test_deploy'
+    branches:
+    - 'master'
   pull_request:
     branches:
-      - '*'
+    - '*'
 
 jobs:
   run_tester:
     runs-on: ${{ matrix.config.os }}
     if: "!contains(github.event.head_commit.message, 'ci skip')"
+    defaults:
+      run:
+        shell: bash -e {0} # -e to fail on error
     env:
       RENV_PATHS_ROOT: ~/.local/share/renv
 
@@ -23,7 +26,6 @@ jobs:
         - { name: '3.9', os: ubuntu-latest, python: '3.9', r: 'release' }
         - { name: '3.8', os: ubuntu-latest, python: '3.8', r: 'release' }
         - { name: '3.7', os: ubuntu-latest, python: '3.7', r: 'oldrel' }
-        - { name: '3.6', os: ubuntu-latest, python: '3.6', r: 'oldrel' }
 
     steps:
     - name: Cancel Previous Runs
@@ -56,8 +58,9 @@ jobs:
       uses: pat-s/always-upload-cache@v2
       with:
         path: ${{ env.pythonLocation }}
-        key: ${{runner.os}}-pip-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}
-        restore-keys: ${{runner.os}}-pip-${{ env.pythonLocation }}-
+        # cache bust by increasing or resetting (after 7 days) the “vX” tag
+        key: ${{runner.os}}-pip-${{ env.pythonLocation }}-v2-${{ hashFiles('pyproject.toml') }}
+        restore-keys: ${{runner.os}}-pip-${{ env.pythonLocation }}-v2-
 
     - name: Cache R packages
       uses: pat-s/always-upload-cache@v2
@@ -70,7 +73,7 @@ jobs:
 
     - name: Install python tools
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip wheel
         pip install --upgrade build
 
     - name: Set up rpy2
@@ -94,4 +97,4 @@ jobs:
         python -c "import anndata2ri"
 
     - name: Run tests
-      run: PYTHONPATH="." pytest
+      run: pytest --verbose --color=yes

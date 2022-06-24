@@ -7,14 +7,14 @@ from . import scipy2ri
 
 
 original_converter: Optional[conversion.Converter] = None
-converter = conversion.Converter("original anndata conversion")
+converter = conversion.Converter('original anndata conversion')
 
 mat_converter = numpy2ri.converter + scipy2ri.converter
 
 
 def full_converter() -> conversion.Converter:
     pandas2ri.activate()
-    new_converter = conversion.Converter("anndata conversion", template=conversion.converter)
+    new_converter = conversion.Converter('anndata conversion', template=conversion.converter)
     pandas2ri.deactivate()
 
     overlay_converter(scipy2ri.converter, new_converter)
