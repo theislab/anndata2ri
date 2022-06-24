@@ -16,6 +16,7 @@ Converter between Python’s AnnData and R’s SingleCellExperiment.
 """
 __all__ = ['activate', 'deactivate', 'py2rpy', 'rpy2py', 'converter']
 
+from pathlib import Path
 from typing import Any
 
 from rpy2.rinterface import Sexp
@@ -24,11 +25,13 @@ from . import py2r, r2py
 from .conv import activate, converter, deactivate
 
 
+HERE = Path(__file__).parent
+
 __author__ = 'Philipp Angerer'
 try:
     from setuptools_scm import get_version
 
-    __version__ = get_version('../..')
+    __version__ = get_version(str(HERE.parent.parent))
 except (ImportError, LookupError):
     try:
         from ._version import __version__
