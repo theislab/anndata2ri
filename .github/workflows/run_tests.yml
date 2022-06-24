@@ -26,7 +26,6 @@ jobs:
         - { name: '3.9', os: ubuntu-latest, python: '3.9', r: 'release' }
         - { name: '3.8', os: ubuntu-latest, python: '3.8', r: 'release' }
         - { name: '3.7', os: ubuntu-latest, python: '3.7', r: 'oldrel' }
-        - { name: '3.6', os: ubuntu-latest, python: '3.6', r: 'oldrel' }
 
     steps:
     - name: Cancel Previous Runs
@@ -59,8 +58,9 @@ jobs:
       uses: pat-s/always-upload-cache@v2
       with:
         path: ${{ env.pythonLocation }}
-        key: ${{runner.os}}-pip-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}
-        restore-keys: ${{runner.os}}-pip-${{ env.pythonLocation }}-
+        # cache bust by increasing or resetting (after 7 days) the “vX” tag
+        key: ${{runner.os}}-pip-${{ env.pythonLocation }}-v2-${{ hashFiles('pyproject.toml') }}
+        restore-keys: ${{runner.os}}-pip-${{ env.pythonLocation }}-v2-
 
     - name: Cache R packages
       uses: pat-s/always-upload-cache@v2

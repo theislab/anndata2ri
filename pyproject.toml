@@ -17,7 +17,7 @@ urls.'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
 urls.'Source Code' = 'https://github.com/theislab/anndata2ri'
 urls.'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
 dynamic = ['version']
-requires-python = '>= 3.6'
+requires-python = '>= 3.7'
 dependencies = [
     'get_version',
     'rpy2 >= 3.4, < 3.4.3',
