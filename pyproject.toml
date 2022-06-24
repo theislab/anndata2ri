@@ -20,7 +20,7 @@ dynamic = ['version']
 requires-python = '>= 3.7'
 dependencies = [
     'get_version',
-    'rpy2 >= 3.4, < 3.4.3',
+    'rpy2 >= 3.4.3',
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
