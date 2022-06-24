@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from types import ModuleType
-from typing import List, Callable, Any
+from typing import Any, Callable, List
 
 import pytest
 from rpy2.rinterface import Sexp
-from rpy2.robjects import globalenv, default_converter
-from rpy2.robjects.conversion import localconverter, Converter
+from rpy2.robjects import default_converter, globalenv
+from rpy2.robjects.conversion import Converter, localconverter
 
 
 class ConversionModule(ModuleType, ABC):
@@ -29,23 +29,23 @@ def conversion_py2rpy_manual(conv_mod: ConversionModule, dataset: Any) -> Sexp:
 
 def conversion_py2rpy_local(conv_mod: ConversionModule, dataset: Any) -> Sexp:
     with localconverter(conv_mod.converter):
-        globalenv["temp"] = dataset
-    return globalenv["temp"]
+        globalenv['temp'] = dataset
+    return globalenv['temp']
 
 
 def conversion_py2rpy_activate(conv_mod: ConversionModule, dataset: Any) -> Sexp:
     try:
         conv_mod.activate()
-        globalenv["temp"] = dataset
+        globalenv['temp'] = dataset
     finally:
         conv_mod.deactivate()
-    return globalenv["temp"]
+    return globalenv['temp']
 
 
 conversions_py2rpy: List[Callable[[ConversionModule, Any], Sexp]] = [
-    pytest.param(conversion_py2rpy_manual, id="manual"),
-    pytest.param(conversion_py2rpy_local, id="local"),
-    pytest.param(conversion_py2rpy_activate, id="activate"),
+    pytest.param(conversion_py2rpy_manual, id='manual'),
+    pytest.param(conversion_py2rpy_local, id='local'),
+    pytest.param(conversion_py2rpy_activate, id='activate'),
 ]
 
 
@@ -74,9 +74,9 @@ def conversion_rpy2py_activate(conv_mod: ConversionModule, dataset: Callable[[],
 
 
 conversions_rpy2py: List[Callable[[ConversionModule, Callable[[], Sexp]], Any]] = [
-    pytest.param(conversion_rpy2py_manual, id="manual"),
-    pytest.param(conversion_rpy2py_local, id="local"),
-    pytest.param(conversion_rpy2py_activate, id="activate"),
+    pytest.param(conversion_rpy2py_manual, id='manual'),
+    pytest.param(conversion_rpy2py_local, id='local'),
+    pytest.param(conversion_rpy2py_activate, id='activate'),
 ]
 
 
