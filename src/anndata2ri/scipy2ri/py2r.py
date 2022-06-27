@@ -17,6 +17,14 @@ base: Optional[Package] = None
 as_logical: Optional[Callable[[Any], BoolVector]] = None
 as_integer: Optional[Callable[[Any], IntVector]] = None
 as_double: Optional[Callable[[Any], FloatVector]] = None
+    
+
+
+def define_type_conv(fun: Callable[[Any], Sexp]) -> Callable[[Any], Sexp]:
+    def conv(x):
+        with localconverter(default_converter + numpy2ri.converter):
+            return fun(x)
+    return conv
 
 
 def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp], Type[Vector]]:
@@ -36,9 +44,9 @@ def py2r_context(f):
             importr('Matrix')  # make class available
             methods = importr('methods')
             base = importr('base')
-            as_logical = lambda x: base.as_logical(numpy2ri.py2rpy(x))
-            as_integer = lambda x: base.as_integer(numpy2ri.py2rpy(x))
-            as_double = lambda x: base.as_double(numpy2ri.py2rpy(x))
+            as_logical = define_type_conv(base.as_logical)
+            as_integer = define_type_conv(base.as_integer)
+            as_double = define_type_conv(base.as_double)
 
         return f(obj)
 
