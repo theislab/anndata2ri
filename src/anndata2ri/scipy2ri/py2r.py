@@ -3,7 +3,7 @@ from typing import Any, Callable, Optional, Tuple, Type
 
 import numpy as np
 from rpy2.rinterface import Sexp
-from rpy2.robjects import BoolVector, FloatVector, IntVector, Vector, baseenv, default_converter, numpy2ri
+from rpy2.robjects import BoolVector, FloatVector, IntVector, Vector, default_converter, numpy2ri
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.packages import Package
 from scipy import sparse
@@ -13,6 +13,7 @@ from .conv import converter
 
 
 methods: Optional[Package] = None
+base: Optional[Package] = None
 as_logical: Optional[Callable[[Any], BoolVector]] = None
 as_integer: Optional[Callable[[Any], IntVector]] = None
 as_double: Optional[Callable[[Any], FloatVector]] = None
@@ -34,9 +35,10 @@ def py2r_context(f):
         if methods is None:
             importr('Matrix')  # make class available
             methods = importr('methods')
-            as_logical = lambda x: baseenv['as.logical'](numpy2ri.py2rpy(x))
-            as_integer = lambda x: baseenv['as.integer'](numpy2ri.py2rpy(x))
-            as_double = lambda x: baseenv['as.double'](numpy2ri.py2rpy(x))
+            base = importr('base')
+            as_logical = lambda x: base.as_logical(numpy2ri.py2rpy(x))
+            as_integer = lambda x: base.as_integer(numpy2ri.py2rpy(x))
+            as_double = lambda x: base.as_double(numpy2ri.py2rpy(x))
 
         return f(obj)
 
