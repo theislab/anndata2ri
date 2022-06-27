@@ -13,7 +13,6 @@ from .conv import converter
 
 
 methods: Optional[Package] = None
-base: Optional[Package] = None
 as_logical: Optional[Callable[[Any], BoolVector]] = None
 as_integer: Optional[Callable[[Any], IntVector]] = None
 as_double: Optional[Callable[[Any], FloatVector]] = None
