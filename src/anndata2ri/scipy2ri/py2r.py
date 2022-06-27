@@ -34,12 +34,11 @@ def py2r_context(f):
         if methods is None:
             importr('Matrix')  # make class available
             methods = importr('methods')
-            as_logical = baseenv['as.logical']
-            as_integer = baseenv['as.integer']
-            as_double = baseenv['as.double']
+            as_logical = lambda x: baseenv['as.logical'](numpy2ri.py2rpy(x))
+            as_integer = lambda x: baseenv['as.integer'](numpy2ri.py2rpy(x))
+            as_double = lambda x: baseenv['as.double'](numpy2ri.py2rpy(x))
 
-        with localconverter(default_converter + numpy2ri.converter):
-            return f(obj)
+        return f(obj)
 
     return wrapper
 
