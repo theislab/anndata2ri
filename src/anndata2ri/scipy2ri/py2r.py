@@ -17,14 +17,6 @@ base: Optional[Package] = None
 as_logical: Optional[Callable[[Any], BoolVector]] = None
 as_integer: Optional[Callable[[Any], IntVector]] = None
 as_double: Optional[Callable[[Any], FloatVector]] = None
-    
-
-
-def define_type_conv(fun: Callable[[Any], Sexp]) -> Callable[[Any], Sexp]:
-    def conv(x):
-        with localconverter(default_converter + numpy2ri.converter):
-            return fun(x)
-    return conv
 
 
 def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp], Type[Vector]]:
@@ -44,9 +36,9 @@ def py2r_context(f):
             importr('Matrix')  # make class available
             methods = importr('methods')
             base = importr('base')
-            as_logical = define_type_conv(base.as_logical)
-            as_integer = define_type_conv(base.as_integer)
-            as_double = define_type_conv(base.as_double)
+            as_logical = base.as_logical
+            as_integer = base.as_integer
+            as_double = base.as_double
 
         return f(obj)
 
@@ -58,13 +50,14 @@ def py2r_context(f):
 def csc_to_rmat(csc: sparse.csc_matrix):
     csc.sort_indices()
     t, conv_data, _ = get_type_conv(csc.dtype)
-    return methods.new(
-        f'{t}gCMatrix',
-        i=as_integer(csc.indices),
-        p=as_integer(csc.indptr),
-        x=conv_data(csc.data),
-        Dim=as_integer(list(csc.shape)),
-    )
+    with localconverter(default_converter + numpy2ri.converter):
+        return methods.new(
+            f'{t}gCMatrix',
+            i=as_integer(csc.indices),
+            p=as_integer(csc.indptr),
+            x=conv_data(csc.data),
+            Dim=as_integer(list(csc.shape)),
+        )
 
 
 @converter.py2rpy.register(sparse.csr_matrix)
@@ -72,26 +65,28 @@ def csc_to_rmat(csc: sparse.csc_matrix):
 def csr_to_rmat(csr: sparse.csr_matrix):
     csr.sort_indices()
     t, conv_data, _ = get_type_conv(csr.dtype)
-    return methods.new(
-        f'{t}gRMatrix',
-        j=as_integer(csr.indices),
-        p=as_integer(csr.indptr),
-        x=conv_data(csr.data),
-        Dim=as_integer(list(csr.shape)),
-    )
+    with localconverter(default_converter + numpy2ri.converter):
+        return methods.new(
+            f'{t}gRMatrix',
+            j=as_integer(csr.indices),
+            p=as_integer(csr.indptr),
+            x=conv_data(csr.data),
+            Dim=as_integer(list(csr.shape)),
+        )
 
 
 @converter.py2rpy.register(sparse.coo_matrix)
 @py2r_context
 def coo_to_rmat(coo: sparse.coo_matrix):
     t, conv_data, _ = get_type_conv(coo.dtype)
-    return methods.new(
-        f'{t}gTMatrix',
-        i=as_integer(coo.row),
-        j=as_integer(coo.col),
-        x=conv_data(coo.data),
-        Dim=as_integer(list(coo.shape)),
-    )
+    with localconverter(default_converter + numpy2ri.converter):
+        return methods.new(
+            f'{t}gTMatrix',
+            i=as_integer(coo.row),
+            j=as_integer(coo.col),
+            x=conv_data(coo.data),
+            Dim=as_integer(list(coo.shape)),
+        )
 
 
 @converter.py2rpy.register(sparse.dia_matrix)
@@ -104,9 +99,10 @@ def dia_to_rmat(dia: sparse.dia_matrix):
             f'R diagonal matrices only support 1 diagonal, but this has {len(dia.offsets)}.'
         )
     is_unit = np.all(dia.data == 1)
-    return methods.new(
-        f'{t}diMatrix',
-        x=vec_cls([]) if is_unit else conv_data(dia.data),
-        diag='U' if is_unit else 'N',
-        Dim=as_integer(list(dia.shape)),
-    )
+    with localconverter(default_converter + numpy2ri.converter):
+        return methods.new(
+            f'{t}diMatrix',
+            x=vec_cls([]) if is_unit else conv_data(dia.data),
+            diag='U' if is_unit else 'N',
+            Dim=as_integer(list(dia.shape)),
+        )
