@@ -39,7 +39,6 @@ doc = [
     'scanpydoc',
     'sphinx-rtd-theme>=0.5',  # Already a dep but 0.5 is prettier
     'lxml',  # For scraping the R link info
-    'importlib_metadata; python_version < "3.8"',
 ]
 
 [tool.hatch.version]

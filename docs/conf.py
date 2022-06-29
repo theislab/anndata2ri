@@ -1,28 +1,42 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-
-
-try:
-    from importlib.metadata import metadata
-except ImportError:
-    from importlib_metadata import metadata
+from unittest.mock import MagicMock
 
 
 HERE = Path(__file__).parent
 
+
+# Can’t use autodoc_mock_imports as we import anndata2ri
+sys.modules['rpy2.rinterface_lib'] = MagicMock()
+submods = ['embedded', 'conversion', 'memorymanagement', 'sexp', 'bufferprotocol', 'callbacks', '_rinterface_capi']
+sys.modules.update({f'rpy2.rinterface_lib.{sub}': MagicMock() for sub in submods})
+sexp = sys.modules['rpy2.rinterface_lib.sexp']
+sexp.Sexp = type('Sexp', (MagicMock,), dict(__module__='rpy2.rinterface'))
+sexp.SexpVector = sexp.SexpEnvironment = sexp.StrSexpVector = MagicMock
+sexp.SexpVector.from_iterable = MagicMock()
+
+import rpy2.rinterface
+
+
+rpy2.rinterface._MissingArgType = object
+rpy2.rinterface.initr_simple = lambda *_, **__: None
+
+# now we can import it!
 sys.path[:0] = [str(HERE.parent), str(HERE / 'ext')]
+import anndata2ri.scipy2ri  # noqa
 
 
 # -- General configuration ------------------------------------------------
 
 
+needs_sphinx = '1.7'  # autosummary bugfix
+
 # General information
 project = 'anndata2ri'
-meta = metadata(project)
-author = meta['author-email'].split('"')[1]
+author = anndata2ri.__author__
 copyright = f'{datetime.now():%Y}, {author}.'
-version = meta['version']
+version = anndata2ri.__version__.replace('.dirty', '')
 release = version
 
 # default settings
