@@ -1,28 +1,29 @@
 from functools import wraps
-from typing import Any, Callable, Optional, Tuple, Type
+from typing import Callable, Optional
 
 import numpy as np
 from rpy2.rinterface import Sexp
-from rpy2.robjects import BoolVector, FloatVector, IntVector, Vector, baseenv, default_converter, numpy2ri
+from rpy2.robjects import default_converter, numpy2ri
 from rpy2.robjects.conversion import localconverter
-from rpy2.robjects.packages import Package
+from rpy2.robjects.packages import Package, SignatureTranslatedAnonymousPackage
 from scipy import sparse
 
 from ..rpy2_ext import importr
 from .conv import converter
 
 
-methods: Optional[Package] = None
-as_logical: Optional[Callable[[Any], BoolVector]] = None
-as_integer: Optional[Callable[[Any], IntVector]] = None
-as_double: Optional[Callable[[Any], FloatVector]] = None
+matrix: Optional[SignatureTranslatedAnonymousPackage] = None
+base: Optional[Package] = None
 
 
-def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp], Type[Vector]]:
+def get_type_conv(dtype: np.dtype) -> Callable[[np.ndarray], Sexp]:
+    global base
+    if base is None:
+        base = importr('base')
     if np.issubdtype(dtype, np.floating):
-        return 'd', as_double, FloatVector
+        return base.as_double
     elif np.issubdtype(dtype, np.bool_):
-        return 'l', as_logical, BoolVector
+        return base.as_logical
     else:
         raise ValueError(f'Unknown dtype {dtype!r} cannot be converted to ?gRMatrix.')
 
@@ -30,16 +31,61 @@ def get_type_conv(dtype: np.dtype) -> Tuple[str, Callable[[np.ndarray], Sexp], T
 def py2r_context(f):
     @wraps(f)
     def wrapper(obj):
-        global methods, as_logical, as_integer, as_double
-        if methods is None:
+        global as_logical, as_integer, as_double, matrix
+        if matrix is None:
             importr('Matrix')  # make class available
-            methods = importr('methods')
-            as_logical = baseenv['as.logical']
-            as_integer = baseenv['as.integer']
-            as_double = baseenv['as.double']
+            matrix = SignatureTranslatedAnonymousPackage(
+                """
+                sparse_matrix <- function(x, conv_data, dims, ...) {
+                    Matrix::sparseMatrix(
+                        ...,
+                        x=conv_data(x),
+                        dims=as.integer(dims),
+                        index1=FALSE
+                    )
+                }
 
-        with localconverter(default_converter + numpy2ri.converter):
-            return f(obj)
+                from_csc <- function(i, p, x, dims, conv_data) {
+                    sparse_matrix(
+                        i=as.integer(i),
+                        p=as.integer(p),
+                        x=x,
+                        conv_data=conv_data,
+                        dims=dims,
+                        repr="C"
+                    )
+                }
+
+                from_csr <- function(j, p, x, dims, conv_data) {
+                    sparse_matrix(
+                        j=as.integer(j),
+                        p=as.integer(p),
+                        x=x,
+                        conv_data=conv_data,
+                        dims=dims,
+                        repr="R"
+                    )
+                }
+
+                from_coo <- function(i, j, x, dims, conv_data) {
+                    sparse_matrix(
+                        i=as.integer(i),
+                        j=as.integer(j),
+                        x=x,
+                        conv_data=conv_data,
+                        dims=dims,
+                        repr="T"
+                    )
+                }
+
+                from_dia <- function(n, x, conv_data) {
+                    Matrix::Diagonal(n=as.integer(n), x=conv_data(x))
+                }
+                """,
+                'matrix',
+            )
+
+        return f(obj)
 
     return wrapper
 
@@ -48,56 +94,52 @@ def py2r_context(f):
 @py2r_context
 def csc_to_rmat(csc: sparse.csc_matrix):
     csc.sort_indices()
-    t, conv_data, _ = get_type_conv(csc.dtype)
-    return methods.new(
-        f'{t}gCMatrix',
-        i=as_integer(csc.indices),
-        p=as_integer(csc.indptr),
-        x=conv_data(csc.data),
-        Dim=as_integer(list(csc.shape)),
-    )
+    conv_data = get_type_conv(csc.dtype)
+    with localconverter(default_converter + numpy2ri.converter):
+        return matrix.from_csc(i=csc.indices, p=csc.indptr, x=csc.data, dims=list(csc.shape), conv_data=conv_data)
 
 
 @converter.py2rpy.register(sparse.csr_matrix)
 @py2r_context
 def csr_to_rmat(csr: sparse.csr_matrix):
     csr.sort_indices()
-    t, conv_data, _ = get_type_conv(csr.dtype)
-    return methods.new(
-        f'{t}gRMatrix',
-        j=as_integer(csr.indices),
-        p=as_integer(csr.indptr),
-        x=conv_data(csr.data),
-        Dim=as_integer(list(csr.shape)),
-    )
+    conv_data = get_type_conv(csr.dtype)
+    with localconverter(default_converter + numpy2ri.converter):
+        return matrix.from_csr(
+            j=csr.indices,
+            p=csr.indptr,
+            x=csr.data,
+            conv_data=conv_data,
+            dims=list(csr.shape),
+        )
 
 
 @converter.py2rpy.register(sparse.coo_matrix)
 @py2r_context
 def coo_to_rmat(coo: sparse.coo_matrix):
-    t, conv_data, _ = get_type_conv(coo.dtype)
-    return methods.new(
-        f'{t}gTMatrix',
-        i=as_integer(coo.row),
-        j=as_integer(coo.col),
-        x=conv_data(coo.data),
-        Dim=as_integer(list(coo.shape)),
-    )
+    conv_data = get_type_conv(coo.dtype)
+    with localconverter(default_converter + numpy2ri.converter):
+        return matrix.from_coo(
+            i=coo.row,
+            j=coo.col,
+            x=coo.data,
+            conv_data=conv_data,
+            dims=list(coo.shape),
+        )
 
 
 @converter.py2rpy.register(sparse.dia_matrix)
 @py2r_context
 def dia_to_rmat(dia: sparse.dia_matrix):
-    t, conv_data, vec_cls = get_type_conv(dia.dtype)
+    conv_data = get_type_conv(dia.dtype)
     if len(dia.offsets) > 1:
         raise ValueError(
             'Cannot convert a dia_matrix with more than 1 diagonal to a *diMatrix. '
             f'R diagonal matrices only support 1 diagonal, but this has {len(dia.offsets)}.'
         )
-    is_unit = np.all(dia.data == 1)
-    return methods.new(
-        f'{t}diMatrix',
-        x=vec_cls([]) if is_unit else conv_data(dia.data),
-        diag='U' if is_unit else 'N',
-        Dim=as_integer(list(dia.shape)),
-    )
+    with localconverter(default_converter + numpy2ri.converter):
+        return matrix.from_dia(
+            n=dia.shape[0],
+            x=dia.data,
+            conv_data=conv_data,
+        )
