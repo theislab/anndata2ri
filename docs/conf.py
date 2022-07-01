@@ -5,6 +5,12 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 
+try:
+    from importlib.metadata import metadata
+except ImportError:
+    from importlib_metadata import metadata
+
+
 HERE = Path(__file__).parent
 
 
@@ -41,9 +47,10 @@ needs_sphinx = '1.7'  # autosummary bugfix
 
 # General information
 project = 'anndata2ri'
-author = anndata2ri.__author__
+meta = metadata(project)
+author = meta['author-email'].split('"')[1]
 copyright = f'{datetime.now():%Y}, {author}.'
-version = anndata2ri.__version__.replace('.dirty', '')
+version = meta['version']
 release = version
 
 # default settings
