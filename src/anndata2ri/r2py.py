@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from anndata import AnnData
 from rpy2.rinterface import IntSexpVector, NULLType, Sexp, SexpS4, baseenv
-from rpy2.robjects import default_converter, pandas2ri
+from rpy2.robjects import default_converter, numpy2ri, pandas2ri
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 
@@ -39,11 +39,16 @@ def rpy2py_vector(v):
         return v
     if isinstance(v, IntSexpVector):
         assert v._R_SIZEOF_ELT == 4, 'R integer size changed away from 32 bit'
+        r = pd.array(v, dtype=pd.Int32Dtype())
+        v_is_na = numpy2ri.rpy2py(baseenv['is.na'](v)).astype(bool)
         if 'factor' in v.rclass:
-            r = pandas2ri.rpy2py(v)
-        else:
-            r = pd.array(v, dtype=pd.Int32Dtype())
-        r[np.array(baseenv['is.na'](v), dtype=bool)] = pd.NA
+            levels = numpy2ri.rpy2py(baseenv['levels'](v))
+            codes = r.to_numpy() - 1
+            # temporarily set NA values to a valid index
+            codes[v_is_na] = 0
+            codes = codes.astype(int)
+            r = pd.array(levels[codes], dtype=pd.CategoricalDtype(levels))
+        r[v_is_na] = pd.NA
         return r
     return pandas2ri.rpy2py(v)
 
