@@ -11,39 +11,38 @@ except ImportError:
     from importlib_metadata import metadata
 
 
+def mock_rpy2():
+    # Can’t use autodoc_mock_imports as we import anndata2ri
+    patch('rpy2.situation.get_r_home', lambda: None).start()
+    sys.modules['rpy2.rinterface_lib'] = MagicMock()
+    submods = ['embedded', 'conversion', 'memorymanagement', 'sexp', 'bufferprotocol', 'callbacks', '_rinterface_capi']
+    sys.modules.update({f'rpy2.rinterface_lib.{sub}': MagicMock() for sub in submods})
+    sexp = sys.modules['rpy2.rinterface_lib'].sexp = sys.modules['rpy2.rinterface_lib.sexp']
+    sexp.Sexp = type('Sexp', (MagicMock, ABC), dict(__module__='rpy2.rinterface_lib.sexp'))
+    sexp.SexpEnvironment = type('SexpEnvironment', (sexp.Sexp,), dict(__module__='rpy2.rinterface_lib.sexp'))
+    sexp.SexpVector = sexp.StrSexpVector = MagicMock
+    sexp.SexpVector.from_iterable = MagicMock()
+
+    import rpy2.rinterface
+    import rpy2.rinterface_lib.sexp
+
+    rpy2.rinterface_lib = sys.modules['rpy2.rinterface_lib']
+    rpy2.rinterface._MissingArgType = object
+    rpy2.rinterface.initr_simple = lambda *_, **__: None
+
+    assert rpy2.rinterface_lib.sexp is sexp
+
+
 HERE = Path(__file__).parent
 
+mock_rpy2()
 
-# Can’t use autodoc_mock_imports as we import anndata2ri
-patch('rpy2.situation.get_r_home', lambda: None).start()
-sys.modules['rpy2.rinterface_lib'] = MagicMock()
-submods = ['embedded', 'conversion', 'memorymanagement', 'sexp', 'bufferprotocol', 'callbacks', '_rinterface_capi']
-sys.modules.update({f'rpy2.rinterface_lib.{sub}': MagicMock() for sub in submods})
-sexp = sys.modules['rpy2.rinterface_lib'].sexp = sys.modules['rpy2.rinterface_lib.sexp']
-sexp.Sexp = type('Sexp', (MagicMock, ABC), dict(__module__='rpy2.rinterface_lib.sexp'))
-sexp.SexpEnvironment = type('SexpEnvironment', (sexp.Sexp,), dict(__module__='rpy2.rinterface_lib.sexp'))
-sexp.SexpVector = sexp.StrSexpVector = MagicMock
-sexp.SexpVector.from_iterable = MagicMock()
-
-import rpy2.rinterface
-import rpy2.rinterface_lib.sexp
-
-
-rpy2.rinterface_lib = sys.modules['rpy2.rinterface_lib']
-rpy2.rinterface._MissingArgType = object
-rpy2.rinterface.initr_simple = lambda *_, **__: None
-
-assert rpy2.rinterface_lib.sexp is sexp
-
-# now we can import it!
+# now we can anndata2ri and our extensions
 sys.path[:0] = [str(HERE.parent), str(HERE / 'ext')]
-import anndata2ri.scipy2ri  # noqa
 
 
 # -- General configuration ------------------------------------------------
 
-
-needs_sphinx = '1.7'  # autosummary bugfix
 
 # General information
 project = 'anndata2ri'
