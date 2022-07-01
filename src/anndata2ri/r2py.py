@@ -1,10 +1,12 @@
+from __future__ import annotations
+
+from collections.abc import Mapping
 from typing import Optional, Union
 
-import numpy as np
 import pandas as pd
 from anndata import AnnData
 from rpy2.rinterface import IntSexpVector, NULLType, Sexp, SexpS4, baseenv
-from rpy2.robjects import default_converter, numpy2ri, pandas2ri
+from rpy2.robjects import RS4, default_converter, numpy2ri, pandas2ri
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 
@@ -73,11 +75,21 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         se = importr('SummarizedExperiment')
         sce = importr('SingleCellExperiment')
 
+        def convert_mats(attr: str, mats: Mapping[str, Sexp], *, transpose: bool = False):
+            rv = []
+            for n, mat in mats.items():
+                conv = mat_converter.rpy2py(mat)
+                if isinstance(conv, RS4):
+                    cls_names = mat_converter.rpy2py(conv.slots['class']).tolist()
+                    raise TypeError(f'Cannot convert {attr} “{n}” of type(s) {cls_names} to Python')
+                rv.append(conv.T if transpose else conv)
+            return rv
+
         assay_names = se.assayNames(obj)
         if not isinstance(assay_names, NULLType):
             assay_names = [str(a) for a in se.assayNames(obj)]
             # The assays can be stored in an env or elsewise so we don’t use obj.slots['assays']
-            assays = [mat_converter.rpy2py(assay).T for assay in (se.assay(obj, n) for n in assay_names)]
+            assays = convert_mats(f'assay', {n: se.assay(obj, n) for n in assay_names}, transpose=True)
             # There’s SingleCellExperiment with no assays
             exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:]))
             assert len(exprs.shape) == 2, exprs.shape
@@ -87,7 +99,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         rdim_names = sce.reducedDimNames(obj)
         if not isinstance(rdim_names, NULLType):
             rdim_names = [str(t) for t in rdim_names]
-            reduced_dims = [mat_converter.rpy2py(rd) for rd in (sce.reducedDim(obj, t) for t in rdim_names)]
+            reduced_dims = convert_mats('reducedDim', {t: sce.reducedDim(obj, t) for t in rdim_names})
             obsm = {conv_name.sce2scanpy(n): d for n, d in zip(rdim_names, reduced_dims)}
         else:
             obsm = None
