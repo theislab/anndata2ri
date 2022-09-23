@@ -14,7 +14,7 @@ mat_converter = numpy2ri.converter + scipy2ri.converter
 
 def full_converter() -> conversion.Converter:
     pandas2ri.activate()
-    new_converter = conversion.Converter('anndata conversion', template=conversion.converter)
+    new_converter = conversion.Converter('anndata conversion', template=conversion.get_conversion())
     pandas2ri.deactivate()
 
     overlay_converter(scipy2ri.converter, new_converter)
@@ -38,7 +38,7 @@ def activate():
         return
 
     new_converter = full_converter()
-    original_converter = conversion.converter
+    original_converter = conversion.get_conversion()
     conversion.set_conversion(new_converter)
 
 
