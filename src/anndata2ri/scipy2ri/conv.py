@@ -19,10 +19,10 @@ def activate():
     if original_converter is not None:
         return
 
-    original_converter = conversion.converter
+    original_converter = conversion.get_conversion()
 
     numpy2ri.activate()
-    new_converter = conversion.Converter('scipy conversion', template=conversion.converter)
+    new_converter = conversion.Converter('scipy conversion', template=conversion.get_conversion())
     numpy2ri.deactivate()
 
     overlay_converter(converter, new_converter)
