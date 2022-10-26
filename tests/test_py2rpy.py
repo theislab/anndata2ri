@@ -5,7 +5,9 @@ import numpy as np
 import pytest
 import scanpy as sc
 from anndata import AnnData
+from pandas import DataFrame
 from rpy2.robjects import baseenv, globalenv
+from rpy2.robjects.conversion import localconverter
 
 import anndata2ri
 from anndata2ri.rpy2_ext import importr
@@ -62,3 +64,12 @@ def test_py2rpy2_numpy_pbmc68k():
         assert len(logs) == 0, [m.message for m in logs]
     finally:
         anndata2ri.deactivate()
+
+
+def test_obsm_df():
+    """Obsm can contain dataframes"""
+    adata = mk_ad_simple()
+    adata.obsm['a'] = DataFrame([[5, 6, 7], [8, 9, 0]], index=adata.obs_names)
+
+    with localconverter(anndata2ri.converter):
+        globalenv['adata_obsm_pd'] = adata
