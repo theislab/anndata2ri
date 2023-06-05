@@ -8,13 +8,18 @@ on:
     branches:
     - '*'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -e {0} # -e to fail on error
+
 jobs:
   run_tester:
     runs-on: ${{ matrix.config.os }}
     if: "!contains(github.event.head_commit.message, 'ci skip')"
-    defaults:
-      run:
-        shell: bash -e {0} # -e to fail on error
     env:
       RENV_PATHS_ROOT: ~/.local/share/renv
 
@@ -22,18 +27,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
+        - { name: '3.11', os: ubuntu-latest, python: '3.11', r: 'release' }
         - { name: '3.10', os: ubuntu-latest, python: '3.10', r: 'release' }
         - { name: '3.9', os: ubuntu-latest, python: '3.9', r: 'release' }
-        - { name: '3.8', os: ubuntu-latest, python: '3.8', r: 'release' }
-        - { name: '3.7', os: ubuntu-latest, python: '3.7', r: 'oldrel' }
+        - { name: '3.8', os: ubuntu-latest, python: '3.8', r: 'oldrel' }
 
     steps:
-    - name: Cancel Previous Runs
-      uses: styfle/cancel-workflow-action@0.6.0
-      with:
-        access_token: ${{ github.token }}
-
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -45,32 +45,16 @@ jobs:
             pandoc gfortran libblas-dev liblapack-dev libedit-dev llvm-dev libcurl4-openssl-dev ffmpeg libhdf5-dev
 
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.config.python }}
+        cache: pip
 
     - name: Set up R
       id: setup-r
       uses: r-lib/actions/setup-r@v2
       with:
         r-version: ${{ matrix.config.r }}
-
-    - name: Cache Python packages
-      uses: pat-s/always-upload-cache@v2
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{runner.os}}-pip-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}
-        restore-keys: ${{runner.os}}-pip-${{ env.pythonLocation }}-
-
-    - name: Cache R packages
-      uses: pat-s/always-upload-cache@v2
-      if: startsWith(runner.os, 'Linux')
-      with:
-        path: ${{ env.RENV_PATHS_ROOT }}
-        # cache bust by increasing or resetting (after 7 days) the “vX” tag
-        key: ${{ runner.os }}-renv-${{ steps.setup-r.outputs.installed-r-version }}-v2-${{ hashFiles('**/renv.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-renv-${{ steps.setup-r.outputs.installed-r-version }}-v2-
 
     - name: Install python tools
       run: |
@@ -82,14 +66,12 @@ jobs:
         pip install rpy2
         echo "LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
-    - name: Install R packages
-      id: install-r-packages
-      run: |
-        if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
-        renv::restore()
-        renv::install("bioc::SingleCellExperiment")
-        renv::install("bioc::scRNAseq")
-      shell: Rscript {0}
+    - uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        cache-version: 1  # increment to bust cache
+        packages: |
+          bioc::SingleCellExperiment
+          bioc::scRNAseq
 
     - name: Install anndata2ri
       run: |
