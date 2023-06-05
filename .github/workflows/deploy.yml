@@ -3,10 +3,10 @@ name: Publish Python 🐍 distributions 📦 to PyPI
 on:
   push:
     branches:
-      - 'master'
-      - 'test_deploy'
+    - 'master'
+    - 'test_deploy'
     tags:
-      - '*'
+    - '*'
 
 jobs:
   build-n-publish:
@@ -14,14 +14,15 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0  # allow deriving correct version from git tags
 
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v2
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.7
+        python-version: 3.11
+        cache: pip
 
     - name: Install pypa/build
       run: >-
