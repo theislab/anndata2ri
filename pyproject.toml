@@ -36,6 +36,7 @@ doc = [
     'sphinx>=3.0',
     'sphinx-autodoc-typehints',
     'scanpydoc',
+    'sphinx-rtd-theme>=0.5',
     'lxml',  # For scraping the R link info
     'importlib_metadata; python_version < "3.8"',
 ]
