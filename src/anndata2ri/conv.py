@@ -18,7 +18,9 @@ def mat_py2rpy(obj: np.ndarray) -> np.ndarray:
     if isinstance(obj, pd.DataFrame):
         numeric_cols = obj.dtypes <= np.number
         if not numeric_cols.all():
-            raise ValueError('DataFrame contains non-numeric columns')
+            non_num = numeric_cols.index[~numeric_cols]
+            msg = f'DataFrame contains non-numeric columns {list(non_num)}'
+            raise ValueError(msg)
         obj = obj.to_numpy()
     return _mat_converter.py2rpy(obj)
 

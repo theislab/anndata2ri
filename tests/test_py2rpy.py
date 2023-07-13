@@ -66,7 +66,7 @@ def test_py2rpy2_numpy_pbmc68k():
 
 @pytest.mark.parametrize('attr', ['X', 'layers', 'obsm'])
 def test_dfs(attr):
-    """Obsm can contain dataframes"""
+    """X, layers, obsm can contain dataframes"""
     adata = mk_ad_simple()
     if attr == 'X':
         adata.X = DataFrame(adata.X, index=adata.obs_names)
@@ -79,3 +79,10 @@ def test_dfs(attr):
 
     with localconverter(anndata2ri.converter):
         globalenv['adata_obsm_pd'] = adata
+
+
+def test_df_error():
+    adata = mk_ad_simple()
+    adata.obsm['stuff'] = DataFrame(dict(a=[1, 2], b=list('ab'), c=[1.0, 2.0]), index=adata.obs_names)
+    with pytest.raises(ValueError, match=r"DataFrame contains non-numeric columns \['b'\]"):
+        anndata2ri.converter.py2rpy(adata)
