@@ -62,6 +62,7 @@ run = 'pytest -vv {args}'
 [tool.pytest.ini_options]
 addopts = [
     '--import-mode=importlib',
+    '-panndata2ri.test_utils',
     # TODO '-Werror',
 ]
 filterwarnings = [

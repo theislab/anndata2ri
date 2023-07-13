@@ -1,5 +1,4 @@
-from typing import List
-from warnings import WarningMessage, catch_warnings, simplefilter
+from warnings import catch_warnings, simplefilter
 
 import numpy as np
 import pytest
@@ -11,7 +10,6 @@ from rpy2.robjects.conversion import localconverter
 
 import anndata2ri
 from anndata2ri.rpy2_ext import importr
-from anndata2ri.test_utils import py2r  # noqa
 
 
 def mk_ad_simple():
@@ -58,7 +56,7 @@ def test_py2rpy2_numpy_pbmc68k():
 
     try:
         anndata2ri.activate()
-        with catch_warnings(record=True) as logs:  # type: List[WarningMessage]
+        with catch_warnings(record=True) as logs:
             simplefilter('ignore', DeprecationWarning)
             globalenv['adata'] = pbmc68k_reduced()
         assert len(logs) == 0, [m.message for m in logs]
