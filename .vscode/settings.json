@@ -1,0 +1,13 @@
+{
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        //"editor.codeActionsOnSave": {
+        //    "source.fixAll.ruff": true,
+        //},
+    },
+    "python.testing.pytestArgs": [],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.terminal.activateEnvironment": false,
+}
