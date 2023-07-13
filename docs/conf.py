@@ -100,7 +100,7 @@ html_context = dict(
     display_github=True,
     github_user='theislab',
     github_repo='anndata2ri',
-    github_version='master',
+    github_version='main',
     conf_py_path='/docs/',
 )
 
