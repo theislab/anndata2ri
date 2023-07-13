@@ -9,7 +9,6 @@ from scipy import sparse
 
 from anndata2ri import scipy2ri
 from anndata2ri.rpy2_ext import importr
-from anndata2ri.test_utils import ConversionModule, conversions_rpy2py
 
 
 matrix = importr('Matrix')
@@ -54,17 +53,16 @@ mats = [
 ]
 
 
-@pytest.mark.parametrize('conversion', conversions_rpy2py)
 @pytest.mark.parametrize('shape,cls,dtype,arr,dataset', mats)
 def test_py2rpy(
-    conversion: Callable[[ConversionModule, Callable[[], Sexp]], sparse.spmatrix],
+    r2py,
     shape: Tuple[int, int],
     cls: Type[sparse.spmatrix],
     dtype: np.dtype,
     arr: np.ndarray,
     dataset: Callable[[], Sexp],
 ):
-    sm = conversion(scipy2ri, dataset)
+    sm = r2py(scipy2ri, dataset)
     assert isinstance(sm, cls)
     assert sm.shape == shape
     assert np.allclose(sm.toarray(), np.array(arr))

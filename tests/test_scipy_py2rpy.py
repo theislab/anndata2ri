@@ -4,7 +4,6 @@ from rpy2.robjects import baseenv, numpy2ri
 from scipy import sparse
 
 from anndata2ri import scipy2ri
-from anndata2ri.test_utils import conversions_py2rpy
 
 
 mats = [
@@ -19,12 +18,11 @@ mats = [
 
 
 @pytest.mark.parametrize('typ', ['l', 'd'])
-@pytest.mark.parametrize('conversion', conversions_py2rpy)
 @pytest.mark.parametrize('shape,dataset,cls', mats)
-def test_py2rpy(typ, conversion, shape, dataset, cls):
+def test_py2rpy(py2r, typ, shape, dataset, cls):
     if typ == 'l':
         dataset = dataset.astype(bool)
-    sm = conversion(scipy2ri, dataset)
+    sm = py2r(scipy2ri, dataset)
     assert f'{typ}{cls}Matrix' in set(sm.rclass)
     assert tuple(baseenv['dim'](sm)) == shape
 

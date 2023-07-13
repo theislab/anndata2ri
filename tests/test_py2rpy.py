@@ -1,15 +1,15 @@
-from typing import List
-from warnings import WarningMessage, catch_warnings, simplefilter
+from warnings import catch_warnings, simplefilter
 
 import numpy as np
 import pytest
 import scanpy as sc
 from anndata import AnnData
+from pandas import DataFrame
 from rpy2.robjects import baseenv, globalenv
+from rpy2.robjects.conversion import localconverter
 
 import anndata2ri
 from anndata2ri.rpy2_ext import importr
-from anndata2ri.test_utils import py2r  # noqa
 
 
 def mk_ad_simple():
@@ -56,9 +56,33 @@ def test_py2rpy2_numpy_pbmc68k():
 
     try:
         anndata2ri.activate()
-        with catch_warnings(record=True) as logs:  # type: List[WarningMessage]
+        with catch_warnings(record=True) as logs:
             simplefilter('ignore', DeprecationWarning)
             globalenv['adata'] = pbmc68k_reduced()
         assert len(logs) == 0, [m.message for m in logs]
     finally:
         anndata2ri.deactivate()
+
+
+@pytest.mark.parametrize('attr', ['X', 'layers', 'obsm'])
+def test_dfs(attr):
+    """X, layers, obsm can contain dataframes"""
+    adata = mk_ad_simple()
+    if attr == 'X':
+        adata.X = DataFrame(adata.X, index=adata.obs_names)
+    elif attr == 'layers':
+        adata.layers['X2'] = DataFrame(adata.X, index=adata.obs_names)
+    elif attr == 'obsm':
+        adata.obsm['X_pca'] = DataFrame(adata.obsm['X_pca'], index=adata.obs_names)
+    else:
+        assert False, attr
+
+    with localconverter(anndata2ri.converter):
+        globalenv['adata_obsm_pd'] = adata
+
+
+def test_df_error():
+    adata = mk_ad_simple()
+    adata.obsm['stuff'] = DataFrame(dict(a=[1, 2], b=list('ab'), c=[1.0, 2.0]), index=adata.obs_names)
+    with pytest.raises(ValueError, match=r"DataFrame contains non-numeric columns \['b'\]"):
+        anndata2ri.converter.py2rpy(adata)

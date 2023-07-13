@@ -1,15 +1,31 @@
-from typing import Optional
+from __future__ import annotations
 
+import numpy as np
+import pandas as pd
 from rpy2.robjects import conversion, numpy2ri, pandas2ri
 from rpy2.robjects.conversion import overlay_converter
 
 from . import scipy2ri
 
 
-original_converter: Optional[conversion.Converter] = None
+original_converter: conversion.Converter | None = None
 converter = conversion.Converter('original anndata conversion')
 
-mat_converter = numpy2ri.converter + scipy2ri.converter
+_mat_converter = numpy2ri.converter + scipy2ri.converter
+
+
+def mat_py2rpy(obj: np.ndarray) -> np.ndarray:
+    if isinstance(obj, pd.DataFrame):
+        numeric_cols = obj.dtypes <= np.number
+        if not numeric_cols.all():
+            non_num = numeric_cols.index[~numeric_cols]
+            msg = f'DataFrame contains non-numeric columns {list(non_num)}'
+            raise ValueError(msg)
+        obj = obj.to_numpy()
+    return _mat_converter.py2rpy(obj)
+
+
+mat_rpy2py = _mat_converter.rpy2py
 
 
 def full_converter() -> conversion.Converter:

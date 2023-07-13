@@ -10,7 +10,7 @@ from rpy2.robjects.methods import RS4
 from rpy2.robjects.vectors import ListVector
 
 from . import conv_name
-from .conv import converter, full_converter, mat_converter
+from .conv import converter, full_converter, mat_py2rpy
 from .rpy2_ext import importr
 
 
@@ -52,8 +52,8 @@ def py2rpy_anndata(obj: AnnData) -> RS4:
         s4v = importr('S4Vectors')
         sce = importr('SingleCellExperiment')
         # TODO: sparse
-        x = {} if obj.X is None else dict(X=mat_converter.py2rpy(obj.X.T))
-        layers = {k: mat_converter.py2rpy(v.T) for k, v in obj.layers.items()}
+        x = {} if obj.X is None else dict(X=mat_py2rpy(obj.X.T))
+        layers = {k: mat_py2rpy(v.T) for k, v in obj.layers.items()}
         assays = ListVector({**x, **layers})
 
         row_args = {k: pandas2ri.py2rpy(v) for k, v in obj.var.items()}
@@ -70,7 +70,7 @@ def py2rpy_anndata(obj: AnnData) -> RS4:
         with localconverter(full_converter() + dict_converter):
             metadata = ListVector(obj.uns.items())
 
-        rd_args = {conv_name.scanpy2sce(k): mat_converter.py2rpy(obj.obsm[k]) for k in obj.obsm.keys()}
+        rd_args = {conv_name.scanpy2sce(k): mat_py2rpy(obj.obsm[k]) for k in obj.obsm.keys()}
         reduced_dims = s4v.SimpleList(**rd_args)
 
         return sce.SingleCellExperiment(

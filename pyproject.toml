@@ -17,16 +17,15 @@ urls.'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
 urls.'Source Code' = 'https://github.com/theislab/anndata2ri'
 urls.'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
 dynamic = ['version']
-requires-python = '>= 3.7'
+requires-python = '>= 3.8'
 dependencies = [
-    'get_version',
     'rpy2 >= 3.4.3',
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
 
 [project.optional-dependencies]
-dev = ['pre-commit']
+dev = ['pre-commit', 'setuptools-scm']
 test = [
     'pytest',
     'pytest-faulthandler',
@@ -37,7 +36,7 @@ doc = [
     'sphinx>=3.0',
     'sphinx-autodoc-typehints',
     'scanpydoc',
-    'sphinx-rtd-theme>=0.5',  # Already a dep but 0.5 is prettier
+    'sphinx-rtd-theme>=0.5',
     'lxml',  # For scraping the R link info
     'importlib_metadata; python_version < "3.8"',
 ]
@@ -48,6 +47,38 @@ raw-options = { local_scheme = 'no-local-version' }  # be able to publish dev ve
 
 [tool.hatch.build.hooks.vcs]
 version-file = 'src/anndata2ri/_version.py'
+
+[tool.hatch.envs.docs]
+features = ['doc']
+[tool.hatch.envs.docs.scripts]
+build = 'sphinx-build -M html docs docs/_build'
+
+[[tool.hatch.envs.test.matrix]]
+python = ['3.8', '3.9', '3.10', '3.11']
+[tool.hatch.envs.test]
+features = ['test']
+[tool.hatch.envs.test.scripts]
+run = 'pytest -vv {args}'
+
+[tool.pytest.ini_options]
+addopts = [
+    '--import-mode=importlib',
+    '-panndata2ri.test_utils',
+    # TODO '-Werror',
+]
+filterwarnings = [
+    # eventlet 0.24.1 imports dns.hash: https://github.com/eventlet/eventlet/pull/563
+    'ignore::DeprecationWarning:dns.hash',
+    # igraph 0.7.1post6 imports SafeConfigParser: https://github.com/igraph/python-igraph/pull/203
+    'ignore::DeprecationWarning:igraph.configuration',
+    # ipywidgets 7.4.2 imports ABCs from collections: https://github.com/jupyter-widgets/ipywidgets/pull/2395
+    'ignore::DeprecationWarning:ipywidgets.widgets.widget_selection',
+    # jinja2 2.10.1 imports ABCs from collections: https://github.com/pallets/jinja/pull/867
+    'ignore::DeprecationWarning:jinja2.utils',
+    'ignore::DeprecationWarning:jinja2.runtime',
+    # rpy2 3.0.2 imports ABCs from collections: https://bitbucket.org/rpy2/rpy2/pull-requests/74/fix-deprecationwarning/diff
+    'ignore::DeprecationWarning:rpy2.rinterface_lib.sexp',
+]
 
 [tool.black]
 line-length = 120

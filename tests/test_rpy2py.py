@@ -7,7 +7,6 @@ from rpy2.robjects import conversion, r
 
 import anndata2ri
 from anndata2ri.rpy2_ext import importr
-from anndata2ri.test_utils import r2py  # noqa
 
 
 as_ = getattr(importr('methods'), 'as')

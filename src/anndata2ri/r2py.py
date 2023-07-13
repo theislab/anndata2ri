@@ -11,7 +11,7 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 
 from . import conv_name
-from .conv import converter, full_converter, mat_converter
+from .conv import converter, full_converter, mat_rpy2py
 from .rpy2_ext import importr
 from .scipy2ri import supported_r_matrix_classes
 from .scipy2ri.r2py import rmat_to_spmat
@@ -78,9 +78,9 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         def convert_mats(attr: str, mats: Mapping[str, Sexp], *, transpose: bool = False):
             rv = []
             for n, mat in mats.items():
-                conv = mat_converter.rpy2py(mat)
+                conv = mat_rpy2py(mat)
                 if isinstance(conv, RS4):
-                    cls_names = mat_converter.rpy2py(conv.slots['class']).tolist()
+                    cls_names = mat_rpy2py(conv.slots['class']).tolist()
                     raise TypeError(f'Cannot convert {attr} “{n}” of type(s) {cls_names} to Python')
                 rv.append(conv.T if transpose else conv)
             return rv
@@ -89,7 +89,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         if not isinstance(assay_names, NULLType):
             assay_names = [str(a) for a in se.assayNames(obj)]
             # The assays can be stored in an env or elsewise so we don’t use obj.slots['assays']
-            assays = convert_mats(f'assay', {n: se.assay(obj, n) for n in assay_names}, transpose=True)
+            assays = convert_mats('assay', {n: se.assay(obj, n) for n in assay_names}, transpose=True)
             # There’s SingleCellExperiment with no assays
             exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:]))
             assert len(exprs.shape) == 2, exprs.shape
