@@ -64,10 +64,18 @@ def test_py2rpy2_numpy_pbmc68k():
         anndata2ri.deactivate()
 
 
-def test_obsm_df():
+@pytest.mark.parametrize('attr', ['X', 'layers', 'obsm'])
+def test_dfs(attr):
     """Obsm can contain dataframes"""
     adata = mk_ad_simple()
-    adata.obsm['a'] = DataFrame([[5, 6, 7], [8, 9, 0]], index=adata.obs_names)
+    if attr == 'X':
+        adata.X = DataFrame(adata.X, index=adata.obs_names)
+    elif attr == 'layers':
+        adata.layers['X2'] = DataFrame(adata.X, index=adata.obs_names)
+    elif attr == 'obsm':
+        adata.obsm['X_pca'] = DataFrame(adata.obsm['X_pca'], index=adata.obs_names)
+    else:
+        assert False, attr
 
     with localconverter(anndata2ri.converter):
         globalenv['adata_obsm_pd'] = adata
