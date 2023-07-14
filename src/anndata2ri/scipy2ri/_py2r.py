@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 from functools import lru_cache, wraps
-from importlib.resources import files
 from typing import TYPE_CHECKING
+
+
+try:
+    from importlib.resources import files
+except ImportError:  # Python < 3.9
+    from importlib_resources import files
 
 import numpy as np
 from rpy2.robjects import default_converter, numpy2ri

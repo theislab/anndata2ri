@@ -3,14 +3,9 @@
 import sys
 from abc import ABC
 from datetime import datetime, timezone
+from importlib.metadata import metadata
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-
-try:
-    from importlib.metadata import metadata
-except ImportError:
-    from importlib_metadata import metadata
 
 
 def mock_rpy2() -> None:
