@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from functools import wraps
+from functools import lru_cache, wraps
+from importlib.resources import files
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -24,6 +25,11 @@ matrix: SignatureTranslatedAnonymousPackage | None = None
 base: Package | None = None
 
 
+@lru_cache
+def get_r_code() -> str:
+    return files('anndata2ri').joinpath('scipy2ri', '_py2r_helpers.r').read_text()
+
+
 def get_type_conv(dtype: np.dtype) -> Callable[[np.ndarray], Sexp]:
     global base  # noqa: PLW0603
     if base is None:
@@ -44,56 +50,8 @@ def py2r_context(f: Callable[[sparse.spmatrix], Sexp]) -> Callable[[sparse.spmat
         global matrix  # noqa: PLW0603
         if matrix is None:
             importr('Matrix')  # make class available
-            matrix = SignatureTranslatedAnonymousPackage(
-                """
-                sparse_matrix <- function(x, conv_data, dims, ...) {
-                    Matrix::sparseMatrix(
-                        ...,
-                        x=conv_data(x),
-                        dims=as.integer(dims),
-                        index1=FALSE
-                    )
-                }
-
-                from_csc <- function(i, p, x, dims, conv_data) {
-                    sparse_matrix(
-                        i=as.integer(i),
-                        p=as.integer(p),
-                        x=x,
-                        conv_data=conv_data,
-                        dims=dims,
-                        repr="C"
-                    )
-                }
-
-                from_csr <- function(j, p, x, dims, conv_data) {
-                    sparse_matrix(
-                        j=as.integer(j),
-                        p=as.integer(p),
-                        x=x,
-                        conv_data=conv_data,
-                        dims=dims,
-                        repr="R"
-                    )
-                }
-
-                from_coo <- function(i, j, x, dims, conv_data) {
-                    sparse_matrix(
-                        i=as.integer(i),
-                        j=as.integer(j),
-                        x=x,
-                        conv_data=conv_data,
-                        dims=dims,
-                        repr="T"
-                    )
-                }
-
-                from_dia <- function(n, x, conv_data) {
-                    Matrix::Diagonal(n=as.integer(n), x=conv_data(x))
-                }
-                """,
-                'matrix',
-            )
+            r_code = get_r_code()
+            matrix = SignatureTranslatedAnonymousPackage(r_code, 'matrix')
 
         return f(obj)
 
