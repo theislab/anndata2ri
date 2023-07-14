@@ -64,7 +64,7 @@ run = 'pytest -vv {args}'
 addopts = [
     '--import-mode=importlib',
     '-panndata2ri.test_utils',
-    # TODO '-Werror',
+    '-Werror',
 ]
 filterwarnings = [
     # eventlet 0.24.1 imports dns.hash: https://github.com/eventlet/eventlet/pull/563
