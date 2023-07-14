@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 from warnings import catch_warnings, simplefilter
 
 import numpy as np
@@ -16,6 +16,8 @@ from anndata2ri._rpy2_ext import importr
 
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from rpy2.rinterface import Sexp
 
     from anndata2ri.test_utils import Py2R
