@@ -84,11 +84,35 @@ filterwarnings = [
 line-length = 120
 skip-string-normalization = true
 
-[tool.isort]
-profile = 'black'
-line_length = 120
-lines_after_imports = 2
-length_sort_straight = true
+[tool.ruff]
+line-length = 120
+select = ['ALL']
+ignore = [
+    'ANN101', # self type doesn’t need to be annotated
+    'C408', # dict() calls are nice
+    'COM812', # trailing commas handled by black
+    'D203', # prefer 0 to 1 blank line before class members
+    'D213', # prefer docstring summary on first line
+    'FIX002', # “TODO” comments
+    'PLR0913', # having many (kw)args is fine
+    'S101', # asserts are fine
+]
+allowed-confusables = ['’', '×']
+[tool.ruff.per-file-ignores]
+'src/**/*.py' = ['PT']  # No Pytest checks
+'docs/**/*.py' = ['INP001']  # No __init__.py in docs
+'tests/**/*.py' = [
+    'INP001', # No __init__.py in tests
+    'D100', # test modules don’t need docstrings
+    'D103', # tests don’t need docstrings
+    'PD901', # “df” is a fine var name in tests
+    'PLR2004', # magic numbers are fine in tests
+]
+[tool.ruff.isort]
+known-first-party = ['anndata2ri']
+lines-after-imports = 2
+[tool.ruff.flake8-quotes]
+inline-quotes = 'single'
 
 [build-system]
 requires = ['hatchling', 'hatch-vcs']

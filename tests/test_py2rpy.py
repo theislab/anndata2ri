@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Callable
 from warnings import catch_warnings, simplefilter
 
 import numpy as np
@@ -9,10 +12,16 @@ from rpy2.robjects import baseenv, globalenv
 from rpy2.robjects.conversion import localconverter
 
 import anndata2ri
-from anndata2ri.rpy2_ext import importr
+from anndata2ri._rpy2_ext import importr
 
 
-def mk_ad_simple():
+if TYPE_CHECKING:
+    from rpy2.rinterface import Sexp
+
+    from anndata2ri.test_utils import Py2R
+
+
+def mk_ad_simple() -> AnnData:
     return AnnData(
         np.array([[1, 2, 3], [0.3, 0.2, 0.1]]),
         dict(cluster=[1, 2]),
@@ -20,11 +29,11 @@ def mk_ad_simple():
     )
 
 
-def check_empty(ex):
+def check_empty(_: Sexp) -> None:
     pass
 
 
-def check_pca(ex):
+def check_pca(ex: Sexp) -> None:
     sce = importr('SingleCellExperiment')
     assert [str(n) for n in sce.reducedDimNames(ex)] == ['PCA']
     pca = sce.reducedDim(ex, 'PCA')
@@ -35,12 +44,16 @@ datasets = [
     pytest.param(check_empty, (0, 0), AnnData, id='empty'),
     pytest.param(check_pca, (2, 3), mk_ad_simple, id='simple'),
     pytest.param(check_empty, (640, 11), sc.datasets.krumsiek11, id='krumsiek'),
-    # pytest.param(check_empty, (2730, 3451), sc.datasets.paul15, id="paul"),
 ]
 
 
-@pytest.mark.parametrize('check,shape,dataset', datasets)
-def test_py2rpy(py2r, check, shape, dataset):
+@pytest.mark.parametrize(('check', 'shape', 'dataset'), datasets)
+def test_py2rpy(
+    py2r: Py2R,
+    check: Callable[[Sexp], None],
+    shape: tuple[int, ...],
+    dataset: Callable[[], AnnData],
+) -> None:
     if dataset is sc.datasets.krumsiek11:
         with pytest.warns(UserWarning, match=r'Duplicated obs_names'):
             ex = py2r(anndata2ri, dataset())
@@ -50,8 +63,8 @@ def test_py2rpy(py2r, check, shape, dataset):
     check(ex)
 
 
-def test_py2rpy2_numpy_pbmc68k():
-    """This has some weird metadata"""
+def test_py2rpy2_numpy_pbmc68k() -> None:
+    """Not tested above as the pbmc68k dataset has some weird metadata."""
     from scanpy.datasets import pbmc68k_reduced
 
     try:
@@ -65,8 +78,8 @@ def test_py2rpy2_numpy_pbmc68k():
 
 
 @pytest.mark.parametrize('attr', ['X', 'layers', 'obsm'])
-def test_dfs(attr):
-    """X, layers, obsm can contain dataframes"""
+def test_dfs(attr: str) -> None:
+    """X, layers, obsm can contain dataframes."""
     adata = mk_ad_simple()
     if attr == 'X':
         adata.X = DataFrame(adata.X, index=adata.obs_names)
@@ -75,13 +88,13 @@ def test_dfs(attr):
     elif attr == 'obsm':
         adata.obsm['X_pca'] = DataFrame(adata.obsm['X_pca'], index=adata.obs_names)
     else:
-        assert False, attr
+        pytest.fail('Forgot to add a case')
 
     with localconverter(anndata2ri.converter):
         globalenv['adata_obsm_pd'] = adata
 
 
-def test_df_error():
+def test_df_error() -> None:
     adata = mk_ad_simple()
     adata.obsm['stuff'] = DataFrame(dict(a=[1, 2], b=list('ab'), c=[1.0, 2.0]), index=adata.obs_names)
     with pytest.raises(ValueError, match=r"DataFrame contains non-numeric columns \['b'\]"):

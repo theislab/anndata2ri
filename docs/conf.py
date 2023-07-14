@@ -1,6 +1,8 @@
+"""Sphinx configuration."""
+
 import sys
 from abc import ABC
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -11,8 +13,8 @@ except ImportError:
     from importlib_metadata import metadata
 
 
-def mock_rpy2():
-    # Can’t use autodoc_mock_imports as we import anndata2ri
+def mock_rpy2() -> None:
+    """Can’t use autodoc_mock_imports as we import anndata2ri."""
     patch('rpy2.situation.get_r_home', lambda: None).start()
     sys.modules['rpy2.rinterface_lib'] = MagicMock()
     submods = ['embedded', 'conversion', 'memorymanagement', 'sexp', 'bufferprotocol', 'callbacks', '_rinterface_capi']
@@ -27,7 +29,7 @@ def mock_rpy2():
     import rpy2.rinterface_lib.sexp
 
     rpy2.rinterface_lib = sys.modules['rpy2.rinterface_lib']
-    rpy2.rinterface._MissingArgType = object
+    rpy2.rinterface._MissingArgType = object  # noqa: SLF001
     rpy2.rinterface.initr_simple = lambda *_, **__: None
 
     assert rpy2.rinterface_lib.sexp is sexp
@@ -48,7 +50,7 @@ sys.path[:0] = [str(HERE.parent), str(HERE / 'ext')]
 project = 'anndata2ri'
 meta = metadata(project)
 author = meta['author-email'].split('"')[1]
-copyright = f'{datetime.now():%Y}, {author}.'
+copyright = f'{datetime.now(tz=timezone.utc):%Y}, {author}.'  # noqa: A001
 version = meta['version']
 release = version
 
@@ -56,7 +58,6 @@ release = version
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
-# default_role = '?'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 pygments_style = 'sphinx'
 
