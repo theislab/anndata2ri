@@ -1,22 +1,24 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, get_args
 
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+SupportedMatType = Literal['d', 'l', 'n']
+SupportedMatStor = Literal['C', 'R', 'T', 'di']
 
 # these are documented in __init__.py because of sphinx limitations
-supported_r_matrix_types = frozenset({'d', 'l', 'n'})
-supported_r_matrix_storage = frozenset({'C', 'R', 'T', 'di'})
+supported_r_matrix_types: frozenset[SupportedMatType] = frozenset(get_args(SupportedMatType))
+supported_r_matrix_storage: frozenset[SupportedMatStor] = frozenset(get_args(SupportedMatStor))
 
 
 @lru_cache(maxsize=None)
 def supported_r_matrix_classes(
-    types: Iterable[str] | str = supported_r_matrix_types,
-    storage: Iterable[str] | str = supported_r_matrix_storage,
+    types: Iterable[SupportedMatType] | SupportedMatType = supported_r_matrix_types,
+    storage: Iterable[SupportedMatStor] | SupportedMatStor = supported_r_matrix_storage,
 ) -> frozenset[str]:
     """Get supported classes, possibly limiting data types or storage types.
 
