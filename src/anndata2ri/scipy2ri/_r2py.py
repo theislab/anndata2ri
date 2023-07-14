@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from warnings import warn
 
 import numpy as np
@@ -7,12 +9,13 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 from scipy import sparse
 
-from .conv import converter
-from .support import supported_r_matrix_classes
+from ._conv import converter
+from ._support import supported_r_matrix_classes
 
 
 @converter.rpy2py.register(SexpS4)
-def rmat_to_spmat(rmat: SexpS4):
+def rmat_to_spmat(rmat: SexpS4) -> sparse.spmatrix:
+    """Convert R sparse matrices to scipy sparse matrices."""
     slots = RSlots(rmat)
     with localconverter(default_converter + numpy2ri.converter):
         shape = baseenv['dim'](rmat)
@@ -20,7 +23,9 @@ def rmat_to_spmat(rmat: SexpS4):
         r_classes = set(rmat.rclass)
         if not supported_r_matrix_classes() & r_classes:
             if any(c.endswith('Matrix') for c in r_classes):
-                warn(f'Encountered Matrix class that is not supported: {r_classes}')
+                # TODO(flying-sheep): #111 set stacklevel
+                # https://github.com/theislab/anndata2ri/issues/111
+                warn(f'Encountered Matrix class that is not supported: {r_classes}', stacklevel=2)
             return rmat
         for storage, mat_cls, idx, nnz in [
             ('C', sparse.csc_matrix, lambda: [slots['i'], slots['p']], lambda c: len(c[0])),
@@ -31,11 +36,13 @@ def rmat_to_spmat(rmat: SexpS4):
             if not supported_r_matrix_classes(storage=storage) & r_classes:
                 continue
             coord_spec = idx()
-            if supported_r_matrix_classes(types='n') & r_classes:
+            data = (
+                np.repeat(a=True, repeats=nnz(coord_spec))
                 # we have pattern matrix without data (but always i and j!)
-                data = np.repeat(True, nnz(coord_spec))
-            else:
-                data = slots['x']
+                if supported_r_matrix_classes(types='n') & r_classes
+                else slots['x']
+            )
             return mat_cls((data, *coord_spec), shape=shape)
-        else:
-            assert False, 'Should have hit one of the branches'
+
+        msg = 'Should have hit one of the branches'
+        raise AssertionError(msg)

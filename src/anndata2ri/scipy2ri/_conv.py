@@ -1,20 +1,19 @@
-from typing import Optional
+from __future__ import annotations
 
 from rpy2.robjects import conversion, numpy2ri
 from rpy2.robjects.conversion import overlay_converter
 
 
-original_converter: Optional[conversion.Converter] = None
+original_converter: conversion.Converter | None = None
 converter = conversion.Converter('original scipy conversion')
 
 
-def activate():
-    """
-    Activate conversion between sparse matrices from Scipy and R’s Matrix package.
+def activate() -> None:
+    """Activate conversion between sparse matrices from Scipy and R’s Matrix package.
 
     Does nothing if this is the active conversion.
     """
-    global original_converter
+    global original_converter  # noqa: PLW0603
 
     if original_converter is not None:
         return
@@ -30,9 +29,9 @@ def activate():
     conversion.set_conversion(new_converter)
 
 
-def deactivate():
+def deactivate() -> None:
     """Deactivate the conversion described above if it is active."""
-    global original_converter
+    global original_converter  # noqa: PLW0603
 
     if original_converter is None:
         return

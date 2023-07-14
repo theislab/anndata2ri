@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 dimension_reductions = {
     'pca',
     'dca',

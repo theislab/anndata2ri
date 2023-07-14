@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pandas as pd
 from rpy2.robjects import conversion, numpy2ri, pandas2ri
@@ -8,13 +10,20 @@ from rpy2.robjects.conversion import overlay_converter
 from . import scipy2ri
 
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from rpy2.rinterface import Sexp
+    from scipy.sparse import spmatrix
+
+
 original_converter: conversion.Converter | None = None
 converter = conversion.Converter('original anndata conversion')
 
 _mat_converter = numpy2ri.converter + scipy2ri.converter
 
 
-def mat_py2rpy(obj: np.ndarray) -> np.ndarray:
+def mat_py2rpy(obj: np.ndarray | spmatrix | pd.DataFrame) -> Sexp:
     if isinstance(obj, pd.DataFrame):
         numeric_cols = obj.dtypes <= np.number
         if not numeric_cols.all():
@@ -25,7 +34,7 @@ def mat_py2rpy(obj: np.ndarray) -> np.ndarray:
     return _mat_converter.py2rpy(obj)
 
 
-mat_rpy2py = _mat_converter.rpy2py
+mat_rpy2py: Callable[[Sexp], np.ndarray | spmatrix | Sexp] = _mat_converter.rpy2py
 
 
 def full_converter() -> conversion.Converter:
@@ -40,15 +49,16 @@ def full_converter() -> conversion.Converter:
     return new_converter
 
 
-def activate():
-    r"""
-    Activate conversion for :class:`~anndata.AnnData` objects
+def activate() -> None:
+    r"""Activate conversion for supported objects.
+
+    This includes :class:`~anndata.AnnData` objects
     as well as :ref:`numpy:arrays` and :class:`pandas.DataFrame`\ s
     via ``rpy2.robjects.numpy2ri`` and ``rpy2.robjects.pandas2ri``.
 
     Does nothing if this is the active converter.
     """
-    global original_converter
+    global original_converter  # noqa: PLW0603
 
     if original_converter is not None:
         return
@@ -58,9 +68,9 @@ def activate():
     conversion.set_conversion(new_converter)
 
 
-def deactivate():
+def deactivate() -> None:
     """Deactivate the conversion described above if it is active."""
-    global original_converter
+    global original_converter  # noqa: PLW0603
 
     if original_converter is None:
         return

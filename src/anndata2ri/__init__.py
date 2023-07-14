@@ -1,6 +1,4 @@
-r"""
-Converter between Python’s AnnData and R’s SingleCellExperiment.
-
+r"""Converter between Python’s AnnData and R’s SingleCellExperiment.
 
 ==========================================================  =  ========================================================
 :rcls:`~SingleCellExperiment::SingleCellExperiment`            :class:`~anndata.AnnData`
@@ -14,16 +12,22 @@ Converter between Python’s AnnData and R’s SingleCellExperiment.
 :rman:`~SingleCellExperiment::reducedDim`\ ``(d, 'DM')``    ⇄  ``d.``\ :attr:`~anndata.AnnData.obsm`\ ``['X_diffmap']``
 ==========================================================  =  ========================================================
 """
-__all__ = ['activate', 'deactivate', 'py2rpy', 'rpy2py', 'converter']
+from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING
 
-from rpy2.rinterface import Sexp
+from . import _py2r, _r2py  # noqa: F401
+from ._conv import activate, converter, deactivate
 
-from . import py2r, r2py
-from .conv import activate, converter, deactivate
 
+if TYPE_CHECKING:
+    from anndata import AnnData
+    from pandas import DataFrame
+    from rpy2.rinterface import Sexp
+
+
+__all__ = ['__version__', 'activate', 'deactivate', 'py2rpy', 'rpy2py', 'converter']
 
 HERE = Path(__file__).parent
 
@@ -35,22 +39,25 @@ try:
 except (ImportError, LookupError):
     try:
         from ._version import __version__
-    except ImportError:
-        raise ImportError('Cannot infer version. Make sure to `pip install` the project or install `setuptools-scm`.')
+    except ImportError as e:
+        msg = 'Cannot infer version. Make sure to `pip install` the project or install `setuptools-scm`.'
+        raise ImportError(msg) from e
 
 
-def py2rpy(obj: Any) -> Sexp:
-    """
-    Convert Python objects to R interface objects. Supports:
+def py2rpy(obj: AnnData) -> Sexp:
+    """Convert Python objects to R interface objects.
+
+    Supports:
 
     - :class:`~anndata.AnnData` → :rcls:`~SingleCellExperiment::SingleCellExperiment`
     """
     return converter.py2rpy(obj)
 
 
-def rpy2py(obj: Any) -> Sexp:
-    """
-    Convert R interface objects to Python objects. Supports:
+def rpy2py(obj: Sexp) -> AnnData | DataFrame:
+    """Convert R interface objects to Python objects.
+
+    Supports:
 
     - :rcls:`~SingleCellExperiment::SingleCellExperiment` → :class:`~anndata.AnnData`
     - :rcls:`S4Vectors::DataFrame` → :class:`pandas.DataFrame`

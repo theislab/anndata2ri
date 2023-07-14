@@ -1,22 +1,34 @@
+"""Sphinx extension for links to R documentation."""
+
+from __future__ import annotations
+
 import logging
-from typing import Tuple
+from typing import TYPE_CHECKING, ClassVar
 
 from docutils import nodes
-from sphinx.application import Sphinx
-from sphinx.environment import BuildEnvironment
 from sphinx.roles import XRefRole
 
 
+if TYPE_CHECKING:
+    from sphinx.application import Sphinx
+    from sphinx.environment import BuildEnvironment
+
+
 class RManRefRole(XRefRole):
-    nodeclass = nodes.reference
+    """R reference role."""
 
-    topic_cache = {}
+    nodeclass: ClassVar[nodes.Node] = nodes.reference
+    topic_cache: ClassVar[dict[str, dict[str, str]]] = {}
+    """pkg → alias → url"""
 
-    def __init__(self, *a, cls: bool = False, **kw):
+    cls: bool
+
+    def __init__(self, *a, cls: bool = False, **kw) -> None:  # noqa: ANN002, ANN003
+        """Set self.cls."""
         super().__init__(*a, **kw)
         self.cls = cls
 
-    def _get_man(self, pkg: str, alias: str):
+    def _get_man(self, pkg: str, alias: str) -> str:
         from urllib.error import HTTPError
 
         pkg_cache = type(self).topic_cache.setdefault(pkg)
@@ -25,14 +37,14 @@ class RManRefRole(XRefRole):
                 try:
                     pkg_cache = self._fetch_cache(repo, pkg)
                     break
-                except HTTPError:
+                except HTTPError:  # noqa: PERF203
                     pass
             else:
                 return None
             type(self).topic_cache[pkg] = pkg_cache
         return pkg_cache.get(alias)
 
-    def _fetch_cache(self, repo: str, pkg: str):
+    def _fetch_cache(self, repo: str, pkg: str) -> dict[str, str]:
         from urllib.parse import urljoin
         from urllib.request import urlopen
 
@@ -41,13 +53,18 @@ class RManRefRole(XRefRole):
         if repo.startswith('R'):
             url = f'https://stat.ethz.ch/R-manual/{repo}/library/{pkg}/html/00Index.html'
             tr_xpath = '//tr'
-            get = lambda tr: (tr[0][0].text, tr[0][0].attrib['href'])
+
+            def get(tr: html.HtmlElement) -> tuple[str, str]:
+                return tr[0][0].text, tr[0][0].attrib['href']
+
         else:
             url = f'https://rdrr.io/{repo}/{pkg}/api/'
             tr_xpath = "//div[@id='body-content']//tr[./td]"
-            get = lambda tr: (tr[0].text, tr[1][0].attrib['href'])
 
-        with urlopen(url) as con:
+            def get(tr: html.HtmlElement) -> tuple[str, str]:
+                return tr[0].text, tr[1][0].attrib['href']
+
+        with urlopen(url) as con:  # noqa: S310
             txt = con.read().decode(con.headers.get_content_charset())
         doc = html.fromstring(txt)
         cache = {}
@@ -57,8 +74,14 @@ class RManRefRole(XRefRole):
         return cache
 
     def process_link(
-        self, env: BuildEnvironment, refnode: nodes.reference, has_explicit_title: bool, title: str, target: str
-    ) -> Tuple[str, str]:
+        self,
+        env: BuildEnvironment,  # noqa: ARG002
+        refnode: nodes.reference,
+        has_explicit_title: bool,  # noqa: ARG002, FBT001
+        title: str,
+        target: str,
+    ) -> tuple[str, str]:
+        """Derive link title and URL from target."""
         qualified = not target.startswith('~')
         if not qualified:
             target = target[1:]
@@ -70,16 +93,11 @@ class RManRefRole(XRefRole):
         url = self._get_man(package, topic)
         refnode['refuri'] = url
         if not url:
-            logging.warning(f'R topic {target} not found.')
+            logging.warning('R topic %s not found.', target)
         return title, url
 
-    # def result_nodes(self, document: nodes.document, env: BuildEnvironment, node: nodes.reference, is_ref: bool):
-    #    target = node.get('reftarget')
-    #    if target:
-    #        node.attributes['refuri'] = target
-    #    return [node], []
 
-
-def setup(app: Sphinx):
+def setup(app: Sphinx) -> None:
+    """Set Sphinx extension up."""
     app.add_role('rman', RManRefRole())
     app.add_role('rcls', RManRefRole(cls=True))

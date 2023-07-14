@@ -1,14 +1,23 @@
+from __future__ import annotations
+
 from functools import partial
-from typing import Callable, Tuple, Type
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-from rpy2.rinterface import Sexp
 from rpy2.robjects import baseenv, numpy2ri, r
 from scipy import sparse
 
 from anndata2ri import scipy2ri
-from anndata2ri.rpy2_ext import importr
+from anndata2ri._rpy2_ext import importr
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from rpy2.rinterface import Sexp
+
+    from anndata2ri.test_utils import R2Py
 
 
 matrix = importr('Matrix')
@@ -29,13 +38,13 @@ lgc = partial(r, 'Matrix::Matrix(c(T, T, F, T, F, T), 2, sparse = TRUE)')
 csc_b1 = [[1, 0, 0], [1, 1, 1]]
 lgr = partial(r, "new('lgRMatrix', j = 1:0, p = c(0L, 0L, 1L, 2L), x = c(T, F), Dim = c(3L, 3L))")
 csr_b1 = [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
-# lgt = ...
-# coo_b1 = ...
+# TODO(flying-sheep): lgt & coo_b1 matrices
+# https://github.com/theislab/anndata2ri/issues/110
 
 ngc = partial(r, "as(Matrix::Matrix(c(T, T, F, T, F, T), 2, sparse = TRUE), 'nMatrix')")
 csc_b2 = [[1, 0, 0], [1, 1, 1]]
-# ngr = ...
-# csr_b2 = ...
+# TODO(flying-sheep): ngr & csr_b2 matrices
+# https://github.com/theislab/anndata2ri/issues/110
 ngt = partial(r, 'Matrix::sparseMatrix(1:2, 3:2, dims = c(3, 3), giveCsparse = FALSE)')
 coo_b2 = [[0, 0, 1], [0, 1, 0], [0, 0, 0]]
 
@@ -53,18 +62,22 @@ mats = [
 ]
 
 
-@pytest.mark.parametrize('shape,cls,dtype,arr,dataset', mats)
+@pytest.mark.parametrize(('shape', 'cls', 'dtype', 'arr', 'dataset'), mats)
 def test_py2rpy(
-    r2py,
-    shape: Tuple[int, int],
-    cls: Type[sparse.spmatrix],
+    r2py: R2Py,
+    shape: tuple[int, int],
+    cls: type[sparse.spmatrix],
     dtype: np.dtype,
     arr: np.ndarray,
     dataset: Callable[[], Sexp],
-):
+) -> None:
     sm = r2py(scipy2ri, dataset)
     assert isinstance(sm, cls)
     assert sm.shape == shape
+    # TODO(flying-sheep): check dtype
+    # https://github.com/theislab/anndata2ri/issues/113
+    if dtype != np.bool_:
+        assert sm.dtype == dtype
     assert np.allclose(sm.toarray(), np.array(arr))
 
     dm = numpy2ri.converter.rpy2py(baseenv['as.matrix'](dataset()))

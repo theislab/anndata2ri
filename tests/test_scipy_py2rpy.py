@@ -1,9 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Literal
+
 import numpy as np
 import pytest
 from rpy2.robjects import baseenv, numpy2ri
 from scipy import sparse
 
 from anndata2ri import scipy2ri
+
+
+if TYPE_CHECKING:
+    from anndata2ri.test_utils import Py2R
 
 
 mats = [
@@ -18,8 +26,14 @@ mats = [
 
 
 @pytest.mark.parametrize('typ', ['l', 'd'])
-@pytest.mark.parametrize('shape,dataset,cls', mats)
-def test_py2rpy(py2r, typ, shape, dataset, cls):
+@pytest.mark.parametrize(('shape', 'dataset', 'cls'), mats)
+def test_py2rpy(
+    py2r: Py2R,
+    typ: Literal['l', 'd'],
+    shape: tuple[int, ...],
+    dataset: sparse.spmatrix,
+    cls: str,
+) -> None:
     if typ == 'l':
         dataset = dataset.astype(bool)
     sm = py2r(scipy2ri, dataset)
