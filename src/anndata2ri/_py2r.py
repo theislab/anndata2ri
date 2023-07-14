@@ -1,17 +1,23 @@
+from __future__ import annotations
+
 from collections.abc import Mapping
+from typing import TYPE_CHECKING
 from warnings import warn
 
 import numpy as np
-import pandas as pd
 from anndata import AnnData
 from rpy2.robjects import conversion, default_converter, pandas2ri
 from rpy2.robjects.conversion import localconverter
-from rpy2.robjects.methods import RS4
 from rpy2.robjects.vectors import ListVector
 
 from . import _conv_name
 from ._conv import converter, full_converter, mat_py2rpy
 from ._rpy2_ext import importr
+
+
+if TYPE_CHECKING:
+    import pandas as pd
+    from rpy2.robjects.methods import RS4
 
 
 class NotConvertedWarning(Warning):

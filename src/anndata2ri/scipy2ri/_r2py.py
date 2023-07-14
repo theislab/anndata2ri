@@ -1,5 +1,3 @@
-"""Methods for converting R matrices to scipy matrices."""
-
 from __future__ import annotations
 
 from warnings import warn
