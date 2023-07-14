@@ -3,10 +3,10 @@ name: Unit Tests
 on:
   push:
     branches:
-    - 'main'
+      - main
   pull_request:
     branches:
-    - '*'
+      - "*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,57 +27,57 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - { name: '3.11', os: ubuntu-latest, python: '3.11', r: 'release' }
-        - { name: '3.10', os: ubuntu-latest, python: '3.10', r: 'release' }
-        - { name: '3.9', os: ubuntu-latest, python: '3.9', r: 'release' }
-        - { name: '3.8', os: ubuntu-latest, python: '3.8', r: 'oldrel' }
+          - { name: "3.11", os: ubuntu-latest, python: "3.11", r: release }
+          - { name: "3.10", os: ubuntu-latest, python: "3.10", r: release }
+          - { name: "3.9", os: ubuntu-latest, python: "3.9", r: release }
+          - { name: "3.8", os: ubuntu-latest, python: "3.8", r: oldrel }
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Install system dependencies
-      if: runner.os == 'Linux'
-      uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        packages: pandoc gfortran libblas-dev liblapack-dev libedit-dev llvm-dev libcurl4-openssl-dev ffmpeg libhdf5-dev
-        version: 1.0
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: pandoc gfortran libblas-dev liblapack-dev libedit-dev llvm-dev libcurl4-openssl-dev ffmpeg libhdf5-dev
+          version: 1.0
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.config.python }}
-        cache: pip
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.config.python }}
+          cache: pip
 
-    - name: Set up R
-      id: setup-r
-      uses: r-lib/actions/setup-r@v2
-      with:
-        r-version: ${{ matrix.config.r }}
+      - name: Set up R
+        id: setup-r
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
 
-    - name: Install python tools
-      run: |
-        python -m pip install --upgrade pip wheel
-        pip install --upgrade build
+      - name: Install python tools
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install --upgrade build
 
-    - name: Set up rpy2
-      run: |
-        pip install rpy2
-        echo "LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+      - name: Set up rpy2
+        run: |
+          pip install rpy2
+          echo "LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
-    - uses: r-lib/actions/setup-r-dependencies@v2
-      with:
-        cache-version: 1  # increment to bust cache
-        packages: |
-          bioc::SingleCellExperiment
-          bioc::scRNAseq
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1 # increment to bust cache
+          packages: |
+            bioc::SingleCellExperiment
+            bioc::scRNAseq
 
-    - name: Install anndata2ri
-      run: |
-        python -m build --wheel
-        pip install $(ls -1 dist/anndata2ri*.whl)[test]
-        python -c "import anndata2ri"
+      - name: Install anndata2ri
+        run: |
+          python -m build --wheel
+          pip install $(ls -1 dist/anndata2ri*.whl)[test]
+          python -c "import anndata2ri"
 
-    - name: Run tests
-      run: pytest --verbose --color=yes
+      - name: Run tests
+        run: pytest --verbose --color=yes
