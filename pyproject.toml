@@ -34,9 +34,7 @@ test = [
 ]
 doc = [
     'sphinx>=3.0',
-    'sphinx-autodoc-typehints',
-    'scanpydoc',
-    'sphinx-rtd-theme>=0.5',
+    'scanpydoc[theme,typehints]',
     'lxml',  # For scraping the R link info
     'importlib_resources; python_version < "3.9"',
 ]
