@@ -26,8 +26,6 @@ if TYPE_CHECKING:
     from pandas import DataFrame
     from rpy2.rinterface import Sexp
 
-    from ._version import __version__
-
 
 __all__ = ['__version__', 'activate', 'deactivate', 'py2rpy', 'rpy2py', 'converter']
 
@@ -40,7 +38,7 @@ try:
     __version__ = get_version(str(HERE.parent.parent))
 except (ImportError, LookupError):
     try:
-        pass
+        from ._version import __version__
     except ImportError as e:
         msg = 'Cannot infer version. Make sure to `pip install` the project or install `setuptools-scm`.'
         raise ImportError(msg) from e
