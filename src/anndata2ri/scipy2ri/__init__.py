@@ -26,12 +26,14 @@ from typing import TYPE_CHECKING
 
 from . import _py2r, _r2py  # noqa: F401
 from ._conv import activate, converter, deactivate
-from ._support import supported_r_matrix_classes, supported_r_matrix_storage, supported_r_matrix_types
+from ._support import supported_r_matrix_storage, supported_r_matrix_types
 
 
 if TYPE_CHECKING:
     from rpy2.rinterface import Sexp
     from scipy import sparse
+
+    from ._support import supported_r_matrix_classes
 
 
 __all__ = [
