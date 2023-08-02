@@ -46,10 +46,10 @@ __all__ = [
 ]
 
 
-supported_r_matrix_types = supported_r_matrix_types
+supported_r_matrix_types = supported_r_matrix_types  # noqa: PLW0127
 """The Matrix data types supported by this module; Double, Logical, and patterN."""
 
-supported_r_matrix_storage = supported_r_matrix_storage
+supported_r_matrix_storage = supported_r_matrix_storage  # noqa: PLW0127
 """The Matrix storage types supported by this module; Column-sparse, Row-Sparse, Triplets, and DIagonal."""
 
 
