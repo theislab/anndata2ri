@@ -11,7 +11,7 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.vectors import ListVector
 
 from . import _conv_name
-from ._conv import converter, full_converter, mat_py2rpy
+from ._conv import converter, mat_py2rpy
 from ._rpy2_ext import importr
 
 
@@ -77,7 +77,7 @@ def py2rpy_anndata(obj: AnnData) -> RS4:
         col_data = s4v.DataFrame(**col_args)
 
         # Convert everything we know
-        with localconverter(full_converter() + dict_converter):
+        with localconverter(converter + dict_converter):
             metadata = ListVector(obj.uns.items())
 
         rd_args = {_conv_name.scanpy2sce(k): mat_py2rpy(obj.obsm[k]) for k in obj.obsm}

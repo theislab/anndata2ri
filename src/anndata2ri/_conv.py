@@ -18,7 +18,13 @@ if TYPE_CHECKING:
 
 
 original_converter: conversion.Converter | None = None
-converter = conversion.Converter('original anndata conversion')
+converter = (
+    conversion.Converter('original anndata conversion', template=conversion.get_conversion())
+    + numpy2ri.converter
+    + pandas2ri.converter
+    + scipy2ri.converter
+)
+
 
 _mat_converter = numpy2ri.converter + scipy2ri.converter
 
@@ -35,14 +41,6 @@ def mat_py2rpy(obj: np.ndarray | spmatrix | pd.DataFrame) -> Sexp:
 
 
 mat_rpy2py: Callable[[Sexp], np.ndarray | spmatrix | Sexp] = _mat_converter.rpy2py
-
-
-def full_converter() -> conversion.Converter:
-    """Load numpy, pandas, scipy, then ours.
-
-    Overwrite the scipy2ri Sexp4 converter.
-    """
-    return conversion.get_conversion() + numpy2ri.converter + pandas2ri.converter + scipy2ri.converter + converter
 
 
 def activate() -> None:
@@ -66,7 +64,7 @@ def activate() -> None:
     if original_converter is not None:
         return
 
-    new_converter = full_converter()
+    new_converter = converter
     original_converter = conversion.get_conversion()
     conversion.set_conversion(new_converter)
 
