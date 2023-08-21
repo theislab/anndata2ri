@@ -102,3 +102,15 @@ def test_df_error() -> None:
     adata.obsm['stuff'] = DataFrame(dict(a=[1, 2], b=list('ab'), c=[1.0, 2.0]), index=adata.obs_names)
     with pytest.raises(ValueError, match=r"DataFrame contains non-numeric columns \['b'\]"):
         anndata2ri.converter.py2rpy(adata)
+
+
+def test_localconverter_scipy() -> None:
+    from numpy.random import default_rng
+    from rpy2.robjects import globalenv
+    from scipy.sparse import csr_matrix
+
+    rng = default_rng(1337)
+    mat = csr_matrix(rng.poisson(1, size=(100, 2000)))
+
+    with localconverter(anndata2ri.converter):
+        globalenv['mat'] = mat
