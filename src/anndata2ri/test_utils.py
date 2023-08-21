@@ -38,11 +38,13 @@ class ConversionModule(ModuleType, ABC):
 
 
 def _conversion_py2rpy_manual(conv_mod: ConversionModule, dataset: Any) -> Sexp:  # noqa: ANN401
-    return conv_mod.converter.py2rpy(dataset)
+    converter = conv_mod.get_conversion() if hasattr(conv_mod, 'get_conversion') else conv_mod.converter
+    return converter.py2rpy(dataset)
 
 
 def _conversion_py2rpy_local(conv_mod: ConversionModule, dataset: Any) -> Sexp:  # noqa: ANN401
-    with localconverter(conv_mod.converter):
+    converter = conv_mod.get_conversion() if hasattr(conv_mod, 'get_conversion') else conv_mod.converter
+    with localconverter(converter):
         globalenv['temp'] = dataset
     return globalenv['temp']
 
@@ -71,19 +73,22 @@ def py2r(request: pytest.FixtureRequest) -> Py2R:
 
 
 def _conversion_rpy2py_manual(conv_mod: ConversionModule, dataset: Callable[[], Sexp]) -> Any:  # noqa: ANN401
-    return conv_mod.converter.rpy2py(dataset())
+    converter = conv_mod.get_conversion() if hasattr(conv_mod, 'get_conversion') else conv_mod.converter
+    return converter.rpy2py(dataset())
 
 
 def _conversion_rpy2py_local(conv_mod: ConversionModule, dataset: Callable[[], Sexp]) -> Any:  # noqa: ANN401
     # Needs default_converter to e.g. call `as` on a SummarizedExperiment:
     # Calling a R function returning a S4 object requires py2rpy[RS4], py2rpy[str], …
-    with localconverter(default_converter + conv_mod.converter):
+    converter = conv_mod.get_conversion() if hasattr(conv_mod, 'get_conversion') else conv_mod.converter
+    with localconverter(default_converter + converter):
         return dataset()
 
 
 def _conversion_rpy2py_activate(conv_mod: ConversionModule, dataset: Callable[[], Sexp]) -> Any:  # noqa: ANN401
     try:
-        conv_mod.activate()
+        with pytest.warns(DeprecationWarning, match=r'global conversion'):
+            conv_mod.activate()
         return dataset()
     finally:
         conv_mod.deactivate()

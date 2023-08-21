@@ -122,6 +122,9 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
 
     obs = rpy2py_data_frame(col_data)
     var = rpy2py_data_frame(row_data)
+    # To avoid ImplicitModificationWarning
+    obs.index = obs.index.astype('string')
+    var.index = var.index.astype('string')
     # The whole shebang: configured converter, numpy, pandas and ours
     with localconverter(full_converter()):
         uns = dict(metadata.items())

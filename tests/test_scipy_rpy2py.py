@@ -49,10 +49,10 @@ ngt = partial(r, 'Matrix::sparseMatrix(1:2, 3:2, dims = c(3, 3), giveCsparse = F
 coo_b2 = [[0, 0, 1], [0, 1, 0], [0, 0, 0]]
 
 mats = [
-    pytest.param((0, 0), sparse.csc_matrix, np.floating, csc_empty, dgc_empty, id='dgC_empty'),
-    pytest.param((3, 2), sparse.csc_matrix, np.floating, csc_f, dgc, id='dgC'),
-    pytest.param((2, 3), sparse.csr_matrix, np.floating, csr_f, dgr, id='dgR'),
-    pytest.param((2, 3), sparse.coo_matrix, np.floating, coo_f, dgt, id='dgT'),
+    pytest.param((0, 0), sparse.csc_matrix, np.float_, csc_empty, dgc_empty, id='dgC_empty'),
+    pytest.param((3, 2), sparse.csc_matrix, np.float_, csc_f, dgc, id='dgC'),
+    pytest.param((2, 3), sparse.csr_matrix, np.float_, csr_f, dgr, id='dgR'),
+    pytest.param((2, 3), sparse.coo_matrix, np.float_, coo_f, dgt, id='dgT'),
     pytest.param((2, 3), sparse.csc_matrix, np.bool_, csc_b1, lgc, id='lgC'),
     pytest.param((3, 3), sparse.csr_matrix, np.bool_, csr_b1, lgr, id='lgR'),
     # pytest.param((?, ?), sparse.coo_matrix, np.bool_, coo_b1, lgt, id="lgT"),
