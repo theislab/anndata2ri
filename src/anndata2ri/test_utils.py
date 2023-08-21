@@ -49,7 +49,8 @@ def _conversion_py2rpy_local(conv_mod: ConversionModule, dataset: Any) -> Sexp: 
 
 def _conversion_py2rpy_activate(conv_mod: ConversionModule, dataset: Any) -> Sexp:  # noqa: ANN401
     try:
-        conv_mod.activate()
+        with pytest.warns(DeprecationWarning, match=r'global conversion'):
+            conv_mod.activate()
         globalenv['temp'] = dataset
     finally:
         conv_mod.deactivate()
