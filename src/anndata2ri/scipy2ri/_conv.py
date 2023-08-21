@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from warnings import warn
+
 from rpy2.robjects import conversion, numpy2ri
 from rpy2.robjects.conversion import overlay_converter
 
@@ -13,6 +15,13 @@ def activate() -> None:
 
     Does nothing if this is the active conversion.
     """
+    warn(
+        'The global conversion available with activate() '
+        'is deprecated and will be removed in the next major release. '
+        'Use a local converter.',
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
     global original_converter  # noqa: PLW0603
 
     if original_converter is not None:

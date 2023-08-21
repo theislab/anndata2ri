@@ -10,7 +10,7 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 
 from . import _conv_name
-from ._conv import converter, full_converter, mat_rpy2py
+from ._conv import converter, mat_rpy2py
 from ._rpy2_ext import importr
 from .scipy2ri import supported_r_matrix_classes
 from .scipy2ri._r2py import rmat_to_spmat
@@ -122,8 +122,11 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
 
     obs = rpy2py_data_frame(col_data)
     var = rpy2py_data_frame(row_data)
+    # To avoid ImplicitModificationWarning
+    obs.index = obs.index.astype('string')
+    var.index = var.index.astype('string')
     # The whole shebang: configured converter, numpy, pandas and ours
-    with localconverter(full_converter()):
+    with localconverter(converter):
         uns = dict(metadata.items())
 
     return AnnData(exprs, obs, var, uns, obsm, layers=layers)

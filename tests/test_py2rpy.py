@@ -70,7 +70,8 @@ def test_py2rpy2_numpy_pbmc68k() -> None:
     from scanpy.datasets import pbmc68k_reduced
 
     try:
-        anndata2ri.activate()
+        with pytest.warns(DeprecationWarning, match=r'global conversion'):
+            anndata2ri.activate()
         with catch_warnings(record=True) as logs:
             simplefilter('ignore', DeprecationWarning)
             globalenv['adata'] = pbmc68k_reduced()

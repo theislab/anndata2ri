@@ -62,20 +62,7 @@ run = 'pytest -vv {args}'
 addopts = [
     '--import-mode=importlib',
     '-panndata2ri.test_utils',
-    # TODO '-Werror',
-]
-filterwarnings = [
-    # eventlet 0.24.1 imports dns.hash: https://github.com/eventlet/eventlet/pull/563
-    'ignore::DeprecationWarning:dns.hash',
-    # igraph 0.7.1post6 imports SafeConfigParser: https://github.com/igraph/python-igraph/pull/203
-    'ignore::DeprecationWarning:igraph.configuration',
-    # ipywidgets 7.4.2 imports ABCs from collections: https://github.com/jupyter-widgets/ipywidgets/pull/2395
-    'ignore::DeprecationWarning:ipywidgets.widgets.widget_selection',
-    # jinja2 2.10.1 imports ABCs from collections: https://github.com/pallets/jinja/pull/867
-    'ignore::DeprecationWarning:jinja2.utils',
-    'ignore::DeprecationWarning:jinja2.runtime',
-    # rpy2 3.0.2 imports ABCs from collections: https://bitbucket.org/rpy2/rpy2/pull-requests/74/fix-deprecationwarning/diff
-    'ignore::DeprecationWarning:rpy2.rinterface_lib.sexp',
+    '-Werror',
 ]
 
 [tool.black]
