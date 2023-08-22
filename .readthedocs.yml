@@ -3,6 +3,10 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
+  jobs:
+    pre_install:
+      - asdf plugin-add R https://github.com/asdf-community/asdf-r.git
+      - asdf install R 4.3.1
 python:
   install:
     - method: pip
