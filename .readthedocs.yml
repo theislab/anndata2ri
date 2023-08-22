@@ -3,10 +3,8 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-  jobs:
-    pre_install:
-      - asdf plugin-add r https://github.com/asdf-community/asdf-r.git
-      - asdf install r 4.3.1
+  apt_packages:
+    - r-base-core
 python:
   install:
     - method: pip
