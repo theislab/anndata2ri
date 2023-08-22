@@ -5,7 +5,7 @@ build:
     python: "3.11"
   jobs:
     pre_install:
-      - asdf plugin-add R https://github.com/asdf-community/asdf-r.git
+      - asdf plugin-add r https://github.com/asdf-community/asdf-r.git
       - asdf install R 4.3.1
 python:
   install:
