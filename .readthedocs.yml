@@ -10,4 +10,5 @@ python:
       extra_requirements:
         - doc
 sphinx:
+  fail_on_warning: true
   configuration: docs/conf.py
