@@ -10,6 +10,7 @@ from anndata import AnnData
 from pandas import DataFrame
 from rpy2.robjects import baseenv, globalenv
 from rpy2.robjects.conversion import localconverter
+from scipy import sparse
 
 import anndata2ri
 from anndata2ri._rpy2_ext import importr
@@ -31,6 +32,25 @@ def mk_ad_simple() -> AnnData:
     )
 
 
+@pytest.mark.parametrize('dtype', [np.float32, np.float64, np.int32, np.int64])
+@pytest.mark.parametrize('mat_type', [np.asarray, sparse.csr_matrix])
+def test_py2rpy_simple(
+    py2r: Py2R,
+    dtype: np.dtype,
+    mat_type: Callable[[np.ndarray], np.ndarray | sparse.spmatrix],
+) -> None:
+    data = mk_ad_simple()
+    if data.X is not None:
+        data.X = mat_type(data.X, dtype=dtype)
+    ex = py2r(anndata2ri, data)
+    assert tuple(baseenv['dim'](ex)[::-1]) == data.shape
+
+
+def krumsiek() -> AnnData:
+    with pytest.warns(UserWarning, match=r'Observation names are not unique'):
+        return sc.datasets.krumsiek11()
+
+
 def check_empty(_: Sexp) -> None:
     pass
 
@@ -45,18 +65,18 @@ def check_pca(ex: Sexp) -> None:
 datasets = [
     pytest.param(check_empty, (0, 0), AnnData, id='empty'),
     pytest.param(check_pca, (2, 3), mk_ad_simple, id='simple'),
-    pytest.param(check_empty, (640, 11), sc.datasets.krumsiek11, id='krumsiek'),
+    pytest.param(check_empty, (640, 11), krumsiek, id='krumsiek'),
 ]
 
 
 @pytest.mark.parametrize(('check', 'shape', 'dataset'), datasets)
-def test_py2rpy(
+def test_py2rpy_datasets(
     py2r: Py2R,
     check: Callable[[Sexp], None],
     shape: tuple[int, ...],
     dataset: Callable[[], AnnData],
 ) -> None:
-    if dataset is sc.datasets.krumsiek11:
+    if dataset is krumsiek:
         with pytest.warns(UserWarning, match=r'Duplicated obs_names'):
             ex = py2r(anndata2ri, dataset())
     else:
@@ -102,15 +122,3 @@ def test_df_error() -> None:
     adata.obsm['stuff'] = DataFrame(dict(a=[1, 2], b=list('ab'), c=[1.0, 2.0]), index=adata.obs_names)
     with pytest.raises(ValueError, match=r"DataFrame contains non-numeric columns \['b'\]"):
         anndata2ri.converter.py2rpy(adata)
-
-
-def test_localconverter_scipy() -> None:
-    from numpy.random import default_rng
-    from rpy2.robjects import globalenv
-    from scipy.sparse import csr_matrix
-
-    rng = default_rng(1337)
-    mat = csr_matrix(rng.poisson(1, size=(100, 2000)))
-
-    with localconverter(anndata2ri.converter):
-        globalenv['mat'] = mat
