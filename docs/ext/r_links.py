@@ -37,7 +37,7 @@ class RManRefRole(XRefRole):
                 try:
                     pkg_cache = self._fetch_cache(repo, pkg)
                     break
-                except HTTPError:  # noqa: PERF203
+                except HTTPError:
                     pass
             else:
                 return None
