@@ -34,10 +34,10 @@ def mk_ad_simple() -> AnnData:
 
 @pytest.mark.parametrize('dtype', [np.float32, np.float64, np.int32, np.int64])
 @pytest.mark.parametrize('mat_type', [np.asarray, sparse.csr_matrix])
-def test_py2rpy_simple(
+def test_simple(
     py2r: Py2R,
     dtype: np.dtype,
-    mat_type: Callable[[np.ndarray], np.ndarray | sparse.spmatrix],
+    mat_type: Callable[[np.ndarray, np.dtype], np.ndarray | sparse.spmatrix],
 ) -> None:
     data = mk_ad_simple()
     if data.X is not None:
@@ -70,7 +70,7 @@ datasets = [
 
 
 @pytest.mark.parametrize(('check', 'shape', 'dataset'), datasets)
-def test_py2rpy_datasets(
+def test_datasets(
     py2r: Py2R,
     check: Callable[[Sexp], None],
     shape: tuple[int, ...],
@@ -85,7 +85,7 @@ def test_py2rpy_datasets(
     check(ex)
 
 
-def test_py2rpy2_numpy_pbmc68k() -> None:
+def test_numpy_pbmc68k() -> None:
     """Not tested above as the pbmc68k dataset has some weird metadata."""
     from scanpy.datasets import pbmc68k_reduced
 
