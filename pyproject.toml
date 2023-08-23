@@ -19,7 +19,7 @@ urls.'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aiss
 dynamic = ['version']
 requires-python = '>= 3.8'
 dependencies = [
-    'rpy2 >= 3.4.3',
+    'rpy2 >= 3.5.2',  # first with get_conversion
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
