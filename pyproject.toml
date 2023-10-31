@@ -17,7 +17,7 @@ urls.'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
 urls.'Source Code' = 'https://github.com/theislab/anndata2ri'
 urls.'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
 dynamic = ['version']
-requires-python = '>= 3.8'
+requires-python = '>= 3.9'
 dependencies = [
     'rpy2 >= 3.5.2',  # first with get_conversion
     'tzlocal',  # for pandas2ri
@@ -36,7 +36,6 @@ doc = [
     'sphinx>=3.0',
     'scanpydoc[theme,typehints]',
     'lxml',  # For scraping the R link info
-    'importlib_resources; python_version < "3.9"',
 ]
 
 [tool.hatch.version]
@@ -52,7 +51,7 @@ features = ['doc']
 build = 'sphinx-build -M html docs docs/_build'
 
 [[tool.hatch.envs.test.matrix]]
-python = ['3.8', '3.9', '3.10', '3.11']
+python = ['3.9', '3.10', '3.11', '3.12']
 [tool.hatch.envs.test]
 features = ['test']
 [tool.hatch.envs.test.scripts]
@@ -65,14 +64,11 @@ addopts = [
     '-Werror',
 ]
 
-[tool.black]
-line-length = 120
-skip-string-normalization = true
-
 [tool.ruff]
 line-length = 120
 select = ['ALL']
 ignore = [
+    'Q', # handled by formatter
     'ANN101', # self type doesn’t need to be annotated
     'C408', # dict() calls are nice
     'COM812', # trailing commas handled by black
@@ -96,8 +92,8 @@ allowed-confusables = ['’', '×']
 [tool.ruff.isort]
 known-first-party = ['anndata2ri']
 lines-after-imports = 2
-[tool.ruff.flake8-quotes]
-inline-quotes = 'single'
+[tool.ruff.format]
+quote-style = 'single'
 
 [build-system]
 requires = ['hatchling', 'hatch-vcs']

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache
 from typing import TYPE_CHECKING, Literal, get_args
 
 
@@ -15,7 +15,7 @@ supported_r_matrix_types: frozenset[SupportedMatType] = frozenset(get_args(Suppo
 supported_r_matrix_storage: frozenset[SupportedMatStor] = frozenset(get_args(SupportedMatStor))
 
 
-@lru_cache(maxsize=None)
+@cache
 def supported_r_matrix_classes(
     types: Iterable[SupportedMatType] | SupportedMatType = supported_r_matrix_types,
     storage: Iterable[SupportedMatStor] | SupportedMatStor = supported_r_matrix_storage,
