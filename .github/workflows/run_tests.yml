@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "3.12", os: ubuntu-latest, python: "3.11", r: release }
+          - { name: "3.12", os: ubuntu-latest, python: "3.12", r: release }
           - { name: "3.11", os: ubuntu-latest, python: "3.11", r: release }
           - { name: "3.10", os: ubuntu-latest, python: "3.10", r: release }
           - { name: "3.9", os: ubuntu-latest, python: "3.9", r: oldrel }
