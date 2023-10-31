@@ -73,7 +73,7 @@ jobs:
           packages: |
             bioc::SingleCellExperiment
             bioc::scRNAseq
-            bioc::BiocFileCache@>=2.11.1
+            bioc::BiocFileCache@>=2.10.1
           # BiocFileCache because of https://github.com/Bioconductor/AnnotationHub/issues/46
 
       - name: Install anndata2ri
