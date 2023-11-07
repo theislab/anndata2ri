@@ -27,10 +27,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "3.12", os: ubuntu-latest, python: "3.12", r: release }
-          - { name: "3.11", os: ubuntu-latest, python: "3.11", r: release }
-          - { name: "3.10", os: ubuntu-latest, python: "3.10", r: release }
-          - { name: "3.9", os: ubuntu-latest, python: "3.9", r: oldrel }
+          - { name: "3.11", os: ubuntu-latest, python: "3.11", r: release, bioc: "3.18" }
+          - { name: "3.10", os: ubuntu-latest, python: "3.10", r: release, bioc: "3.18" }
+          - { name: "3.9", os: ubuntu-latest, python: "3.9", r: release, bioc: "3.18" }
+          # Cannot test
+          # - Python 3.12 because of numba
+          # - R oldrel because of a bug in BiocFileCache that only got released to BioC 3.18+
 
     steps:
       - uses: actions/checkout@v4
@@ -74,8 +76,7 @@ jobs:
             bioc::SingleCellExperiment
             bioc::scRNAseq
         env:
-          # this should have BiocFileCache 2.10.1
-          R_BIOC_VERSION: 3.18
+          R_BIOC_VERSION: ${{ matrix.config.bioc }}
 
       - name: Install anndata2ri
         run: |
