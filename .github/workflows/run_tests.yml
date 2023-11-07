@@ -75,8 +75,8 @@ jobs:
             bioc::scRNAseq
             bioc::BiocFileCache@2.10.1
           # BiocFileCache because of https://github.com/Bioconductor/AnnotationHub/issues/46
-          env:
-            R_BIOC_VERSION: release
+        env:
+          R_BIOC_VERSION: release
 
       - name: Install anndata2ri
         run: |
