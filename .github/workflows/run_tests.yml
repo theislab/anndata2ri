@@ -74,7 +74,7 @@ jobs:
             bioc::SingleCellExperiment
             bioc::scRNAseq
         env:
-          # this should have BiocFileCache 2.10.1 
+          # this should have BiocFileCache 2.10.1
           R_BIOC_VERSION: 3.18
 
       - name: Install anndata2ri
