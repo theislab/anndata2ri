@@ -27,9 +27,27 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "3.11", os: ubuntu-latest, python: "3.11", r: release, bioc: "3.18" }
-          - { name: "3.10", os: ubuntu-latest, python: "3.10", r: release, bioc: "3.18" }
-          - { name: "3.9", os: ubuntu-latest, python: "3.9", r: release, bioc: "3.18" }
+          - {
+              name: "3.11",
+              os: ubuntu-latest,
+              python: "3.11",
+              r: release,
+              bioc: "3.18",
+            }
+          - {
+              name: "3.10",
+              os: ubuntu-latest,
+              python: "3.10",
+              r: release,
+              bioc: "3.18",
+            }
+          - {
+              name: "3.9",
+              os: ubuntu-latest,
+              python: "3.9",
+              r: release,
+              bioc: "3.18",
+            }
           # Cannot test
           # - Python 3.12 because of numba
           # - R oldrel because of a bug in BiocFileCache that only got released to BioC 3.18+
