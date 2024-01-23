@@ -27,7 +27,7 @@ mats = [
 
 @pytest.mark.parametrize('typ', ['l', 'd'])
 @pytest.mark.parametrize(('shape', 'dataset', 'cls'), mats)
-def test_py2rpy(
+def test_mats(
     py2r: Py2R,
     typ: Literal['l', 'd'],
     shape: tuple[int, ...],
