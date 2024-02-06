@@ -57,7 +57,13 @@ def test_py2rpy(
     dataset: Callable[[], AnnData],
 ) -> None:
     if dataset is sc.datasets.krumsiek11:
-        with pytest.warns(UserWarning, match=r'Duplicated obs_names'):
+        with (
+            pytest.warns(UserWarning, match=r'Duplicated obs_names'),
+            pytest.warns(UserWarning, match=r'Observation names are not unique'),
+            # TODO(flying-sheep): Adapt to rpy2 changes instead
+            # https://github.com/theislab/anndata2ri/issues/109
+            pytest.warns(DeprecationWarning, match=r'rpy2\.robjects\.conversion is deprecated'),
+        ):
             ex = py2r(anndata2ri, dataset())
     else:
         ex = py2r(anndata2ri, dataset())
