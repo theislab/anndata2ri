@@ -59,7 +59,7 @@ def rmat_to_spmat(rmat: SexpS4) -> sparse.spmatrix:
                 if supported_r_matrix_classes(types='n') & r_classes
                 else slots['x']
             )
-            dtype = np.bool_ if supported_r_matrix_classes(types=('n', 'l')) & r_classes else np.float_
+            dtype = np.bool_ if supported_r_matrix_classes(types=('n', 'l')) & r_classes else np.float64
             return mat_cls((data, *coord_spec), shape=shape, dtype=dtype)
 
         msg = 'Should have hit one of the branches'

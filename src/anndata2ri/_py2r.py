@@ -26,8 +26,8 @@ class NotConvertedWarning(Warning):
 
 dict_converter = conversion.Converter('Converter handling dicts')
 dict_converter.py2rpy.register(np.bool_, lambda x: conversion.py2rpy(bool(x)))
-dict_converter.py2rpy.register(np.int_, lambda x: conversion.py2rpy(int(x)))
-dict_converter.py2rpy.register(np.float_, lambda x: conversion.py2rpy(float(x)))
+dict_converter.py2rpy.register(np.integer, lambda x: conversion.py2rpy(int(x)))
+dict_converter.py2rpy.register(np.floating, lambda x: conversion.py2rpy(float(x)))
 dict_converter.py2rpy.register(np.bytes_, lambda x: conversion.py2rpy(bytes(x)))
 dict_converter.py2rpy.register(np.str_, lambda x: conversion.py2rpy(str(x)))
 
