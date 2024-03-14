@@ -20,6 +20,7 @@ R                                                      Python
 :rcls:`~Matrix::ldiMatrix`                             :class:`~scipy.sparse.dia_matrix`\ ``(dtype=bool)``
 =====================================================  ======================================================
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

@@ -12,6 +12,7 @@ r"""Converter between Python’s AnnData and R’s SingleCellExperiment.
 :rman:`~SingleCellExperiment::reducedDim`\ ``(d, 'DM')``    ⇄  ``d.``\ :attr:`~anndata.AnnData.obsm`\ ``['X_diffmap']``
 ==========================================================  =  ========================================================
 """
+
 from __future__ import annotations
 
 from pathlib import Path
