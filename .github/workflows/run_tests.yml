@@ -18,7 +18,7 @@ defaults:
 
 jobs:
   run_tester:
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     env:
       RENV_PATHS_ROOT: ~/.local/share/renv
@@ -27,20 +27,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {
-              name: "3.12",
-              os: ubuntu-latest,
-              python: "3.11",
-              r: release,
-              bioc: "3.19",
-            }
-          - {
-              name: "3.9",
-              os: ubuntu-latest,
-              python: "3.9",
-              r: oldrel,
-              bioc: "3.18",
-            }
+          - python: "3.12"
+            r: release
+            bioc: "3.19"
+          - python: "3.9"
+            r: oldrel
+            bioc: "3.18"
 
     steps:
       - uses: actions/checkout@v4
