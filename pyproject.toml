@@ -45,17 +45,16 @@ raw-options = { local_scheme = 'no-local-version' }  # be able to publish dev ve
 [tool.hatch.build.hooks.vcs]
 version-file = 'src/anndata2ri/_version.py'
 
+[tool.hatch.envs.default]
+installer = 'uv'
+
 [tool.hatch.envs.docs]
 features = ['doc']
 [tool.hatch.envs.docs.scripts]
 build = 'sphinx-build -M html docs docs/_build'
 
-[[tool.hatch.envs.test.matrix]]
-python = ['3.9', '3.10', '3.11', '3.12']
-[tool.hatch.envs.test]
+[tool.hatch.envs.hatch-test]
 features = ['test']
-[tool.hatch.envs.test.scripts]
-run = 'pytest -vv {args}'
 
 [tool.pytest.ini_options]
 addopts = [
