@@ -17,9 +17,9 @@ urls.'Documentation' = 'https://icb-anndata2ri.readthedocs-hosted.com/'
 urls.'Source Code' = 'https://github.com/theislab/anndata2ri'
 urls.'Issue Tracker' = 'https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc'
 dynamic = ['version']
-requires-python = '>= 3.8'
+requires-python = '>= 3.9'
 dependencies = [
-    'rpy2 >= 3.4.3',
+    'rpy2 >= 3.5.2',  # first with get_conversion
     'tzlocal',  # for pandas2ri
     'anndata',
 ]
@@ -36,7 +36,6 @@ doc = [
     'sphinx>=3.0',
     'scanpydoc[theme,typehints]',
     'lxml',  # For scraping the R link info
-    'importlib_resources; python_version < "3.9"',
 ]
 
 [tool.hatch.version]
@@ -46,17 +45,16 @@ raw-options = { local_scheme = 'no-local-version' }  # be able to publish dev ve
 [tool.hatch.build.hooks.vcs]
 version-file = 'src/anndata2ri/_version.py'
 
+[tool.hatch.envs.default]
+installer = 'uv'
+
 [tool.hatch.envs.docs]
 features = ['doc']
 [tool.hatch.envs.docs.scripts]
 build = 'sphinx-build -M html docs docs/_build'
 
-[[tool.hatch.envs.test.matrix]]
-python = ['3.8', '3.9', '3.10', '3.11']
-[tool.hatch.envs.test]
+[tool.hatch.envs.hatch-test]
 features = ['test']
-[tool.hatch.envs.test.scripts]
-run = 'pytest -vv {args}'
 
 [tool.pytest.ini_options]
 addopts = [
@@ -65,14 +63,12 @@ addopts = [
     '-Werror',
 ]
 
-[tool.black]
-line-length = 120
-skip-string-normalization = true
-
 [tool.ruff]
 line-length = 120
+[tool.ruff.lint]
 select = ['ALL']
 ignore = [
+    'Q', # handled by formatter
     'ANN101', # self type doesn’t need to be annotated
     'C408', # dict() calls are nice
     'COM812', # trailing commas handled by black
@@ -83,7 +79,11 @@ ignore = [
     'S101', # asserts are fine
 ]
 allowed-confusables = ['’', '×']
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
+'**/*.ipynb' = [
+    'T201',  # Allow print in notebooks
+    'F821',  # `%%R -o` means that ruff doesn’t understand which variables exist
+]
 'src/**/*.py' = ['PT']  # No Pytest checks
 'docs/**/*.py' = ['INP001']  # No __init__.py in docs
 'tests/**/*.py' = [
@@ -93,11 +93,11 @@ allowed-confusables = ['’', '×']
     'PD901', # “df” is a fine var name in tests
     'PLR2004', # magic numbers are fine in tests
 ]
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ['anndata2ri']
 lines-after-imports = 2
-[tool.ruff.flake8-quotes]
-inline-quotes = 'single'
+[tool.ruff.format]
+quote-style = 'single'
 
 [build-system]
 requires = ['hatchling', 'hatch-vcs']

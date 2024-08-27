@@ -47,7 +47,10 @@ def test_simple(
 
 
 def krumsiek() -> AnnData:
-    with pytest.warns(UserWarning, match=r'Observation names are not unique'):
+    with (
+        pytest.warns(UserWarning, match=r'Duplicated obs_names'),
+        pytest.warns(UserWarning, match=r'Observation names are not unique'),
+    ):
         return sc.datasets.krumsiek11()
 
 
@@ -77,7 +80,9 @@ def test_datasets(
     dataset: Callable[[], AnnData],
 ) -> None:
     if dataset is krumsiek:
-        with pytest.warns(UserWarning, match=r'Duplicated obs_names'):
+        # TODO(flying-sheep): Adapt to rpy2 changes instead
+        # https://github.com/theislab/anndata2ri/issues/109
+        with pytest.warns(DeprecationWarning, match=r'rpy2\.robjects\.conversion is deprecated'):
             ex = py2r(anndata2ri, dataset())
     else:
         ex = py2r(anndata2ri, dataset())

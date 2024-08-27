@@ -3,7 +3,7 @@
 /docs/_build/
 _version.py
 __pycache__/
-.pytest_cache/
+.*cache/
 
 # Jupyter
 /.ipynb_checkpoints/
