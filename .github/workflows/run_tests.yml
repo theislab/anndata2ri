@@ -48,7 +48,7 @@ jobs:
           version: 1.0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.config.python }}
           cache: pip
@@ -76,6 +76,7 @@ jobs:
           packages: |
             bioc::SingleCellExperiment
             bioc::scRNAseq
+            ${{ matrix.config.r == 'oldrel' && 'cran::rjson@0.2.21' || '' }}
         env:
           R_BIOC_VERSION: ${{ matrix.config.bioc }}
 
