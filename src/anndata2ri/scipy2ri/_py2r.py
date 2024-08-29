@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import cache, wraps
+from functools import cache
 from importlib.resources import files
 from typing import TYPE_CHECKING
 
@@ -23,14 +23,16 @@ if TYPE_CHECKING:
 
 @cache
 def baseenv() -> InstalledSTPackage:
-    return importr('base')
+    with localconverter(default_converter):
+        return importr('base')
 
 
 @cache
 def matrixenv() -> SignatureTranslatedAnonymousPackage:
-    importr('Matrix')  # make class available
-    r_code = files('anndata2ri').joinpath('scipy2ri', '_py2r_helpers.r').read_text()
-    return SignatureTranslatedAnonymousPackage(r_code, 'matrix')
+    with localconverter(default_converter):
+        importr('Matrix')  # make class available
+        r_code = files('anndata2ri').joinpath('scipy2ri', '_py2r_helpers.r').read_text()
+        return SignatureTranslatedAnonymousPackage(r_code, 'matrix')
 
 
 def get_type_conv(dtype: np.dtype) -> Callable[[np.ndarray], Sexp]:
@@ -47,33 +49,22 @@ def get_type_conv(dtype: np.dtype) -> Callable[[np.ndarray], Sexp]:
     raise ValueError(msg)
 
 
-def py2r_context(f: Callable[[sparse.spmatrix], Sexp]) -> Callable[[sparse.spmatrix], Sexp]:
-    """R globalenv context with some helper functions."""
-
-    @wraps(f)
-    def wrapper(obj: sparse.spmatrix) -> Sexp:
-        matrixenv()  # make Matrix class available
-        return f(obj)
-
-    return wrapper
-
-
 @converter.py2rpy.register(sparse.csc_matrix)
-@py2r_context
 def csc_to_rmat(csc: sparse.csc_matrix) -> Sexp:
+    matrix = matrixenv()
     csc.sort_indices()
     conv_data = get_type_conv(csc.dtype)
     with localconverter(default_converter + numpy2ri.converter):
-        return matrixenv().from_csc(i=csc.indices, p=csc.indptr, x=csc.data, dims=list(csc.shape), conv_data=conv_data)
+        return matrix.from_csc(i=csc.indices, p=csc.indptr, x=csc.data, dims=list(csc.shape), conv_data=conv_data)
 
 
 @converter.py2rpy.register(sparse.csr_matrix)
-@py2r_context
 def csr_to_rmat(csr: sparse.csr_matrix) -> Sexp:
+    matrix = matrixenv()
     csr.sort_indices()
     conv_data = get_type_conv(csr.dtype)
     with localconverter(default_converter + numpy2ri.converter):
-        return matrixenv().from_csr(
+        return matrix.from_csr(
             j=csr.indices,
             p=csr.indptr,
             x=csr.data,
@@ -83,11 +74,11 @@ def csr_to_rmat(csr: sparse.csr_matrix) -> Sexp:
 
 
 @converter.py2rpy.register(sparse.coo_matrix)
-@py2r_context
 def coo_to_rmat(coo: sparse.coo_matrix) -> Sexp:
+    matrix = matrixenv()
     conv_data = get_type_conv(coo.dtype)
     with localconverter(default_converter + numpy2ri.converter):
-        return matrixenv().from_coo(
+        return matrix.from_coo(
             i=coo.row,
             j=coo.col,
             x=coo.data,
@@ -97,8 +88,8 @@ def coo_to_rmat(coo: sparse.coo_matrix) -> Sexp:
 
 
 @converter.py2rpy.register(sparse.dia_matrix)
-@py2r_context
 def dia_to_rmat(dia: sparse.dia_matrix) -> Sexp:
+    matrix = matrixenv()
     conv_data = get_type_conv(dia.dtype)
     if len(dia.offsets) > 1:
         msg = (
@@ -107,7 +98,7 @@ def dia_to_rmat(dia: sparse.dia_matrix) -> Sexp:
         )
         raise ValueError(msg)
     with localconverter(default_converter + numpy2ri.converter):
-        return matrixenv().from_dia(
+        return matrix.from_dia(
             n=dia.shape[0],
             x=dia.data,
             conv_data=conv_data,

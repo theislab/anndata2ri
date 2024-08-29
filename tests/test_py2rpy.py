@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from warnings import catch_warnings, simplefilter
+from warnings import catch_warnings, filterwarnings, simplefilter
 
 import numpy as np
 import pytest
@@ -81,6 +81,8 @@ def test_datasets(
         # TODO(flying-sheep): Adapt to rpy2 changes instead
         # https://github.com/theislab/anndata2ri/issues/109
         with pytest.warns(DeprecationWarning, match=r'rpy2\.robjects\.conversion is deprecated'):
+            filterwarnings('ignore', r'Duplicated obs_names', UserWarning)
+            filterwarnings('ignore', r'Observation names are not unique', UserWarning)
             ex = py2r(anndata2ri, dataset())
     else:
         ex = py2r(anndata2ri, dataset())
