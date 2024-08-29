@@ -69,7 +69,7 @@ expression_sets = [
 
 
 @pytest.mark.parametrize(('check', 'shape', 'dataset'), expression_sets)
-def test_convert_manual(
+def test_manual(
     r2py: R2Py,
     check: Callable[[AnnData], None],
     shape: tuple[int, ...],
@@ -81,7 +81,7 @@ def test_convert_manual(
     check(ad)
 
 
-def test_convert_empty_df_with_rows(r2py: R2Py) -> None:
+def test_empty_df_with_rows(r2py: R2Py) -> None:
     df = r('S4Vectors::DataFrame(a=1:10)[, -1]')
     assert df.slots['nrows'][0] == 10
 
@@ -89,7 +89,7 @@ def test_convert_empty_df_with_rows(r2py: R2Py) -> None:
     assert isinstance(df_py, pd.DataFrame)
 
 
-def test_convert_factor(r2py: R2Py) -> None:
+def test_factor(r2py: R2Py) -> None:
     code = """
     SingleCellExperiment::SingleCellExperiment(
         assays = list(counts = matrix(rpois(6*4, 5), ncol=4)),
