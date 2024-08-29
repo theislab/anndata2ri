@@ -47,11 +47,9 @@ def test_simple(
 
 
 def krumsiek() -> AnnData:
-    with (
-        pytest.warns(UserWarning, match=r'Duplicated obs_names'),
-        pytest.warns(UserWarning, match=r'Observation names are not unique'),
-    ):
-        return sc.datasets.krumsiek11()
+    adata = sc.datasets.krumsiek11()
+    adata.obs_names_make_unique()
+    return adata
 
 
 def check_empty(_: Sexp) -> None:

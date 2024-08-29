@@ -11,7 +11,7 @@ from rpy2.robjects.robject import RSlots
 
 from . import _conv_name
 from ._conv import converter, mat_rpy2py
-from ._rpy2_ext import importr
+from ._rpy2_ext import R_INT_BYTES, importr
 from .scipy2ri import supported_r_matrix_classes
 from .scipy2ri._r2py import rmat_to_spmat
 
@@ -21,9 +21,6 @@ if TYPE_CHECKING:
 
     import numpy as np
     from scipy.sparse import spmatrix
-
-
-R_INT_BYTES = 4
 
 
 @converter.rpy2py.register(SexpS4)

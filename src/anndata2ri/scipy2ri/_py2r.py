@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from functools import lru_cache, wraps
+from functools import cache, wraps
 from importlib.resources import files
 from typing import TYPE_CHECKING
 
 import numpy as np
 from rpy2.robjects import default_converter, numpy2ri
 from rpy2.robjects.conversion import localconverter
-from rpy2.robjects.packages import Package, SignatureTranslatedAnonymousPackage
+from rpy2.robjects.packages import InstalledSTPackage, SignatureTranslatedAnonymousPackage
 from scipy import sparse
 
-from anndata2ri._rpy2_ext import importr
+from anndata2ri._rpy2_ext import R_INT_BYTES, importr
 
 from ._conv import converter
 
@@ -21,21 +21,26 @@ if TYPE_CHECKING:
     from rpy2.rinterface import Sexp
 
 
-matrix: SignatureTranslatedAnonymousPackage | None = None
-base: Package | None = None
+@cache
+def baseenv() -> InstalledSTPackage:
+    return importr('base')
 
 
-@lru_cache
-def get_r_code() -> str:
-    return files('anndata2ri').joinpath('scipy2ri', '_py2r_helpers.r').read_text()
+@cache
+def matrixenv() -> SignatureTranslatedAnonymousPackage:
+    importr('Matrix')  # make class available
+    r_code = files('anndata2ri').joinpath('scipy2ri', '_py2r_helpers.r').read_text()
+    return SignatureTranslatedAnonymousPackage(r_code, 'matrix')
 
 
 def get_type_conv(dtype: np.dtype) -> Callable[[np.ndarray], Sexp]:
-    global base  # noqa: PLW0603
-    if base is None:
-        base = importr('base')
+    base = baseenv()
     if np.issubdtype(dtype, np.floating):
         return base.as_double
+    if np.issubdtype(dtype, np.integer):
+        if dtype.itemsize <= R_INT_BYTES:
+            return base.as_integer
+        return base.as_numeric  # maybe uses R_xlen_t?
     if np.issubdtype(dtype, np.bool_):
         return base.as_logical
     msg = f'Unknown dtype {dtype!r} cannot be converted to ?gRMatrix.'
@@ -47,12 +52,7 @@ def py2r_context(f: Callable[[sparse.spmatrix], Sexp]) -> Callable[[sparse.spmat
 
     @wraps(f)
     def wrapper(obj: sparse.spmatrix) -> Sexp:
-        global matrix  # noqa: PLW0603
-        if matrix is None:
-            importr('Matrix')  # make class available
-            r_code = get_r_code()
-            matrix = SignatureTranslatedAnonymousPackage(r_code, 'matrix')
-
+        matrixenv()  # make Matrix class available
         return f(obj)
 
     return wrapper
@@ -64,7 +64,7 @@ def csc_to_rmat(csc: sparse.csc_matrix) -> Sexp:
     csc.sort_indices()
     conv_data = get_type_conv(csc.dtype)
     with localconverter(default_converter + numpy2ri.converter):
-        return matrix.from_csc(i=csc.indices, p=csc.indptr, x=csc.data, dims=list(csc.shape), conv_data=conv_data)
+        return matrixenv().from_csc(i=csc.indices, p=csc.indptr, x=csc.data, dims=list(csc.shape), conv_data=conv_data)
 
 
 @converter.py2rpy.register(sparse.csr_matrix)
@@ -73,7 +73,7 @@ def csr_to_rmat(csr: sparse.csr_matrix) -> Sexp:
     csr.sort_indices()
     conv_data = get_type_conv(csr.dtype)
     with localconverter(default_converter + numpy2ri.converter):
-        return matrix.from_csr(
+        return matrixenv().from_csr(
             j=csr.indices,
             p=csr.indptr,
             x=csr.data,
@@ -87,7 +87,7 @@ def csr_to_rmat(csr: sparse.csr_matrix) -> Sexp:
 def coo_to_rmat(coo: sparse.coo_matrix) -> Sexp:
     conv_data = get_type_conv(coo.dtype)
     with localconverter(default_converter + numpy2ri.converter):
-        return matrix.from_coo(
+        return matrixenv().from_coo(
             i=coo.row,
             j=coo.col,
             x=coo.data,
@@ -107,7 +107,7 @@ def dia_to_rmat(dia: sparse.dia_matrix) -> Sexp:
         )
         raise ValueError(msg)
     with localconverter(default_converter + numpy2ri.converter):
-        return matrix.from_dia(
+        return matrixenv().from_dia(
             n=dia.shape[0],
             x=dia.data,
             conv_data=conv_data,
