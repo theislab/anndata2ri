@@ -24,10 +24,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - python: "3.12"
+          - python: "3.13"
             r: release
             bioc: "3.19"
-          - python: "3.9"
+          - python: "3.10"
             r: oldrel
             bioc: "3.18"
 
