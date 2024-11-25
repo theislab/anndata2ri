@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from rpy2.rinterface import Sexp
 
 
-__all__ = ['__version__', 'activate', 'deactivate', 'py2rpy', 'rpy2py', 'converter']
+__all__ = ['__version__', 'activate', 'converter', 'deactivate', 'py2rpy', 'rpy2py']
 
 HERE = Path(__file__).parent
 

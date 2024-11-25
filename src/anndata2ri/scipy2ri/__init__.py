@@ -37,13 +37,13 @@ if TYPE_CHECKING:
 
 __all__ = [
     'activate',
+    'converter',
     'deactivate',
     'py2rpy',
     'rpy2py',
-    'converter',
-    'supported_r_matrix_types',
-    'supported_r_matrix_storage',
     'supported_r_matrix_classes',
+    'supported_r_matrix_storage',
+    'supported_r_matrix_types',
 ]
 
 
