@@ -47,7 +47,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.config.python }}
-          cache: pip
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install python tools
+        run: uv tool install build
 
       - id: setup-r
         uses: r-lib/actions/setup-r@v2
@@ -55,13 +61,9 @@ jobs:
           r-version: ${{ matrix.config.r }}
           use-public-rspm: true # compiled packages from posit
 
-      - name: Install python tools
-        run: |
-          python -m pip install --upgrade pip wheel build
-
       - name: Set up rpy2
         run: |
-          python -m pip install rpy2
+          uv pip install --system rpy2
           echo "LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
       - uses: r-lib/actions/setup-r-dependencies@v2
@@ -76,8 +78,8 @@ jobs:
 
       - name: Install anndata2ri
         run: |
-          python -m build --wheel
-          python -m pip install $(ls -1 dist/anndata2ri*.whl)[test]
+          pyproject-build --installer=uv --wheel
+          uv pip install --system $(ls -1 dist/anndata2ri*.whl)[test]
           python -c "import anndata2ri"
 
       - name: Run tests
