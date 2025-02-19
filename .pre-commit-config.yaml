@@ -14,7 +14,6 @@ repos:
     hooks:
       - id: pyproject-fmt
   - repo: https://github.com/biomejs/pre-commit
-    rev: v0.6.1
+    rev: v1.9.4
     hooks:
       - id: biome-format
-        additional_dependencies: ["@biomejs/biome@1.8.3"]
