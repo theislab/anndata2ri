@@ -63,6 +63,7 @@ build = "sphinx-build -M html docs docs/_build"
 
 [tool.hatch.envs.hatch-test]
 features = [ "test" ]
+extra-dependencies = [ "ipykernel" ]
 
 [tool.ruff]
 line-length = 120
