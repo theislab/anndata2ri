@@ -15,7 +15,7 @@ defaults:
 
 jobs:
   run_tester:
-    runs-on: ubuntu-24.04  # https://github.com/actions/runner-images/issues/11639
+    runs-on: ubuntu-22.04  # https://github.com/actions/runner-images/issues/11639
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     env:
       RENV_PATHS_ROOT: ~/.local/share/renv
