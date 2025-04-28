@@ -14,6 +14,9 @@ if TYPE_CHECKING:
     from sphinx.environment import BuildEnvironment
 
 
+logger = logging.getLogger(__name__)
+
+
 class RManRefRole(XRefRole):
     """R reference role."""
 
@@ -93,7 +96,7 @@ class RManRefRole(XRefRole):
         url = self._get_man(package, topic)
         refnode['refuri'] = url
         if not url:
-            logging.warning('R topic %s not found.', target)
+            logger.warning('R topic %s not found.', target)
         return title, url
 
 
