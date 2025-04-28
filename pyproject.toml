@@ -70,7 +70,6 @@ line-length = 120
 format.quote-style = "single"
 lint.select = [ "ALL" ]
 lint.ignore = [
-    "ANN101",  # self type doesn’t need to be annotated
     "C408",    # dict() calls are nice
     "COM812",  # trailing commas handled by black
     "D203",    # prefer 0 to 1 blank line before class members
