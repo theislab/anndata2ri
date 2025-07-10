@@ -4,8 +4,12 @@ from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING, ClassVar
+from urllib.error import HTTPError
+from urllib.parse import urljoin
+from urllib.request import urlopen
 
 from docutils import nodes
+from lxml import html
 from sphinx.roles import XRefRole
 
 
@@ -32,8 +36,6 @@ class RManRefRole(XRefRole):
         self.cls = cls
 
     def _get_man(self, pkg: str, alias: str) -> str:
-        from urllib.error import HTTPError
-
         pkg_cache = type(self).topic_cache.setdefault(pkg)
         if not pkg_cache:
             for repo in ['R-patched', 'cran', 'bioc']:
@@ -48,11 +50,6 @@ class RManRefRole(XRefRole):
         return pkg_cache.get(alias)
 
     def _fetch_cache(self, repo: str, pkg: str) -> dict[str, str]:
-        from urllib.parse import urljoin
-        from urllib.request import urlopen
-
-        from lxml import html
-
         if repo.startswith('R'):
             url = f'https://stat.ethz.ch/R-manual/{repo}/library/{pkg}/html/00Index.html'
             tr_xpath = '//tr'

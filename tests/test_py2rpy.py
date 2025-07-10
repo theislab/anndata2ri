@@ -10,6 +10,7 @@ from anndata import AnnData
 from pandas import DataFrame
 from rpy2.robjects import baseenv, globalenv
 from rpy2.robjects.conversion import localconverter
+from scanpy.datasets import pbmc68k_reduced
 from scipy import sparse
 
 import anndata2ri
@@ -78,11 +79,11 @@ def test_datasets(
     dataset: Callable[[], AnnData],
 ) -> None:
     if dataset is krumsiek:
+        filterwarnings('ignore', r'Duplicated obs_names', UserWarning)
+        filterwarnings('ignore', r'Observation names are not unique', UserWarning)
         # TODO(flying-sheep): Adapt to rpy2 changes instead
         # https://github.com/theislab/anndata2ri/issues/109
         with pytest.warns(DeprecationWarning, match=r'rpy2\.robjects\.conversion is deprecated'):
-            filterwarnings('ignore', r'Duplicated obs_names', UserWarning)
-            filterwarnings('ignore', r'Observation names are not unique', UserWarning)
             ex = py2r(anndata2ri, dataset())
     else:
         ex = py2r(anndata2ri, dataset())
@@ -92,8 +93,6 @@ def test_datasets(
 
 def test_numpy_pbmc68k() -> None:
     """Not tested above as the pbmc68k dataset has some weird metadata."""
-    from scanpy.datasets import pbmc68k_reduced
-
     try:
         with pytest.warns(DeprecationWarning, match=r'global conversion'):
             anndata2ri.activate()
