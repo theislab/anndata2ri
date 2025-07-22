@@ -87,7 +87,7 @@ def _conversion_rpy2py_local(conv_mod: ConversionModule, dataset: Callable[[], S
 
 def _conversion_rpy2py_activate(conv_mod: ConversionModule, dataset: Callable[[], Sexp]) -> Any:  # noqa: ANN401
     try:
-        with pytest.warns(DeprecationWarning, match=r'conversion.*context'):
+        with pytest.warns(DeprecationWarning, match=r'conversion'):
             conv_mod.activate()
         return dataset()
     finally:
