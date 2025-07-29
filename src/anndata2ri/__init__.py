@@ -15,11 +15,10 @@ r"""Converter between Python’s AnnData and R’s SingleCellExperiment.
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from . import _py2r, _r2py  # noqa: F401
-from ._conv import activate, converter, deactivate
+from ._conv import converter
 
 
 if TYPE_CHECKING:
@@ -28,21 +27,7 @@ if TYPE_CHECKING:
     from rpy2.rinterface import Sexp
 
 
-__all__ = ['__version__', 'activate', 'converter', 'deactivate', 'py2rpy', 'rpy2py']
-
-HERE = Path(__file__).parent
-
-__author__ = 'Philipp Angerer'
-try:
-    from setuptools_scm import get_version
-
-    __version__ = get_version(str(HERE.parent.parent))
-except (ImportError, LookupError):
-    try:
-        from ._version import __version__
-    except ImportError as e:
-        msg = 'Cannot infer version. Make sure to `pip install` the project or install `setuptools-scm`.'
-        raise ImportError(msg) from e
+__all__ = ['converter', 'py2rpy', 'rpy2py']
 
 
 def py2rpy(obj: AnnData) -> Sexp:

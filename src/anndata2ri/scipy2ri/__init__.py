@@ -26,7 +26,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from . import _py2r, _r2py  # noqa: F401
-from ._conv import activate, converter, deactivate
+from ._conv import converter
 from ._support import supported_r_matrix_classes, supported_r_matrix_storage, supported_r_matrix_types
 
 
@@ -36,9 +36,7 @@ if TYPE_CHECKING:
 
 
 __all__ = [
-    'activate',
     'converter',
-    'deactivate',
     'py2rpy',
     'rpy2py',
     'supported_r_matrix_classes',

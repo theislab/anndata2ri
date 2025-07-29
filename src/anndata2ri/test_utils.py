@@ -28,14 +28,6 @@ class ConversionModule(ModuleType, ABC):
     def converter(self) -> Converter:
         """Conversion modules have a “converter”."""
 
-    @abstractmethod
-    def activate(self) -> None:
-        """Conversion modules can be a “activate”d."""
-
-    @abstractmethod
-    def deactivate(self) -> None:
-        """Conversion modules can be a “deactivate”d."""
-
 
 def _conversion_py2rpy_manual(conv_mod: ConversionModule, dataset: Any) -> Sexp:  # noqa: ANN401
     converter = conv_mod.get_conversion() if hasattr(conv_mod, 'get_conversion') else conv_mod.converter
@@ -49,20 +41,9 @@ def _conversion_py2rpy_local(conv_mod: ConversionModule, dataset: Any) -> Sexp: 
     return globalenv['temp']
 
 
-def _conversion_py2rpy_activate(conv_mod: ConversionModule, dataset: Any) -> Sexp:  # noqa: ANN401
-    try:
-        with pytest.warns(DeprecationWarning, match=r'global conversion'):
-            conv_mod.activate()
-        globalenv['temp'] = dataset
-    finally:
-        conv_mod.deactivate()
-    return globalenv['temp']
-
-
 conversions_py2rpy: list[Py2R] = [
     pytest.param(_conversion_py2rpy_manual, id='manual'),
     pytest.param(_conversion_py2rpy_local, id='local'),
-    pytest.param(_conversion_py2rpy_activate, id='activate'),
 ]
 
 
@@ -85,19 +66,9 @@ def _conversion_rpy2py_local(conv_mod: ConversionModule, dataset: Callable[[], S
         return dataset()
 
 
-def _conversion_rpy2py_activate(conv_mod: ConversionModule, dataset: Callable[[], Sexp]) -> Any:  # noqa: ANN401
-    try:
-        with pytest.warns(DeprecationWarning, match=r'conversion'):
-            conv_mod.activate()
-        return dataset()
-    finally:
-        conv_mod.deactivate()
-
-
 conversions_rpy2py: list[R2Py] = [
     pytest.param(_conversion_rpy2py_manual, id='manual'),
     pytest.param(_conversion_rpy2py_local, id='local'),
-    pytest.param(_conversion_rpy2py_activate, id='activate'),
 ]
 
 

@@ -62,7 +62,7 @@ please make sure you first:
 Usage from Python
 -----------------
 
-Either use the converter manually …
+Use the converter as a context manager:
 
 .. code-block:: python
 
@@ -73,24 +73,18 @@ Either use the converter manually …
    with localconverter(anndata2ri.converter):
        adata = r('as(some_data, "SingleCellExperiment")')
 
-… or activate it globally:
-
-.. code-block:: python
-
-   import anndata2ri
-   from rpy2.robjects import r
-   anndata2ri.activate()
-
-   adata = r('as(some_data, "SingleCellExperiment")')
-
 Usage from Jupyter
 ------------------
-Activate the conversion before you load the extension:
+Override the `R magic option`_:
+
+.. _R magic option: https://rpy2.github.io/doc/latest/html/generated_rst/notebooks.html#options
 
 .. code-block:: python
 
    import anndata2ri
-   anndata2ri.activate()
+   import IPython
+   ipy = IPython.get_ipython()
+   ipy.magics_manager.registry['RMagics'].options.converter = anndata2ri.converter
    %load_ext rpy2.ipython
 
 Now you can move objects from Python to R …

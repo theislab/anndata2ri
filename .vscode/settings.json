@@ -13,5 +13,5 @@
     },
     "python.testing.pytestEnabled": true,
     "python.testing.pytestArgs": ["--color=yes", "-vv"],
-    "python.terminal.activateEnvironment": false,
+    "python.terminal.activateEnvironment": true,
 }

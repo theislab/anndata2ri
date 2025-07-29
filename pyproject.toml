@@ -30,7 +30,7 @@ dependencies = [
     "tzlocal",     # for pandas2ri
 ]
 
-optional-dependencies.dev = [ "pre-commit", "setuptools-scm" ]
+optional-dependencies.dev = [ "pre-commit" ]
 optional-dependencies.doc = [
     "lxml",                       # For scraping the R link info
     "scanpydoc[theme,typehints]",
