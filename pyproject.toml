@@ -95,6 +95,7 @@ lint.per-file-ignores.'tests/**/*.py' = [
 lint.allowed-confusables = [ "×", "’" ]
 lint.isort.known-first-party = [ "anndata2ri" ]
 lint.isort.lines-after-imports = 2
+lint.isort.required-imports = [ "from __future__ import annotations" ]
 
 [tool.pyproject-fmt]
 indent = 4

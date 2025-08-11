@@ -1,5 +1,7 @@
 """Sphinx configuration."""
 
+from __future__ import annotations
+
 import sys
 from datetime import datetime, timezone
 from importlib.metadata import metadata

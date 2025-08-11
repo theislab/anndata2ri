@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING
 
 from . import _py2r, _r2py  # noqa: F401
 from ._conv import converter
+from ._ipython import set_ipython_converter
 
 
 if TYPE_CHECKING:
@@ -27,7 +28,7 @@ if TYPE_CHECKING:
     from rpy2.rinterface import Sexp
 
 
-__all__ = ['converter', 'py2rpy', 'rpy2py']
+__all__ = ['converter', 'py2rpy', 'rpy2py', 'set_ipython_converter']
 
 
 def py2rpy(obj: AnnData) -> Sexp:

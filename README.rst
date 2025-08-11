@@ -82,10 +82,8 @@ Override the `R magic option`_:
 .. code-block:: python
 
    import anndata2ri
-   import IPython
-   ipy = IPython.get_ipython()
-   ipy.magics_manager.registry['RMagics'].options.converter = anndata2ri.converter
    %load_ext rpy2.ipython
+   anndata2ri.set_ipython_converter()
 
 Now you can move objects from Python to R …
 
