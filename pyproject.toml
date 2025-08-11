@@ -8,15 +8,13 @@ readme = "README.rst"
 authors = [
     { name = "Philipp A.", email = "flying-sheep@web.de" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -30,7 +28,7 @@ dependencies = [
     "tzlocal",     # for pandas2ri
 ]
 
-optional-dependencies.dev = [ "pre-commit" ]
+optional-dependencies.dev = [ "pre-commit", "scipy-stubs" ]
 optional-dependencies.doc = [
     "ipython",
     "lxml",                       # For scraping the R link info
@@ -64,7 +62,7 @@ scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
 scripts.clean = "git clean -fdX -- {args:docs}"
 
 [tool.hatch.envs.hatch-test]
-features = [ "test" ]
+features = [ "test", "dev" ]
 extra-dependencies = [ "ipykernel" ]
 
 [tool.ruff]

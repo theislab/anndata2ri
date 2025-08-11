@@ -27,7 +27,7 @@ jobs:
           - python: "3.13"
             r: release
             bioc: "3.21"
-          - python: "3.9"
+          - python: "3.11"
             r: oldrel
             bioc: "3.19"
 

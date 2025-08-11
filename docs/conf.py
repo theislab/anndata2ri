@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from importlib.metadata import metadata
 from pathlib import Path
 
@@ -22,7 +22,7 @@ sys.path[:0] = [str(HERE / 'ext')]
 project = 'anndata2ri'
 meta = metadata(project)
 author = meta['author-email'].split('"')[1]
-copyright = f'{datetime.now(tz=timezone.utc):%Y}, {author}.'  # noqa: A001
+copyright = f'{datetime.now(tz=UTC):%Y}, {author}.'  # noqa: A001
 version = meta['version']
 release = version
 

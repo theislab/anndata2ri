@@ -34,11 +34,11 @@ def mk_ad_simple() -> AnnData:
 
 
 @pytest.mark.parametrize('dtype', [np.float32, np.float64, np.int32, np.int64])
-@pytest.mark.parametrize('mat_type', [np.asarray, sparse.csr_matrix])
+@pytest.mark.parametrize('mat_type', [np.asarray, sparse.csr_matrix, sparse.csc_array])
 def test_simple(
     py2r: Py2R,
     dtype: np.dtype,
-    mat_type: Callable[[np.ndarray, np.dtype], np.ndarray | sparse.spmatrix],
+    mat_type: Callable[[np.ndarray, np.dtype], np.ndarray | sparse.spmatrix | sparse.sparray],
 ) -> None:
     data = mk_ad_simple()
     if data.X is not None:
