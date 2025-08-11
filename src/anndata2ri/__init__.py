@@ -18,7 +18,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from . import _py2r, _r2py  # noqa: F401
-from ._conv import converter
+from ._conv import converter as _c
 from ._ipython import set_ipython_converter
 
 
@@ -31,12 +31,18 @@ if TYPE_CHECKING:
 __all__ = ['converter', 'py2rpy', 'rpy2py', 'set_ipython_converter']
 
 
+converter = _c
+"""A converter able to convert most things into an :class:`~anndata.AnnData` object."""
+
+
 def py2rpy(obj: AnnData) -> Sexp:
     """Convert Python objects to R interface objects.
 
-    Supports:
+    Supports
+    --------
+    :class:`~anndata.AnnData`
+        → :rcls:`~SingleCellExperiment::SingleCellExperiment`
 
-    - :class:`~anndata.AnnData` → :rcls:`~SingleCellExperiment::SingleCellExperiment`
     """
     return converter.py2rpy(obj)
 
@@ -44,9 +50,12 @@ def py2rpy(obj: AnnData) -> Sexp:
 def rpy2py(obj: Sexp) -> AnnData | DataFrame:
     """Convert R interface objects to Python objects.
 
-    Supports:
+    Supports
+    --------
+    :rcls:`~SingleCellExperiment::SingleCellExperiment`
+        → :class:`~anndata.AnnData`
+    :rcls:`S4Vectors::DataFrame`
+        → :class:`pandas.DataFrame`
 
-    - :rcls:`~SingleCellExperiment::SingleCellExperiment` → :class:`~anndata.AnnData`
-    - :rcls:`S4Vectors::DataFrame` → :class:`pandas.DataFrame`
     """
     return converter.rpy2py(obj)

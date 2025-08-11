@@ -59,8 +59,9 @@ installer = "uv"
 
 [tool.hatch.envs.docs]
 features = [ "doc" ]
-[tool.hatch.envs.docs.scripts]
-build = "sphinx-build -M html docs docs/_build"
+scripts.build = "sphinx-build -M html docs docs/_build"
+scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
+scripts.clean = "git clean -fdX -- {args:docs}"
 
 [tool.hatch.envs.hatch-test]
 features = [ "test" ]
@@ -97,6 +98,7 @@ lint.allowed-confusables = [ "×", "’" ]
 lint.isort.known-first-party = [ "anndata2ri" ]
 lint.isort.lines-after-imports = 2
 lint.isort.required-imports = [ "from __future__ import annotations" ]
+lint.pydocstyle.convention = "numpy"
 
 [tool.pyproject-fmt]
 indent = 4

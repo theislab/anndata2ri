@@ -37,11 +37,15 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
+    'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
     'scanpydoc',
     *[p.stem for p in (HERE / 'ext').glob('*.py')],
 ]
 
+always_use_bars_union = True
+typehints_document_rtype_none = False
+typehints_use_rtype = False
 # Generate the API documentation when building
 autosummary_generate = True
 autodoc_member_order = 'bysource'
@@ -51,6 +55,7 @@ napoleon_include_init_with_doc = False
 napoleon_use_rtype = True  # having a separate entry generally helps readability
 napoleon_use_param = True
 todo_include_todos = False
+napoleon_custom_sections = ['Supports']
 
 intersphinx_mapping = dict(
     anndata=('https://anndata.readthedocs.io/en/latest/', None),

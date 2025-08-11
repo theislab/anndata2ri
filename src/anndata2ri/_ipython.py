@@ -11,6 +11,17 @@ if TYPE_CHECKING:
 
 
 def set_ipython_converter(ipython: InteractiveShell | None = None, converter: Converter | None = None) -> None:
+    """Set the default converter for :mod:`~rpy2.ipython.rmagic` in IPython.
+
+    Parameters
+    ----------
+    ipython
+        The IPython instance to set the converter for.
+        If not specified, the current IPython instance is used.
+    converter
+        The converter to use.
+        If not specified, :attr:`~anndata2ri.converter` is used.
+    """
     import anndata2ri  # noqa: PLC0415
 
     if ipython is None:

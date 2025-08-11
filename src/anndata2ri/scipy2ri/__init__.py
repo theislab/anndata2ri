@@ -1,4 +1,4 @@
-r"""Convert scipy.sparse matrices between Python and R.
+r"""Convert :mod:`scipy.sparse` matrices between Python and R.
 
 For a detailed comparison between the two languages’
 sparse matrix environment, see `issue #8`_.
@@ -55,8 +55,8 @@ supported_r_matrix_storage = supported_r_matrix_storage  # noqa: PLW0127
 def py2rpy(obj: sparse.spmatrix) -> Sexp:
     """Convert scipy sparse matrices objects to R sparse matrices.
 
-    Supports:
-
+    Supports
+    --------
     :class:`~scipy.sparse.csc_matrix` (dtype in {float32, float64, bool}) →
         :rcls:`~Matrix::dgCMatrix` or :rcls:`~Matrix::lgCMatrix`
     :class:`~scipy.sparse.csr_matrix` (dtype in {float32, float64, bool}) →
@@ -65,6 +65,7 @@ def py2rpy(obj: sparse.spmatrix) -> Sexp:
         :rcls:`~Matrix::dgTMatrix` or :rcls:`~Matrix::lgTMatrix`
     :class:`~scipy.sparse.dia_matrix` (dtype in {float32, float64, bool}) →
         :rcls:`~Matrix::ddiMatrix` or :rcls:`~Matrix::ldiMatrix`
+
     """
     return converter.py2rpy(obj)
 
@@ -72,8 +73,8 @@ def py2rpy(obj: sparse.spmatrix) -> Sexp:
 def rpy2py(obj: Sexp) -> sparse.spmatrix:
     """Convert R sparse matrices to scipy sparse matrices.
 
-    Supports:
-
+    Supports
+    --------
     :rcls:`~Matrix::dgCMatrix`, :rcls:`~Matrix::lgCMatrix`, or :rcls:`~Matrix::ngCMatrix` →
         :class:`~scipy.sparse.csc_matrix` (dtype float64 or bool)
     :rcls:`~Matrix::dgRMatrix`, :rcls:`~Matrix::lgRMatrix`, or :rcls:`~Matrix::ngRMatrix` →
@@ -82,5 +83,6 @@ def rpy2py(obj: Sexp) -> sparse.spmatrix:
         :class:`~scipy.sparse.coo_matrix` (dtype float64 or bool)
     :rcls:`~Matrix::ddiMatrix` or :rcls:`~Matrix::ldiMatrix` →
         :class:`~scipy.sparse.dia_matrix` (dtype float64 or bool)
+
     """
     return converter.rpy2py(obj)
