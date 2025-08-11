@@ -100,7 +100,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
             # The assays can be stored in an env or elsewise so we don’t use obj.slots['assays']
             assays = convert_mats('assay', {n: se.assay(obj, n) for n in assay_names}, transpose=True)
             # There’s SingleCellExperiment with no assays
-            exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:]))
+            exprs, layers = assays[0], dict(zip(assay_names[1:], assays[1:], strict=True))
             assert len(exprs.shape) == 2, exprs.shape  # noqa: PLR2004
         else:
             exprs, layers = None, {}
@@ -109,7 +109,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         if not isinstance(rdim_names, NULLType):
             rdim_names = [str(t) for t in rdim_names]
             reduced_dims = convert_mats('reducedDim', {t: sce.reducedDim(obj, t) for t in rdim_names})
-            obsm = {_conv_name.sce2scanpy(n): d for n, d in zip(rdim_names, reduced_dims)}
+            obsm = {_conv_name.sce2scanpy(n): d for n, d in zip(rdim_names, reduced_dims, strict=True)}
         else:
             obsm = None
 
