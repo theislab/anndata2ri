@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import numpy as np
 import pytest
@@ -12,6 +12,9 @@ from anndata2ri import scipy2ri
 
 if TYPE_CHECKING:
     from anndata2ri.test_utils import Py2R
+
+    SpMat = sparse.csr_matrix | sparse.csc_matrix | sparse.coo_matrix | sparse.dia_matrix
+    SpArr = sparse.csr_array | sparse.csc_array | sparse.coo_array | sparse.dia_array
 
 
 mats = [
@@ -27,15 +30,20 @@ mats = [
 
 @pytest.mark.parametrize('typ', ['l', 'd'])
 @pytest.mark.parametrize(('shape', 'dataset', 'cls'), mats)
+@pytest.mark.parametrize('container', ['matrix', 'array'])
 def test_mats(
     py2r: Py2R,
     typ: Literal['l', 'd'],
     shape: tuple[int, ...],
-    dataset: sparse.spmatrix,
+    dataset: SpMat | SpArr,
     cls: str,
+    container: Literal['matrix', 'array'],
 ) -> None:
     if typ == 'l':
         dataset = dataset.astype(bool)
+    if container == 'array':
+        f = getattr(sparse, f'{type(dataset).__name__[:3]}_array')
+        dataset = cast('SpArr', f(dataset))
     sm = py2r(scipy2ri, dataset)
     assert f'{typ}{cls}Matrix' in set(sm.rclass)
     assert tuple(baseenv['dim'](sm)) == shape

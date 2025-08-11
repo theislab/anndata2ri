@@ -49,8 +49,8 @@ def get_type_conv(dtype: np.dtype) -> Callable[[np.ndarray], Sexp]:
     raise ValueError(msg)
 
 
-@converter.py2rpy.register(sparse.csc_matrix)
-def csc_to_rmat(csc: sparse.csc_matrix) -> Sexp:
+@converter.py2rpy.register(sparse.csc_matrix | sparse.csc_array)
+def csc_to_rmat(csc: sparse.csc_matrix | sparse.csc_array) -> Sexp:
     matrix = matrixenv()
     csc.sort_indices()
     conv_data = get_type_conv(csc.dtype)
@@ -58,8 +58,8 @@ def csc_to_rmat(csc: sparse.csc_matrix) -> Sexp:
         return matrix.from_csc(i=csc.indices, p=csc.indptr, x=csc.data, dims=list(csc.shape), conv_data=conv_data)
 
 
-@converter.py2rpy.register(sparse.csr_matrix)
-def csr_to_rmat(csr: sparse.csr_matrix) -> Sexp:
+@converter.py2rpy.register(sparse.csr_matrix | sparse.csr_array)
+def csr_to_rmat(csr: sparse.csr_matrix | sparse.csr_array) -> Sexp:
     matrix = matrixenv()
     csr.sort_indices()
     conv_data = get_type_conv(csr.dtype)
@@ -73,8 +73,8 @@ def csr_to_rmat(csr: sparse.csr_matrix) -> Sexp:
         )
 
 
-@converter.py2rpy.register(sparse.coo_matrix)
-def coo_to_rmat(coo: sparse.coo_matrix) -> Sexp:
+@converter.py2rpy.register(sparse.coo_matrix | sparse.coo_array)
+def coo_to_rmat(coo: sparse.coo_matrix | sparse.coo_array) -> Sexp:
     matrix = matrixenv()
     conv_data = get_type_conv(coo.dtype)
     with localconverter(default_converter + numpy2ri.converter):
@@ -87,8 +87,8 @@ def coo_to_rmat(coo: sparse.coo_matrix) -> Sexp:
         )
 
 
-@converter.py2rpy.register(sparse.dia_matrix)
-def dia_to_rmat(dia: sparse.dia_matrix) -> Sexp:
+@converter.py2rpy.register(sparse.dia_matrix | sparse.dia_array)
+def dia_to_rmat(dia: sparse.dia_matrix | sparse.dia_array) -> Sexp:
     matrix = matrixenv()
     conv_data = get_type_conv(dia.dtype)
     if len(dia.offsets) > 1:

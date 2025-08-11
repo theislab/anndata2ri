@@ -30,7 +30,7 @@ dependencies = [
     "tzlocal",     # for pandas2ri
 ]
 
-optional-dependencies.dev = [ "pre-commit" ]
+optional-dependencies.dev = [ "pre-commit", "scipy-stubs" ]
 optional-dependencies.doc = [
     "ipython",
     "lxml",                       # For scraping the R link info
@@ -64,7 +64,7 @@ scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
 scripts.clean = "git clean -fdX -- {args:docs}"
 
 [tool.hatch.envs.hatch-test]
-features = [ "test" ]
+features = [ "test", "dev" ]
 extra-dependencies = [ "ipykernel" ]
 
 [tool.ruff]
