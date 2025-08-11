@@ -67,6 +67,10 @@ intersphinx_mapping = dict(
     scipy=('https://docs.scipy.org/doc/scipy/reference/', None),
 )
 
+qualname_overrides = {
+    'rpy2.robjects.conversion.Converter': ('py:mod', 'rpy2.robjects.conversion'),
+}
+
 
 # -- Options for HTML output ----------------------------------------------
 

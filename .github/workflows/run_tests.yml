@@ -84,3 +84,12 @@ jobs:
 
       - name: Run tests
         run: pytest --verbose --color=yes
+
+  check:
+    if: always()
+    needs: [run_tester]
+    runs-on: ubuntu-latest
+    steps:
+        - uses: re-actors/alls-green@release/v1
+          with:
+            jobs: ${{ toJSON(needs) }}
