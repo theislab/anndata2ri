@@ -59,6 +59,7 @@ napoleon_custom_sections = ['Supports']
 
 intersphinx_mapping = dict(
     anndata=('https://anndata.readthedocs.io/en/latest/', None),
+    ipython=('https://ipython.readthedocs.io/en/stable/', None),
     numpy=('https://docs.scipy.org/doc/numpy/', None),
     pandas=('http://pandas.pydata.org/pandas-docs/stable/', None),
     python=('https://docs.python.org/3', None),

@@ -15,47 +15,16 @@ r"""Converter between Python’s AnnData and R’s SingleCellExperiment.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from . import _py2r, _r2py  # noqa: F401
-from ._conv import converter as _c
+from ._conv import converter
 from ._ipython import set_ipython_converter
 
 
-if TYPE_CHECKING:
-    from anndata import AnnData
-    from pandas import DataFrame
-    from rpy2.rinterface import Sexp
+__all__ = ['converter', 'set_ipython_converter']
 
 
-__all__ = ['converter', 'py2rpy', 'rpy2py', 'set_ipython_converter']
+converter = converter  # noqa: PLW0127
+"""A :class:`~rpy2.robjects.conversion.Converter` for :mod:`anndata`.
 
-
-converter = _c
-"""A converter able to convert most things into an :class:`~anndata.AnnData` object."""
-
-
-def py2rpy(obj: AnnData) -> Sexp:
-    """Convert Python objects to R interface objects.
-
-    Supports
-    --------
-    :class:`~anndata.AnnData`
-        → :rcls:`~SingleCellExperiment::SingleCellExperiment`
-
-    """
-    return converter.py2rpy(obj)
-
-
-def rpy2py(obj: Sexp) -> AnnData | DataFrame:
-    """Convert R interface objects to Python objects.
-
-    Supports
-    --------
-    :rcls:`~SingleCellExperiment::SingleCellExperiment`
-        → :class:`~anndata.AnnData`
-    :rcls:`S4Vectors::DataFrame`
-        → :class:`pandas.DataFrame`
-
-    """
-    return converter.rpy2py(obj)
+Includes :mod:`rpy2.robjects.numpy2ri`, :mod:`rpy2.robjects.pandas2ri`, and :mod:`.scipy2ri`.
+"""
