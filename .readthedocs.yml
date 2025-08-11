@@ -5,6 +5,7 @@ build:
     python: "3.13"
   apt_packages:
     - r-base-core
+    - r-base-dev
 python:
   install:
     - method: pip
