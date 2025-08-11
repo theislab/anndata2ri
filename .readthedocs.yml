@@ -6,6 +6,7 @@ build:
   apt_packages:
     - r-base-core
     - r-base-dev
+    - libtirpc-dev  # https://bugs.launchpad.net/ubuntu/+source/r-base/+bug/2120296
 python:
   install:
     - method: pip

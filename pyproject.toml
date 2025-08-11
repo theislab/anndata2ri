@@ -32,8 +32,8 @@ dependencies = [
 
 optional-dependencies.dev = [ "pre-commit" ]
 optional-dependencies.doc = [
-    "ipython",                    # For scraping the R link info
-    "lxml",
+    "ipython",
+    "lxml",                       # For scraping the R link info
     "scanpydoc[theme,typehints]",
     "sphinx",
 ]
