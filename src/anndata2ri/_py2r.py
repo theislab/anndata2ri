@@ -40,10 +40,11 @@ STACK_LEVEL = 2
 @dict_converter.py2rpy.register(Mapping)
 def py2rpy_dict(obj: Mapping) -> ListVector:
     """Try converting everything. For nested dicts, this needs itself to be registered."""
+    converter = conversion.get_conversion()
     converted = {}
     try:
         for k, v in obj.items():
-            converted[str(k)] = conversion.py2rpy(v)
+            converted[str(k)] = converter.py2rpy(v)
     except NotImplementedError as e:
         warn(str(e), NotConvertedWarning, stacklevel=STACK_LEVEL)
     # This tries to convert everything again. This works because py2rpy(Sexp) is the identity function
@@ -78,7 +79,7 @@ def py2rpy_anndata(obj: AnnData) -> RS4:
 
         # Convert everything we know
         with localconverter(converter + dict_converter):
-            metadata = ListVector(obj.uns.items())
+            metadata = ListVector(dict(obj.uns))
 
         rd_args = {_conv_name.scanpy2sce(k): mat_py2rpy(obj.obsm[k]) for k in obj.obsm}
         reduced_dims = s4v.SimpleList(**rd_args)

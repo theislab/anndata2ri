@@ -126,4 +126,4 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
     with localconverter(converter):
         uns = dict(metadata.items())
 
-    return AnnData(exprs, obs, var, uns, obsm, layers=layers)
+    return AnnData(exprs, obs, var, uns, obsm=obsm, layers=layers)

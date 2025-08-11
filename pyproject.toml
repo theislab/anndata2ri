@@ -30,11 +30,12 @@ dependencies = [
     "tzlocal",     # for pandas2ri
 ]
 
-optional-dependencies.dev = [ "pre-commit", "setuptools-scm" ]
+optional-dependencies.dev = [ "pre-commit" ]
 optional-dependencies.doc = [
+    "ipython",
     "lxml",                       # For scraping the R link info
     "scanpydoc[theme,typehints]",
-    "sphinx>=3",
+    "sphinx",
 ]
 optional-dependencies.test = [
     "pygments",
@@ -58,8 +59,9 @@ installer = "uv"
 
 [tool.hatch.envs.docs]
 features = [ "doc" ]
-[tool.hatch.envs.docs.scripts]
-build = "sphinx-build -M html docs docs/_build"
+scripts.build = "sphinx-build -M html docs docs/_build"
+scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
+scripts.clean = "git clean -fdX -- {args:docs}"
 
 [tool.hatch.envs.hatch-test]
 features = [ "test" ]
@@ -95,6 +97,8 @@ lint.per-file-ignores.'tests/**/*.py' = [
 lint.allowed-confusables = [ "×", "’" ]
 lint.isort.known-first-party = [ "anndata2ri" ]
 lint.isort.lines-after-imports = 2
+lint.isort.required-imports = [ "from __future__ import annotations" ]
+lint.pydocstyle.convention = "numpy"
 
 [tool.pyproject-fmt]
 indent = 4

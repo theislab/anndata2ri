@@ -81,27 +81,17 @@ def test_datasets(
     if dataset is krumsiek:
         filterwarnings('ignore', r'Duplicated obs_names', UserWarning)
         filterwarnings('ignore', r'Observation names are not unique', UserWarning)
-        # TODO(flying-sheep): Adapt to rpy2 changes instead
-        # https://github.com/theislab/anndata2ri/issues/109
-        with pytest.warns(DeprecationWarning, match=r'rpy2\.robjects\.conversion is deprecated'):
-            ex = py2r(anndata2ri, dataset())
-    else:
-        ex = py2r(anndata2ri, dataset())
+    ex = py2r(anndata2ri, dataset())
     assert tuple(baseenv['dim'](ex)[::-1]) == shape
     check(ex)
 
 
 def test_numpy_pbmc68k() -> None:
     """Not tested above as the pbmc68k dataset has some weird metadata."""
-    try:
-        with pytest.warns(DeprecationWarning, match=r'global conversion'):
-            anndata2ri.activate()
-        with catch_warnings(record=True) as logs:
-            simplefilter('ignore', DeprecationWarning)
-            globalenv['adata'] = pbmc68k_reduced()
-        assert len(logs) == 0, [m.message for m in logs]
-    finally:
-        anndata2ri.deactivate()
+    with localconverter(anndata2ri.converter), catch_warnings(record=True) as logs:
+        simplefilter('ignore', DeprecationWarning)
+        globalenv['adata'] = pbmc68k_reduced()
+    assert len(logs) == 0, [m.message for m in logs]
 
 
 @pytest.mark.parametrize('attr', ['X', 'layers', 'obsm'])
