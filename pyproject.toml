@@ -89,7 +89,6 @@ lint.per-file-ignores.'tests/**/*.py' = [
     "D100",    # test modules don’t need docstrings
     "D103",    # tests don’t need docstrings
     "INP001",  # No __init__.py in tests
-    "PD901",   # “df” is a fine var name in tests
     "PLR2004", # magic numbers are fine in tests
 ]
 lint.allowed-confusables = [ "×", "’" ]
