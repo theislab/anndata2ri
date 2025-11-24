@@ -32,7 +32,7 @@ jobs:
             bioc: "3.19"
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           filter: blob:none
