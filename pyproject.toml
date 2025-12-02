@@ -34,7 +34,7 @@ optional-dependencies.doc = [
     "ipython",
     "lxml",                       # For scraping the R link info
     "scanpydoc[theme,typehints]",
-    "sphinx",
+    "sphinx<9",                   # https://github.com/tox-dev/sphinx-autodoc-typehints/issues/586
 ]
 optional-dependencies.test = [
     "pygments",
