@@ -73,7 +73,7 @@ jobs:
       - name: Install anndata2ri
         run: |
           pyproject-build --installer=uv --wheel
-          uv pip install --system $(ls -1 dist/anndata2ri*.whl)[test]
+          uv pip install --system --group=test $(ls -1 dist/anndata2ri*.whl)
           python -c "import anndata2ri"
 
       - name: Run tests
