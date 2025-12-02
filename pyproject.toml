@@ -28,23 +28,24 @@ dependencies = [
     "rpy2>=3.5.2", # first with get_conversion
     "tzlocal",     # for pandas2ri
 ]
+urls.'Documentation' = "https://icb-anndata2ri.readthedocs-hosted.com/"
+urls.'Issue Tracker' = "https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"
+urls.'Source Code' = "https://github.com/theislab/anndata2ri"
 
-optional-dependencies.dev = [ "pre-commit", "scipy-stubs" ]
-optional-dependencies.doc = [
-    "ipython",
-    "lxml",                       # For scraping the R link info
-    "scanpydoc[theme,typehints]",
-    "sphinx<9",                   # https://github.com/tox-dev/sphinx-autodoc-typehints/issues/586
-]
-optional-dependencies.test = [
+[dependency-groups]
+dev = [ "pre-commit", "scipy-stubs" ]
+test = [
     "pygments",
     "pytest",
     "pytest-faulthandler",
     "scanpy",
 ]
-urls.'Documentation' = "https://icb-anndata2ri.readthedocs-hosted.com/"
-urls.'Issue Tracker' = "https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"
-urls.'Source Code' = "https://github.com/theislab/anndata2ri"
+doc = [
+    "ipython",
+    "lxml",                       # For scraping the R link info
+    "scanpydoc[theme,typehints]",
+    "sphinx<9",                   # https://github.com/tox-dev/sphinx-autodoc-typehints/issues/586
+]
 
 [tool.hatch.version]
 source = "vcs"
@@ -57,13 +58,13 @@ version-file = "src/anndata2ri/_version.py"
 installer = "uv"
 
 [tool.hatch.envs.docs]
-features = [ "doc" ]
+dependency-groups = [ "doc" ]
 scripts.build = "sphinx-build -M html docs docs/_build"
 scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
 scripts.clean = "git clean -fdX -- {args:docs}"
 
 [tool.hatch.envs.hatch-test]
-features = [ "test", "dev" ]
+dependency-groups = [ "test", "dev" ]
 extra-dependencies = [ "ipykernel" ]
 
 [tool.ruff]

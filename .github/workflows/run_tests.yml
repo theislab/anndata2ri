@@ -9,10 +9,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    shell: bash -e {0} # -e to fail on error
-
 jobs:
   run_tester:
     runs-on: ubuntu-24.04
@@ -39,7 +35,7 @@ jobs:
 
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: awalsh128/cache-apt-pkgs-action@v1
         with:
           packages: pandoc gfortran libblas-dev liblapack-dev libedit-dev llvm-dev libcurl4-openssl-dev ffmpeg libhdf5-dev
           version: "1.0"
@@ -49,8 +45,6 @@ jobs:
           python-version: ${{ matrix.config.python }}
 
       - uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
 
       - name: Install python tools
         run: uv tool install build
@@ -79,7 +73,7 @@ jobs:
       - name: Install anndata2ri
         run: |
           pyproject-build --installer=uv --wheel
-          uv pip install --system $(ls -1 dist/anndata2ri*.whl)[test]
+          uv pip install --system --group=test $(ls -1 dist/anndata2ri*.whl)
           python -c "import anndata2ri"
 
       - name: Run tests
