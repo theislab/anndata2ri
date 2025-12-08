@@ -44,7 +44,7 @@ doc = [
     "ipython",
     "lxml",                       # For scraping the R link info
     "scanpydoc[theme,typehints]",
-    "sphinx<9",                   # https://github.com/tox-dev/sphinx-autodoc-typehints/issues/586
+    "sphinx<10",                   # https://github.com/tox-dev/sphinx-autodoc-typehints/issues/586
 ]
 
 [tool.hatch.version]
