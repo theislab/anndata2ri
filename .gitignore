@@ -1,7 +1,6 @@
 # Python
 /dist/
 /docs/_build/
-_version.py
 __pycache__/
 .*cache/
 
