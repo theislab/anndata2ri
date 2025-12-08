@@ -44,15 +44,12 @@ doc = [
     "ipython",
     "lxml",                       # For scraping the R link info
     "scanpydoc[theme,typehints]",
-    "sphinx<10",                  # https://github.com/tox-dev/sphinx-autodoc-typehints/issues/586
+    "sphinx",
 ]
 
 [tool.hatch.version]
 source = "vcs"
 raw-options = { local_scheme = "no-local-version" } # be able to publish dev version
-
-[tool.hatch.build.hooks.vcs]
-version-file = "src/anndata2ri/_version.py"
 
 [tool.hatch.envs.default]
 installer = "uv"
@@ -102,7 +99,8 @@ lint.pydocstyle.convention = "numpy"
 [tool.pyproject-fmt]
 indent = 4
 
-[tool.pytest.ini_options]
+[tool.pytest]
+strict = true
 addopts = [
     "--import-mode=importlib",
     "-panndata2ri.test_utils",
