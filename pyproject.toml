@@ -47,10 +47,6 @@ doc = [
     "sphinx",
 ]
 
-[tool.hatch.version]
-source = "vcs"
-raw-options = { local_scheme = "no-local-version" } # be able to publish dev version
-
 [tool.hatch.envs.default]
 installer = "uv"
 
@@ -63,6 +59,10 @@ scripts.clean = "git clean -fdX -- {args:docs}"
 [tool.hatch.envs.hatch-test]
 dependency-groups = [ "test", "dev" ]
 extra-dependencies = [ "ipykernel" ]
+
+[tool.hatch.version]
+source = "vcs"
+raw-options = { local_scheme = "no-local-version" } # be able to publish dev version
 
 [tool.ruff]
 line-length = 120
