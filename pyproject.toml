@@ -28,9 +28,9 @@ dependencies = [
     "rpy2>=3.5.2", # first with get_conversion
     "tzlocal",     # for pandas2ri
 ]
-urls.'Documentation' = "https://icb-anndata2ri.readthedocs-hosted.com/"
-urls.'Issue Tracker' = "https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"
-urls.'Source Code' = "https://github.com/theislab/anndata2ri"
+urls."Documentation" = "https://icb-anndata2ri.readthedocs-hosted.com/"
+urls."Issue Tracker" = "https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"
+urls."Source Code" = "https://github.com/theislab/anndata2ri"
 
 [dependency-groups]
 dev = [ "pre-commit", "scipy-stubs" ]
@@ -47,22 +47,16 @@ doc = [
     "sphinx",
 ]
 
-[tool.hatch.envs.default]
-installer = "uv"
-
-[tool.hatch.envs.docs]
-dependency-groups = [ "doc" ]
-scripts.build = "sphinx-build -M html docs docs/_build"
-scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
-scripts.clean = "git clean -fdX -- {args:docs}"
-
-[tool.hatch.envs.hatch-test]
-dependency-groups = [ "test", "dev" ]
-extra-dependencies = [ "ipykernel" ]
-
-[tool.hatch.version]
-source = "vcs"
-raw-options = { local_scheme = "no-local-version" } # be able to publish dev version
+[tool.hatch]
+envs.default.installer = "uv"
+envs.docs.dependency-groups = [ "doc" ]
+envs.docs.scripts.build = "sphinx-build -M html docs docs/_build"
+envs.docs.scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
+envs.docs.scripts.clean = "git clean -fdX -- {args:docs}"
+envs.hatch-test.dependency-groups = [ "test", "dev" ]
+envs.hatch-test.extra-dependencies = [ "ipykernel" ]
+version.source = "vcs"
+version.raw-options = { local_scheme = "no-local-version" }  # be able to publish dev version
 
 [tool.ruff]
 line-length = 120
@@ -78,13 +72,13 @@ lint.ignore = [
     "Q",       # handled by formatter
     "S101",    # asserts are fine
 ]
-lint.per-file-ignores.'**/*.ipynb' = [
+lint.per-file-ignores."**/*.ipynb" = [
     "F821", # `%%R -o` means that ruff doesn’t understand which variables exist
     "T201", # Allow print in notebooks
 ]
-lint.per-file-ignores.'docs/**/*.py' = [ "INP001" ] # No __init__.py in docs
-lint.per-file-ignores.'src/**/*.py' = [ "PT" ] # No Pytest checks
-lint.per-file-ignores.'tests/**/*.py' = [
+lint.per-file-ignores."docs/**/*.py" = [ "INP001" ] # No __init__.py in docs
+lint.per-file-ignores."src/**/*.py" = [ "PT" ]      # No Pytest checks
+lint.per-file-ignores."tests/**/*.py" = [
     "D100",    # test modules don’t need docstrings
     "D103",    # tests don’t need docstrings
     "INP001",  # No __init__.py in tests
