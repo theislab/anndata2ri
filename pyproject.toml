@@ -76,8 +76,8 @@ lint.per-file-ignores."**/*.ipynb" = [
     "F821", # `%%R -o` means that ruff doesn’t understand which variables exist
     "T201", # Allow print in notebooks
 ]
-lint.per-file-ignores."docs/**/*.py" = [ "INP001" ]
-lint.per-file-ignores."src/**/*.py" = [ "PT" ]
+lint.per-file-ignores."docs/**/*.py" = [ "INP001" ] # No __init__.py in docs
+lint.per-file-ignores."src/**/*.py" = [ "PT" ]      # No Pytest checks
 lint.per-file-ignores."tests/**/*.py" = [
     "D100",    # test modules don’t need docstrings
     "D103",    # tests don’t need docstrings
