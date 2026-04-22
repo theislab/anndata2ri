@@ -20,12 +20,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - python: "3.13"
+          - python: "3.14"
             r: release
-            bioc: "3.21"
           - python: "3.11"
             r: oldrel
-            bioc: "3.19"
 
     steps:
       - uses: actions/checkout@v6
@@ -66,9 +64,6 @@ jobs:
           packages: |
             bioc::SingleCellExperiment
             bioc::scRNAseq
-            ${{ matrix.config.r == 'oldrel' && 'cran::rjson@0.2.21' || '' }}
-        env:
-          R_BIOC_VERSION: ${{ matrix.config.bioc }}
 
       - name: Install anndata2ri
         run: |
