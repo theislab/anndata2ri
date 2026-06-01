@@ -48,15 +48,15 @@ doc = [
 ]
 
 [tool.hatch]
-envs.default.installer = "uv"
-envs.docs.dependency-groups = [ "doc" ]
-envs.docs.scripts.build = "sphinx-build -M html docs docs/_build"
-envs.docs.scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
-envs.docs.scripts.clean = "git clean -fdX -- {args:docs}"
-envs.hatch-test.dependency-groups = [ "test", "dev" ]
-envs.hatch-test.extra-dependencies = [ "ipykernel" ]
 version.source = "vcs"
 version.raw-options = { local_scheme = "no-local-version" }  # be able to publish dev version
+envs.default.installer = "uv"
+envs.docs.scripts.build = "sphinx-build -M html docs docs/_build"
+envs.docs.scripts.clean = "git clean -fdX -- {args:docs}"
+envs.docs.scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
+envs.docs.dependency-groups = [ "doc" ]
+envs.hatch-test.extra-dependencies = [ "ipykernel" ]
+envs.hatch-test.dependency-groups = [ "test", "dev" ]
 
 [tool.ruff]
 line-length = 120
@@ -94,9 +94,9 @@ lint.pydocstyle.convention = "numpy"
 indent = 4
 
 [tool.pytest]
-strict = true
 addopts = [
     "--import-mode=importlib",
     "-panndata2ri.test_utils",
     "-Werror",
 ]
+strict = true
