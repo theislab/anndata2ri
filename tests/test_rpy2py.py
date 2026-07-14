@@ -23,12 +23,15 @@ if TYPE_CHECKING:
 as_ = getattr(importr('methods'), 'as')
 se = importr('SummarizedExperiment')
 sce = importr('SingleCellExperiment')
-eh = importr('ExperimentHub')
-seq = importr('scRNAseq')
 
 
-# avoid prompt
-Path(eh.getExperimentHubOption('CACHE')[0]).mkdir(parents=True, exist_ok=True)
+def get_allen() -> Sexp:
+    eh = importr('ExperimentHub')
+    seq = importr('scRNAseq')
+
+    # avoid prompt
+    Path(eh.getExperimentHubOption('CACHE')[0]).mkdir(parents=True, exist_ok=True)
+    return as_(seq.ReprocessedAllenData(assays='tophat_counts'), 'SingleCellExperiment')
 
 
 def check_allen(adata: AnnData) -> None:
@@ -57,12 +60,7 @@ local({
 """
 
 expression_sets = [
-    pytest.param(
-        check_allen,
-        (379, 20816),
-        lambda: as_(seq.ReprocessedAllenData(assays='tophat_counts'), 'SingleCellExperiment'),
-        id='allen',
-    ),
+    pytest.param(check_allen, (379, 20816), get_allen, id='allen'),
     pytest.param(lambda _: None, (0, 0), sce.SingleCellExperiment, id='empty'),
     pytest.param(check_example, (100, 200), lambda: r(code_example), id='example'),
 ]
