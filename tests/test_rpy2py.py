@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pandas as pd
 import pytest
 from anndata import AnnData
@@ -37,7 +38,8 @@ def get_allen() -> Sexp:
 def check_allen(adata: AnnData) -> None:
     assert adata.uns.keys() == {'SuppInfo', 'which_qc'}
     assert set(adata.obs.keys()) > {'NREADS', 'NALIGNED', 'Animal.ID', 'passes_qc_checks_s'}
-    assert adata.obs['Secondary.Type'][:4].tolist() == ['L4 Ctxn3', '', 'L5a Batf3', None], 'NAs not conserved?'
+    na_val = np.nan if pd.options.future.infer_string else None
+    assert adata.obs['Secondary.Type'][:4].tolist() == ['L4 Ctxn3', '', 'L5a Batf3', na_val], 'NAs not conserved?'
     assert adata.obs['Animal.ID'][:4].tolist() == [133632, 133632, 151560, pd.NA], 'NAs not conserved?'
 
 
