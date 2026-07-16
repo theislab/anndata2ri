@@ -64,7 +64,8 @@ def py2rpy_anndata(obj: AnnData) -> RS4:
         s4v = importr('S4Vectors')
         sce = importr('SingleCellExperiment')
         x = {} if obj.X is None else dict(X=mat_py2rpy(obj.X.T))
-        layers = {k: mat_py2rpy(v.T) for k, v in obj.layers.items()}
+        # obj.layers[None] aliases obj.X (AnnData ≥0.13), so skip it here.
+        layers = {k: mat_py2rpy(v.T) for k, v in obj.layers.items() if k is not None}
         assays = ListVector({**x, **layers})
 
         row_args = {k: pandas2ri.py2rpy(v) for k, v in obj.var.items()}
