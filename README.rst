@@ -16,8 +16,8 @@
    :target: https://github.com/theislab/anndata2ri/actions/workflows/run_tests.yml
    :alt: Unit Tests
 
-.. |doi| image:: https://zenodo.org/badge/171714778.svg
-   :target: https://zenodo.org/badge/latestdoi/171714778
+.. |doi| image:: https://doi.org/10.5281/zenodo.3992373.svg
+   :target: https://doi.org/10.5281/zenodo.3992373
    :alt: Publication DOI
 
 AnnData ↭ SingleCellExperiment
