@@ -1,6 +1,11 @@
 anndata2ri
 ==========
 
+.. toctree::
+   :hidden:
+
+   self
+
 .. automodule:: anndata2ri
    :members:
 

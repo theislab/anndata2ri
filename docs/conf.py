@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from datetime import UTC, datetime
 from importlib.metadata import metadata
@@ -74,9 +75,21 @@ qualname_overrides = {
 
 # -- Options for HTML output ----------------------------------------------
 
+if _gh_url := os.environ.get('READTHEDOCS_GIT_CLONE_URL'):
+    _gh_url = _gh_url.removesuffix('.git')
+
+_git_id = (
+    None  # this would have to be the base branch of the PR
+    if os.environ.get('READTHEDOCS_VERSION_TYPE') == 'external'
+    else os.environ.get('READTHEDOCS_GIT_IDENTIFIER')
+)
 
 html_theme = 'scanpydoc'
-html_theme_options = dict(collapse_navigation=True)
+html_theme_options = dict(
+    collapse_navigation=True,
+    repository_url=_gh_url,
+    repository_branch=_git_id,
+)
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
 html_context = dict(
