@@ -4,14 +4,11 @@ build:
   tools:
     python: "3.13"
   apt_packages:
-    - r-base-core
+    - r-base
     - r-base-dev
     - libtirpc-dev  # https://bugs.launchpad.net/ubuntu/+source/r-base/+bug/2120296
   jobs:
     create_environment:
-      - asdf plugin add r
-      - R_EXTRA_CONFIGURE_OPTIONS='--enable-R-shlib --with-cairo' asdf install r latest
-      - asdf global r latest
       - asdf plugin add uv
       - asdf install uv latest
       - asdf global uv latest
