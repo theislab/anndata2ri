@@ -87,6 +87,7 @@ _git_id = (
 html_theme = 'scanpydoc'
 html_theme_options = dict(
     home_page_in_toc=True,
+    show_navbar_depth=2,
     repository_url=_gh_url,
     repository_branch=_git_id,
 )
