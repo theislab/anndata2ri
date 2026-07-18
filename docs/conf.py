@@ -64,7 +64,7 @@ intersphinx_mapping = dict(
     pandas=('http://pandas.pydata.org/pandas-docs/stable/', None),
     python=('https://docs.python.org/3', None),
     rpy2=('https://rpy2.github.io/doc/latest/html/', None),
-    scipy=('https://docs.scipy.org/doc/scipy/reference/', None),
+    scipy=('https://docs.scipy.org/doc/scipy/', None),
 )
 
 qualname_overrides = {

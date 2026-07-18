@@ -8,7 +8,7 @@
    :target: https://anaconda.org/bioconda/anndata2ri
    :alt: Bioconda Version
 
-.. |rtd| image:: https://readthedocs.com/projects/icb-anndata2ri/badge/?version=latest&token=ee358f7efe36cbbd7d04db1b708fa81cefc44634ae7f3f8e0afcd03a1f0b1158
+.. |rtd| image:: https://app.readthedocs.com/projects/icb-anndata2ri/badge/
    :target: docs_
    :alt: Documentation Status
 
@@ -16,7 +16,7 @@
    :target: https://github.com/theislab/anndata2ri/actions/workflows/run_tests.yml
    :alt: Unit Tests
 
-.. |doi| image:: https://doi.org/10.5281/zenodo.3992373.svg
+.. |doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3992373.svg
    :target: https://doi.org/10.5281/zenodo.3992373
    :alt: Publication DOI
 
