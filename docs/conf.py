@@ -86,11 +86,19 @@ _git_id = (
 
 html_theme = 'scanpydoc'
 html_theme_options = dict(
-    home_page_in_toc=True,
-    show_navbar_depth=2,
+    article_header_end=[],  # turn off TOC on the right
     repository_url=_gh_url,
     repository_branch=_git_id,
 )
+html_sidebars = {
+    '**': [
+        'navbar-logo.html',
+        'icon-links.html',
+        'search-button-field.html',
+        # Instead of nav ('sbt-sidebar-nav.html'), TOC below:
+        'page-toc.html',
+    ]
+}
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
 html_context = dict(
