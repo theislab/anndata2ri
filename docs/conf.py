@@ -86,7 +86,6 @@ _git_id = (
 
 html_theme = 'scanpydoc'
 html_theme_options = dict(
-    article_header_end=[],  # turn off TOC on the right
     repository_url=_gh_url,
     repository_branch=_git_id,
 )
