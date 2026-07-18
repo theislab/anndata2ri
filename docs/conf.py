@@ -88,6 +88,7 @@ html_theme = 'scanpydoc'
 html_theme_options = dict(
     repository_url=_gh_url,
     repository_branch=_git_id,
+    use_repository_button=True,
 )
 html_sidebars = {
     '**': [
@@ -100,13 +101,6 @@ html_sidebars = {
 }
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
-html_context = dict(
-    display_github=True,
-    github_user='theislab',
-    github_repo='anndata2ri',
-    github_version='main',
-    conf_py_path='/docs/',
-)
 
 
 # -- Options for other output formats ------------------------------------------
