@@ -5,6 +5,7 @@ requires = [ "hatch-vcs", "hatchling" ]
 [project]
 name = "anndata2ri"
 readme = "README.rst"
+license = "GPL-3.0-or-later"
 authors = [
     { name = "Philipp A.", email = "flying-sheep@web.de" },
 ]
@@ -13,7 +14,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -63,14 +63,14 @@ line-length = 120
 format.quote-style = "single"
 lint.select = [ "ALL" ]
 lint.ignore = [
-    "C408",    # dict() calls are nice
-    "COM812",  # trailing commas handled by black
-    "D203",    # prefer 0 to 1 blank line before class members
-    "D213",    # prefer docstring summary on first line
-    "FIX002",  # “TODO” comments
-    "PLR0913", # having many (kw)args is fine
-    "Q",       # handled by formatter
-    "S101",    # asserts are fine
+    "C408",   # dict() calls are nice
+    "COM812", # trailing commas handled by black
+    "CPY001", # no need for copyright notices
+    "D203",   # prefer 0 to 1 blank line before class members
+    "D213",   # prefer docstring summary on first line
+    "FIX002", # “TODO” comments
+    "Q",      # handled by formatter
+    "S101",   # asserts are fine
 ]
 lint.per-file-ignores."**/*.ipynb" = [
     "F821", # `%%R -o` means that ruff doesn’t understand which variables exist
@@ -82,6 +82,7 @@ lint.per-file-ignores."tests/**/*.py" = [
     "D100",    # test modules don’t need docstrings
     "D103",    # tests don’t need docstrings
     "INP001",  # No __init__.py in tests
+    "PLR0913", # many fixtures are OK
     "PLR2004", # magic numbers are fine in tests
 ]
 lint.allowed-confusables = [ "×", "’" ]

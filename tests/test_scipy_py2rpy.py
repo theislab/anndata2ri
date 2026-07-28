@@ -32,6 +32,7 @@ mats = [
 @pytest.mark.parametrize(('shape', 'dataset', 'cls'), mats)
 @pytest.mark.parametrize('container', ['matrix', 'array'])
 def test_mats(
+    *,
     py2r: Py2R,
     typ: Literal['l', 'd'],
     shape: tuple[int, ...],
