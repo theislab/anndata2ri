@@ -64,6 +64,7 @@ mats = [
 
 @pytest.mark.parametrize(('shape', 'cls', 'dtype', 'arr', 'dataset'), mats)
 def test_mats(
+    *,
     r2py: R2Py,
     shape: tuple[int, int],
     cls: type[sparse.spmatrix],
