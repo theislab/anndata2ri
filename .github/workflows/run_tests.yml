@@ -79,6 +79,6 @@ jobs:
     needs: [run_tester]
     runs-on: ubuntu-latest
     steps:
-        - uses: re-actors/alls-green@release/v1
-          with:
-            jobs: ${{ toJSON(needs) }}
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
