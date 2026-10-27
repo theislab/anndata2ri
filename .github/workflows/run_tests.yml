@@ -1,84 +1,84 @@
 name: Unit Tests
 
 on:
-    push:
-        branches: [main]
-    pull_request:
+  push:
+    branches: [main]
+  pull_request:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    run_tester:
-        runs-on: ubuntu-24.04
-        if: "!contains(github.event.head_commit.message, 'ci skip')"
-        env:
-            RENV_PATHS_ROOT: ~/.local/share/renv
+  run_tester:
+    runs-on: ubuntu-24.04
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    env:
+      RENV_PATHS_ROOT: ~/.local/share/renv
 
-        strategy:
-            fail-fast: false
-            matrix:
-                config:
-                    - python: "3.14"
-                      r: release
-                    - python: "3.11"
-                      r: oldrel
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - python: "3.14"
+            r: release
+          - python: "3.11"
+            r: oldrel
 
-        steps:
-            - uses: actions/checkout@v7
-              with:
-                  fetch-depth: 0
-                  filter: blob:none
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          filter: blob:none
 
-            - name: Install system dependencies
-              if: runner.os == 'Linux'
-              uses: awalsh128/cache-apt-pkgs-action@v1
-              with:
-                  packages: pandoc gfortran libblas-dev liblapack-dev libedit-dev llvm-dev libcurl4-openssl-dev ffmpeg libhdf5-dev libsz2
-                  version: "1.0"
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: pandoc gfortran libblas-dev liblapack-dev libedit-dev llvm-dev libcurl4-openssl-dev ffmpeg libhdf5-dev libsz2
+          version: "1.0"
 
-            - uses: actions/setup-python@v7
-              with:
-                  python-version: ${{ matrix.config.python }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.config.python }}
 
-            - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v7
 
-            - name: Install python tools
-              run: uv tool install build
+      - name: Install python tools
+        run: uv tool install build
 
-            - id: setup-r
-              uses: r-lib/actions/setup-r@v2
-              with:
-                  r-version: ${{ matrix.config.r }}
-                  use-public-rspm: true # compiled packages from posit
+      - id: setup-r
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          use-public-rspm: true # compiled packages from posit
 
-            - name: Set up rpy2
-              run: |
-                  uv pip install --system rpy2
-                  echo "LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+      - name: Set up rpy2
+        run: |
+          uv pip install --system rpy2
+          echo "LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
-            - uses: r-lib/actions/setup-r-dependencies@v2
-              with:
-                  cache-version: 1 # increment to bust cache
-                  packages: |
-                      bioc::SingleCellExperiment
-                      bioc::scRNAseq
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1 # increment to bust cache
+          packages: |
+            bioc::SingleCellExperiment
+            bioc::scRNAseq
 
-            - name: Install anndata2ri
-              run: |
-                  pyproject-build --installer=uv --wheel
-                  uv pip install --system --group=test $(ls -1 dist/anndata2ri*.whl)
-                  python -c "import anndata2ri"
+      - name: Install anndata2ri
+        run: |
+          pyproject-build --installer=uv --wheel
+          uv pip install --system --group=test $(ls -1 dist/anndata2ri*.whl)
+          python -c "import anndata2ri"
 
-            - name: Run tests
-              run: pytest --verbose --color=yes
+      - name: Run tests
+        run: pytest --verbose --color=yes
 
-    check:
-        if: always()
-        needs: [run_tester]
-        runs-on: ubuntu-latest
-        steps:
-            - uses: re-actors/alls-green@release/v1
-              with:
-                  jobs: ${{ toJSON(needs) }}
+  check:
+    if: always()
+    needs: [run_tester]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
