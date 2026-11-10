@@ -9,7 +9,7 @@ build:
       - asdf install pixi latest
       - asdf global pixi latest
     install:
-      - pixi install -e docs --locked --run-post-link-scripts
+      - pixi install -e docs --run-post-link-scripts
     build:
       html:
         - pixi run -e docs build -T

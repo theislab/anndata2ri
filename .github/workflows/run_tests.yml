@@ -38,7 +38,6 @@ jobs:
       - uses: prefix-dev/setup-pixi@v0.11.3
         with:
           environments: ${{ matrix.env }}
-          locked: true
           # bioconductor-genomeinfodbdata downloads its data in a post-link script
           configuration: run-post-link-scripts = "insecure"
       - run: pixi run -e ${{ matrix.env }} test --verbose --color=yes
