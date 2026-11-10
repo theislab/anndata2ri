@@ -17,3 +17,7 @@ repos:
     rev: v2.6.4
     hooks:
       - id: biome-format
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.32.0
+    hooks:
+      - id: zizmor

@@ -49,13 +49,29 @@ doc = [
 [tool.hatch]
 version.source = "vcs"
 version.raw-options = { local_scheme = "no-local-version" }  # be able to publish dev version
-envs.default.installer = "uv"
-envs.docs.scripts.build = "sphinx-build -M html docs docs/_build"
-envs.docs.scripts.clean = "git clean -fdX -- {args:docs}"
-envs.docs.scripts.open = "python3 -m webbrowser -t docs/_build/html/index.html"
-envs.docs.dependency-groups = [ "doc" ]
-envs.hatch-test.extra-dependencies = [ "ipykernel" ]
-envs.hatch-test.dependency-groups = [ "test", "dev" ]
+
+[tool.pixi]
+workspace.channels = [ "conda-forge", "bioconda" ]
+workspace.platforms = [ "linux-64", "osx-arm64" ]
+dependencies.python = ">=3.13"
+dependencies.r-base = "*"
+dependencies.rpy2 = ">=3.5.2"
+pypi-dependencies.anndata2ri = { path = ".", editable = true }
+feature.doc.tasks.build = "sphinx-build -M html docs docs/_build -W"
+feature.doc.tasks.clean = "git clean -fdX -- docs"
+feature.doc.tasks.open = "python3 -m webbrowser -t docs/_build/html/index.html"
+feature.py313.dependencies.python = "3.13.*"
+feature.py313.dependencies.r-base = "4.4.*"
+feature.py314.dependencies.python = "3.14.*"
+feature.test.dependencies.bioconductor-scrnaseq = "*"
+feature.test.dependencies.bioconductor-singlecellexperiment = "*"
+feature.test.dependencies.ipykernel = "*"
+feature.test.tasks.test = "pytest"
+environments.default = { features = [ "test", "dev", "py314" ], solve-group = "latest" }
+environments.docs = { features = [ "doc", "py314" ], solve-group = "latest" }
+# CI runs every `test-*` environment
+environments.test-latest = { features = [ "test", "dev", "py314" ], solve-group = "latest" }
+environments.test-oldest = { features = [ "test", "dev", "py313" ] }
 
 [tool.ruff]
 line-length = 120
@@ -98,8 +114,5 @@ addopts = [
     "--import-mode=importlib",
     "-panndata2ri.test_utils",
 ]
-filterwarnings = [
-    "error",
-    "ignore::pandas.errors.Pandas4Warning:anndata",
-]
+filterwarnings = [ "error" ]  # more in anndata2ri.test_utils
 strict = true
