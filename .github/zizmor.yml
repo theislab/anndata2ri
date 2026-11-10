@@ -1,0 +1,3 @@
+rules:
+  unpinned-uses: # pinned in .github/workflows/actions.lock via `gh actions-lock`
+    disable: true
