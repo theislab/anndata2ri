@@ -22,7 +22,7 @@ jobs:
         config:
           - python: "3.14"
             r: release
-          - python: "3.11"
+          - python: "3.13"
             r: oldrel
 
     steps:
