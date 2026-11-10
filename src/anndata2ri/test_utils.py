@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
+import pandas as pd
 import pytest
 from rpy2.robjects import default_converter, globalenv
 from rpy2.robjects.conversion import Converter, localconverter
@@ -18,6 +19,13 @@ if TYPE_CHECKING:
 
     Py2R = Callable[['ConversionModule', Any], Any]
     R2Py = Callable[['ConversionModule', Callable[[], Sexp]], Any]
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Add warning filters that can’t be specified statically."""
+    # Pandas4Warning only exists in pandas ≥3, pytest errors on unknown categories
+    if hasattr(pd.errors, 'Pandas4Warning'):
+        config.addinivalue_line('filterwarnings', 'ignore::pandas.errors.Pandas4Warning:anndata')
 
 
 class ConversionModule(ModuleType, ABC):
