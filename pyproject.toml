@@ -67,9 +67,9 @@ feature.test.dependencies.bioconductor-scrnaseq = "*"
 feature.test.dependencies.bioconductor-singlecellexperiment = "*"
 feature.test.dependencies.ipykernel = "*"
 feature.test.tasks.test = "pytest"
-# CI runs every `test-*` environment
 environments.default = { features = [ "test", "dev", "py314" ], solve-group = "latest" }
 environments.docs = { features = [ "doc", "py314" ], solve-group = "latest" }
+# CI runs every `test-*` environment
 environments.test-latest = { features = [ "test", "dev", "py314" ], solve-group = "latest" }
 environments.test-oldest = { features = [ "test", "dev", "py313" ] }
 
