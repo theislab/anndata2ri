@@ -1,5 +1,5 @@
 {
-    "[json][jsonc]": {
+    "[json][jsonc][yaml][markdown]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "biomejs.biome",
     },
