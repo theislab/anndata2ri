@@ -12,3 +12,7 @@ __pycache__/
 
 # Scanpy
 /data/
+
+# Pixi
+/.pixi/
+/pixi.lock
