@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from warnings import catch_warnings, filterwarnings, simplefilter
 
 import numpy as np
+import pandas as pd
 import pytest
 import scanpy as sc
 from anndata import AnnData
@@ -92,6 +93,38 @@ def test_numpy_pbmc68k() -> None:
         simplefilter('ignore', DeprecationWarning)
         globalenv['adata'] = pbmc68k_reduced()
     assert len(logs) == 0, [m.message for m in logs]
+
+
+@pytest.mark.parametrize(
+    'dtype',
+    [
+        pytest.param(np.dtype(str), id='U'),
+        pytest.param(np.dtypes.StringDType(), id='T-na_unset'),
+        pytest.param(np.dtypes.StringDType(na_object=pd.NA), id='T-na_pd'),
+        pytest.param(np.dtypes.StringDType(na_object=np.nan), id='T-na_nan'),
+        pytest.param(np.dtypes.StringDType(na_object=None), id='T-na_none'),
+        pytest.param(np.dtypes.StringDType(na_object='b'), id='T-na_str'),
+    ],
+)
+@pytest.mark.parametrize('shape', [(4,), (2, 2)], ids=['1d', '2d'])
+def test_string_dtype(dtype: np.dtype, shape: tuple[int, ...]) -> None:
+    has_na = hasattr(dtype, 'na_object')
+    values = ['a', 'b', None if has_na else 'c', 'd']  # the 'b' is a real string, not missing
+    arr = (
+        np.array(values, dtype=np.dtypes.StringDType(na_object=None)).astype(dtype)
+        if has_na
+        else np.array(values, dtype=dtype)
+    ).reshape(shape)
+
+    adata = mk_ad_simple()
+    adata.uns['strs'] = arr
+    ex = anndata2ri.converter.py2rpy(adata)
+    r_arr = importr('S4Vectors').metadata(ex).rx2('strs')
+
+    assert tuple(baseenv['typeof'](r_arr)) == ('character',)
+    assert tuple(baseenv['dim'](r_arr)) == shape
+    na_mask = pd.isna(np.array(values, dtype=object)).reshape(shape)
+    assert list(baseenv['is.na'](r_arr)) == list(na_mask.ravel(order='F'))
 
 
 @pytest.mark.parametrize('attr', ['X', 'layers', 'obsm'])
