@@ -10,14 +10,14 @@ Here’s an overview over the matching classes (note that ``dtype=float32`` is a
 =====================================================  ======================================================
 R                                                      Python
 =====================================================  ======================================================
-:rcls:`~Matrix::dgCMatrix`                             :class:`~scipy.sparse.csc_matrix`\ ``(dtype=float64)``
-:rcls:`~Matrix::lgCMatrix`/:rcls:`~Matrix::ngCMatrix`  :class:`~scipy.sparse.csc_matrix`\ ``(dtype=bool)``
-:rcls:`~Matrix::dgRMatrix`                             :class:`~scipy.sparse.csr_matrix`\ ``(dtype=float64)``
-:rcls:`~Matrix::lgRMatrix`/:rcls:`~Matrix::ngRMatrix`  :class:`~scipy.sparse.csr_matrix`\ ``(dtype=bool)``
-:rcls:`~Matrix::dgTMatrix`                             :class:`~scipy.sparse.coo_matrix`\ ``(dtype=float64)``
-:rcls:`~Matrix::lgTMatrix`/:rcls:`~Matrix::ngTMatrix`  :class:`~scipy.sparse.coo_matrix`\ ``(dtype=bool)``
-:rcls:`~Matrix::ddiMatrix`                             :class:`~scipy.sparse.dia_matrix`\ ``(dtype=float64)``
-:rcls:`~Matrix::ldiMatrix`                             :class:`~scipy.sparse.dia_matrix`\ ``(dtype=bool)``
+:rcls:`~Matrix::dgCMatrix`                             :class:`~scipy.sparse.csc_array`\ ``(dtype=float64)``
+:rcls:`~Matrix::lgCMatrix`/:rcls:`~Matrix::ngCMatrix`  :class:`~scipy.sparse.csc_array`\ ``(dtype=bool)``
+:rcls:`~Matrix::dgRMatrix`                             :class:`~scipy.sparse.csr_array`\ ``(dtype=float64)``
+:rcls:`~Matrix::lgRMatrix`/:rcls:`~Matrix::ngRMatrix`  :class:`~scipy.sparse.csr_array`\ ``(dtype=bool)``
+:rcls:`~Matrix::dgTMatrix`                             :class:`~scipy.sparse.coo_array`\ ``(dtype=float64)``
+:rcls:`~Matrix::lgTMatrix`/:rcls:`~Matrix::ngTMatrix`  :class:`~scipy.sparse.coo_array`\ ``(dtype=bool)``
+:rcls:`~Matrix::ddiMatrix`                             :class:`~scipy.sparse.dia_array`\ ``(dtype=float64)``
+:rcls:`~Matrix::ldiMatrix`                             :class:`~scipy.sparse.dia_array`\ ``(dtype=bool)``
 =====================================================  ======================================================
 """
 

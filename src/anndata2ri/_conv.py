@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from rpy2.rinterface import Sexp
-    from scipy.sparse import spmatrix
+    from scipy.sparse import sparray, spmatrix
 
 
 converter = conversion.Converter(
@@ -37,7 +37,7 @@ def py2rpy_ndarray(obj: np.ndarray) -> Sexp:
 _mat_converter = numpy2ri.converter + scipy2ri.converter
 
 
-def mat_py2rpy(obj: np.ndarray | spmatrix | pd.DataFrame) -> Sexp:
+def mat_py2rpy(obj: np.ndarray | sparray | spmatrix | pd.DataFrame) -> Sexp:
     if isinstance(obj, pd.DataFrame):
         numeric_cols = obj.dtypes.map(pd.api.types.is_numeric_dtype)
         if not numeric_cols.all():
@@ -48,4 +48,4 @@ def mat_py2rpy(obj: np.ndarray | spmatrix | pd.DataFrame) -> Sexp:
     return _mat_converter.py2rpy(obj)
 
 
-mat_rpy2py: Callable[[Sexp], np.ndarray | spmatrix | Sexp] = _mat_converter.rpy2py
+mat_rpy2py: Callable[[Sexp], np.ndarray | sparray | Sexp] = _mat_converter.rpy2py
