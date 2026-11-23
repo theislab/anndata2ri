@@ -53,13 +53,15 @@ def rmat_to_spmat(rmat: SexpS4) -> sparse.sparray:
             if not supported_r_matrix_classes(storage=storage) & r_classes:
                 continue
             coord_spec = idx(slots)
-            data = (
-                np.repeat(a=True, repeats=nnz(coord_spec))
-                # we have pattern matrix without data (but always i and j!)
-                if supported_r_matrix_classes(types='n') & r_classes
-                else slots['x']
-            )
             dtype = np.bool_ if supported_r_matrix_classes(types=('n', 'l')) & r_classes else np.float64
+            if storage == 'di' and slots['diag'][0] == 'U':
+                # unit diagonal: `x` is empty, all diagonal entries are 1
+                data = np.ones(shape[0], dtype=dtype)
+            elif supported_r_matrix_classes(types='n') & r_classes:
+                # we have pattern matrix without data (but always i and j!)
+                data = np.repeat(a=True, repeats=nnz(coord_spec))
+            else:
+                data = slots['x']
             return mat_cls((data, *coord_spec), shape=shape, dtype=dtype)
 
         msg = 'Should have hit one of the branches'
