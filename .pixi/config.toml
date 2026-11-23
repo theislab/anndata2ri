@@ -1,0 +1,2 @@
+# bioconductor-genomeinfodbdata downloads its data in a post-link script
+run-post-link-scripts = "insecure"

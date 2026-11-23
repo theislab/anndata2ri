@@ -14,5 +14,4 @@ __pycache__/
 /data/
 
 # Pixi
-/.pixi/
 /pixi.lock
