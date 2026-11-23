@@ -10,7 +10,7 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.robject import RSlots
 
 from . import _conv_name
-from ._conv import converter, mat_rpy2py
+from ._conv import converter, mat_rpy2py, realize_delayed
 from ._rpy2_ext import R_INT_BYTES, importr
 from .scipy2ri import supported_r_matrix_classes
 from .scipy2ri._r2py import rmat_to_spmat
@@ -19,7 +19,9 @@ from .scipy2ri._r2py import rmat_to_spmat
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
+    import h5py
     import numpy as np
+    from anndata.abc import CSCDataset, CSRDataset
     from scipy.sparse import sparray
 
 
@@ -36,6 +38,8 @@ def rpy2py_s4(obj: SexpS4) -> pd.DataFrame | AnnData | None:
         return rpy2py_single_cell_experiment(obj)
     if supported_r_matrix_classes() & r_classes:
         return rmat_to_spmat(obj)
+    if (mat := realize_delayed(obj)) is not None:
+        return mat_rpy2py(mat)
     # Don’t use the registered one, it would lead to recursion.
     return default_converter.rpy2py(obj)
 
@@ -81,15 +85,17 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         se = importr('SummarizedExperiment')
         sce = importr('SingleCellExperiment')
 
-        def convert_mats(attr: str, mats: Mapping[str, Sexp], *, transpose: bool = False) -> list[np.ndarray | sparray]:
+        def convert_mats(
+            attr: str, mats: Mapping[str, Sexp], *, transpose: bool = False
+        ) -> list[np.ndarray | sparray | h5py.Dataset | CSRDataset | CSCDataset]:
             rv = []
             for n, mat in mats.items():
-                conv = mat_rpy2py(mat)
+                conv = mat_rpy2py(mat, transpose=transpose)
                 if isinstance(conv, RS4):
                     cls_names = mat_rpy2py(conv.slots['class']).tolist()
                     msg = f'Cannot convert {attr} “{n}” of type(s) {cls_names} to Python'
                     raise TypeError(msg)
-                rv.append(conv.T if transpose else conv)
+                rv.append(conv)
             return rv
 
         assay_names = se.assayNames(obj)

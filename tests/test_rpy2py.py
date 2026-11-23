@@ -3,10 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import h5py
+import numpy as np
 import pandas as pd
 import pytest
 from anndata import AnnData
-from rpy2.robjects import conversion, r
+from anndata.abc import CSCDataset, CSRDataset
+from rpy2.robjects import baseenv, conversion, numpy2ri, r
+from scipy import sparse
 
 import anndata2ri
 from anndata2ri._rpy2_ext import importr
@@ -99,3 +103,93 @@ def test_factor(r2py: R2Py) -> None:
     ad = r2py(anndata2ri, lambda: r(code))
     assert isinstance(ad.obs['a_factor'].values, pd.Categorical)
     assert ad.obs['a_factor'].to_numpy().tolist() == pd.Categorical.from_codes([0, 0, -1, 1], ['A', 'B']).tolist()
+
+
+delayed_mats = [
+    pytest.param(np.ndarray, 'DelayedArray::DelayedArray(matrix((1:6) - 3, 2))', id='dense'),
+    pytest.param(
+        sparse.csc_array,
+        'DelayedArray::DelayedArray(Matrix::sparseMatrix(1:2, 3:2, x = c(1, -2), dims = c(4, 3)))',
+        id='sparse',
+    ),
+    pytest.param(
+        np.ndarray,
+        'BiocSingular::LowRankMatrix(matrix((1:6) / 2, 3), matrix((1:8) - 4, 4))',
+        id='LowRankMatrix',
+    ),
+]
+
+
+@pytest.mark.parametrize(('cls', 'code'), delayed_mats)
+def test_delayed(r2py: R2Py, cls: type, code: str) -> None:
+    converted = r2py(anndata2ri, lambda: r(code))
+    assert isinstance(converted, cls)
+    dense = numpy2ri.converter.rpy2py(baseenv['as.matrix'](r(code)))
+    np.testing.assert_allclose(converted.toarray() if isinstance(converted, sparse.sparray) else converted, dense)
+
+
+def test_delayed_assays(r2py: R2Py) -> None:
+    code = """
+    local({
+        lr <- BiocSingular::LowRankMatrix(matrix(rnorm(12), 6), matrix(rnorm(8), 4))
+        SingleCellExperiment::SingleCellExperiment(
+            assays = list(reconstructed = lr, delayed = DelayedArray::DelayedArray(as.matrix(lr)))
+        )
+    })
+    """
+    ad = r2py(anndata2ri, lambda: r(code))
+    assert ad.shape == (4, 6)
+    assert isinstance(ad.X, np.ndarray)
+    np.testing.assert_allclose(ad.layers['delayed'], ad.X)
+
+
+X_BACKED = np.array([[0.0, 1.0], [0.0, 2.0], [3.0, 0.0]])  # cells × genes
+R_X_BACKED = 'matrix(c(0, 0, 3, 1, 2, 0), 3)'
+
+
+def write_r(code: str) -> Callable[[Path], object]:
+    return lambda p: r(code.format(x=R_X_BACKED, path=p.as_posix()))
+
+
+def write_h5ad(fmt: type[sparse.sparray] | None) -> Callable[[Path], None]:
+    return lambda p: AnnData(X_BACKED if fmt is None else fmt(X_BACKED)).write_h5ad(p)
+
+
+backed_assays = [
+    pytest.param(
+        write_r('HDF5Array::writeHDF5Array(t({x}), "{path}", "m")'),
+        'HDF5Array::HDF5Array("{path}", "m")',
+        h5py.Dataset,
+        id='HDF5Array',
+    ),
+    pytest.param(
+        write_r('HDF5Array::writeTENxMatrix(Matrix::Matrix(t({x}), sparse = TRUE), "{path}", "g")'),
+        'HDF5Array::TENxMatrix("{path}", "g")',
+        CSRDataset,
+        id='TENxMatrix',
+    ),
+    pytest.param(write_h5ad(None), 'HDF5Array::H5ADMatrix("{path}")', h5py.Dataset, id='h5ad-dense'),
+    pytest.param(write_h5ad(sparse.csr_array), 'HDF5Array::H5ADMatrix("{path}")', CSRDataset, id='h5ad-csr'),
+    pytest.param(write_h5ad(sparse.csc_array), 'HDF5Array::H5ADMatrix("{path}")', CSCDataset, id='h5ad-csc'),
+    pytest.param(
+        write_r('HDF5Array::writeHDF5Array(t({x}), "{path}", "m")'),
+        '1 * HDF5Array::HDF5Array("{path}", "m")',
+        np.ndarray,
+        id='not-pristine',
+    ),
+]
+
+
+@pytest.mark.parametrize(('write', 'read', 'cls'), backed_assays)
+def test_backed_assays(r2py: R2Py, tmp_path: Path, write: Callable[[Path], object], read: str, cls: type) -> None:
+    path = tmp_path / 'x.h5'
+    write(path)
+    read = read.format(path=path.as_posix())
+    # reading the same file twice must work too
+    code = f'SingleCellExperiment::SingleCellExperiment(list(counts = {read}, again = {read}))'
+    ad = r2py(anndata2ri, lambda: r(code))
+    for arr in [ad.X, ad.layers['again']]:
+        assert isinstance(arr, cls)
+        x = arr[()] if isinstance(arr, h5py.Dataset) else arr
+        x = x.to_memory() if isinstance(x, CSRDataset | CSCDataset) else x
+        np.testing.assert_array_equal(x.toarray() if sparse.issparse(x) else x, X_BACKED)

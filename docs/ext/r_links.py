@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import logging
+import json
 from typing import TYPE_CHECKING, ClassVar
 from urllib.error import HTTPError
 from urllib.parse import urljoin
@@ -11,6 +11,7 @@ from urllib.request import urlopen
 from docutils import nodes
 from lxml import html
 from sphinx.roles import XRefRole
+from sphinx.util import logging
 
 
 if TYPE_CHECKING:
@@ -50,28 +51,20 @@ class RManRefRole(XRefRole):
         return pkg_cache.get(alias)
 
     def _fetch_cache(self, repo: str, pkg: str) -> dict[str, str]:
-        if repo.startswith('R'):
-            url = f'https://stat.ethz.ch/R-manual/{repo}/library/{pkg}/html/00Index.html'
-            tr_xpath = '//tr'
+        if not repo.startswith('R'):
+            # R-universe builds current manuals for all CRAN and Bioconductor packages
+            base = f'https://{repo}.r-universe.dev'
+            with urlopen(f'{base}/api/packages/{pkg}') as con:  # noqa: S310
+                help_pages = json.load(con)['_help']
+            return {
+                topic: f'{base}/{pkg}/doc/manual.html#{page["page"]}' for page in help_pages for topic in page['topics']
+            }
 
-            def get(tr: html.HtmlElement) -> tuple[str, str]:
-                return tr[0][0].text, tr[0][0].attrib['href']
-
-        else:
-            url = f'https://rdrr.io/{repo}/{pkg}/api/'
-            tr_xpath = "//div[@id='body-content']//tr[./td]"
-
-            def get(tr: html.HtmlElement) -> tuple[str, str]:
-                return tr[0].text, tr[1][0].attrib['href']
-
-        with urlopen(url) as con:  # noqa: S310
+        url = f'https://stat.ethz.ch/R-manual/{repo}/library/{pkg}/html/00Index.html'
+        with urlopen(url) as con:
             txt = con.read().decode(con.headers.get_content_charset())
         doc = html.fromstring(txt)
-        cache = {}
-        for tr in doc.xpath(tr_xpath):
-            topic, href = get(tr)
-            cache[topic] = urljoin(url, href)
-        return cache
+        return {tr[0][0].text: urljoin(url, tr[0][0].attrib['href']) for tr in doc.xpath('//tr')}
 
     def process_link(
         self,
@@ -93,7 +86,7 @@ class RManRefRole(XRefRole):
         url = self._get_man(package, topic)
         refnode['refuri'] = url
         if not url:
-            logger.warning('R topic %s not found.', target)
+            logger.warning('R topic %s not found.', target, location=refnode)
         return title, url
 
 
