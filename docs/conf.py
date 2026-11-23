@@ -59,7 +59,7 @@ todo_include_todos = False
 napoleon_custom_sections = ['Supports']
 
 intersphinx_mapping = dict(
-    anndata=('https://anndata.readthedocs.io/en/latest/', None),
+    anndata=('https://anndata.scverse.org/en/stable/', None),
     ipython=('https://ipython.readthedocs.io/en/stable/', None),
     numpy=('https://numpy.org/doc/stable/', None),
     pandas=('http://pandas.pydata.org/pandas-docs/stable/', None),
