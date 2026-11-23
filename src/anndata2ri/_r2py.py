@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     import numpy as np
-    from scipy.sparse import spmatrix
+    from scipy.sparse import sparray
 
 
 @converter.rpy2py.register(SexpS4)
@@ -81,9 +81,7 @@ def rpy2py_single_cell_experiment(obj: SexpS4) -> AnnData:
         se = importr('SummarizedExperiment')
         sce = importr('SingleCellExperiment')
 
-        def convert_mats(
-            attr: str, mats: Mapping[str, Sexp], *, transpose: bool = False
-        ) -> list[np.ndarray | spmatrix]:
+        def convert_mats(attr: str, mats: Mapping[str, Sexp], *, transpose: bool = False) -> list[np.ndarray | sparray]:
             rv = []
             for n, mat in mats.items():
                 conv = mat_rpy2py(mat)

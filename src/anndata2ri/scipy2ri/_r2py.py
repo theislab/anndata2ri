@@ -23,20 +23,20 @@ if TYPE_CHECKING:
 OPTIONS: Iterable[
     tuple[
         SupportedMatStor,
-        type[sparse.spmatrix],
+        type[sparse.sparray],
         Callable[[RSlots], CoordSpec],
         Callable[[CoordSpec], int] | None,
     ]
 ] = [
-    ('C', sparse.csc_matrix, lambda slots: (slots['i'], slots['p']), lambda c: len(c[0])),
-    ('R', sparse.csr_matrix, lambda slots: (slots['j'], slots['p']), lambda c: len(c[0])),
-    ('T', sparse.coo_matrix, lambda slots: ((slots['i'], slots['j']),), lambda c: len(c[0][0])),
-    ('di', sparse.dia_matrix, lambda _: ([0],), None),
+    ('C', sparse.csc_array, lambda slots: (slots['i'], slots['p']), lambda c: len(c[0])),
+    ('R', sparse.csr_array, lambda slots: (slots['j'], slots['p']), lambda c: len(c[0])),
+    ('T', sparse.coo_array, lambda slots: ((slots['i'], slots['j']),), lambda c: len(c[0][0])),
+    ('di', sparse.dia_array, lambda _: ([0],), None),
 ]
 
 
 @converter.rpy2py.register(SexpS4)
-def rmat_to_spmat(rmat: SexpS4) -> sparse.spmatrix:
+def rmat_to_spmat(rmat: SexpS4) -> sparse.sparray:
     """Convert R sparse matrices to scipy sparse matrices."""
     slots = RSlots(rmat)
     with localconverter(default_converter + numpy2ri.converter):
