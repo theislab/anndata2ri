@@ -8,7 +8,7 @@
    :target: https://anaconda.org/bioconda/anndata2ri
    :alt: Bioconda Version
 
-.. |rtd| image:: https://app.readthedocs.org/projects/icb-anndata2ri/badge/
+.. |rtd| image:: https://app.readthedocs.org/projects/anndata2ri/badge/
    :target: docs_
    :alt: Documentation Status
 
