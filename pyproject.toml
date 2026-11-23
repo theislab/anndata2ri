@@ -29,7 +29,7 @@ dependencies = [
 ]
 urls."Issue Tracker" = "https://github.com/theislab/anndata2ri/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"
 urls."Source Code" = "https://github.com/theislab/anndata2ri"
-urls.Documentation = "https://icb-anndata2ri.readthedocs-hosted.com/"
+urls.Documentation = "https://anndata2ri.readthedocs.io/"
 
 [dependency-groups]
 dev = [ "pre-commit", "scipy-stubs" ]
@@ -41,9 +41,10 @@ test = [
 ]
 doc = [
     "ipython",
-    "lxml",                       # For scraping the R link info
-    "scanpydoc[theme,typehints]",
+    "lxml",                     # For scraping the R link info
+    "scverse-doc[full]",
     "sphinx",
+    "sphinx-autodoc-typehints",
 ]
 
 [tool.hatch]

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import sys
 from datetime import UTC, datetime
 from importlib.metadata import metadata
@@ -28,38 +27,24 @@ version = meta['version']
 release = version
 
 # default settings
-templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 pygments_style = 'sphinx'
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
+    'scverse_doc',
     'sphinx_autodoc_typehints',
-    'scanpydoc',
     *[p.stem for p in (HERE / 'ext').glob('*.py')],
 ]
 
 always_use_bars_union = True
 typehints_document_rtype_none = False
 typehints_use_rtype = False
-# Generate the API documentation when building
-autosummary_generate = True
 autodoc_member_order = 'bysource'
-napoleon_google_docstring = False
-napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
-napoleon_use_rtype = True  # having a separate entry generally helps readability
-napoleon_use_param = True
-todo_include_todos = False
 napoleon_custom_sections = ['Supports']
 
 intersphinx_mapping = dict(
-    anndata=('https://anndata.readthedocs.io/en/latest/', None),
+    anndata=('https://anndata.scverse.org/en/stable/', None),
     ipython=('https://ipython.readthedocs.io/en/stable/', None),
     numpy=('https://numpy.org/doc/stable/', None),
     pandas=('http://pandas.pydata.org/pandas-docs/stable/', None),
@@ -68,37 +53,17 @@ intersphinx_mapping = dict(
     scipy=('https://docs.scipy.org/doc/scipy/', None),
 )
 
-qualname_overrides = {
+xref_overrides = {
+    # rpy2 documents these modules only as page sections
+    ('py:mod', 'rpy2.robjects.numpy2ri'): ('std:ref', 'robjects-numpy'),
+    ('py:mod', 'rpy2.robjects.pandas2ri'): ('std:ref', 'robjects-pandas'),
     'rpy2.robjects.conversion.Converter': ('py:mod', 'rpy2.robjects.conversion'),
 }
 
 
 # -- Options for HTML output ----------------------------------------------
 
-if _gh_url := os.environ.get('READTHEDOCS_GIT_CLONE_URL'):
-    _gh_url = _gh_url.removesuffix('.git')
-
-_git_id = (
-    None  # this would have to be the base branch of the PR
-    if os.environ.get('READTHEDOCS_VERSION_TYPE') == 'external'
-    else os.environ.get('READTHEDOCS_GIT_IDENTIFIER')
-)
-
-html_theme = 'scanpydoc'
-html_theme_options = dict(
-    repository_url=_gh_url,
-    repository_branch=_git_id,
-    use_repository_button=True,
-)
-html_sidebars = {
-    '**': [
-        'navbar-logo.html',
-        'icon-links.html',
-        'search-button-field.html',
-        # Instead of nav ('sbt-sidebar-nav.html'), TOC below:
-        'page-toc.html',
-    ]
-}
+source_repository = 'https://github.com/theislab/anndata2ri'
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
 
