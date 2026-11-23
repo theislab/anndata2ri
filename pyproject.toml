@@ -41,9 +41,10 @@ test = [
 ]
 doc = [
     "ipython",
-    "lxml",                       # For scraping the R link info
-    "scanpydoc[theme,typehints]",
+    "lxml",                     # For scraping the R link info
+    "scverse-doc[full]",
     "sphinx",
+    "sphinx-autodoc-typehints",
 ]
 
 [tool.hatch]
