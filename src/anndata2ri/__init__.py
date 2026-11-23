@@ -15,7 +15,7 @@ r"""Converter between Python’s AnnData and R’s SingleCellExperiment.
 Assays and reduced dimensions stored as :rcls:`~DelayedArray::DelayedArray`\ s
 (e.g. :rcls:`~BiocSingular::LowRankMatrix`) are loaded into memory.
 Assays that are unmodified :rcls:`~HDF5Array::HDF5Array`\ s, :rcls:`~HDF5Array::TENxMatrix`\ es,
-or ``HDF5Array::H5ADMatrix``\ es are instead converted to backed arrays
+or :rcls:`~HDF5Array::H5ADMatrix`\ es are instead converted to backed arrays
 (:class:`h5py.Dataset`, :class:`anndata.abc.CSRDataset`, or :class:`anndata.abc.CSCDataset`)
 that read from the HDF5 file on access.
 """
