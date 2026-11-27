@@ -9,12 +9,13 @@ import pytest
 import scanpy as sc
 from anndata import AnnData
 from pandas import DataFrame
-from rpy2.robjects import baseenv, globalenv
+from rpy2.robjects import baseenv, conversion, globalenv
 from rpy2.robjects.conversion import localconverter
 from scanpy.datasets import pbmc68k_reduced
 from scipy import sparse
 
 import anndata2ri
+from anndata2ri._py2r import NotConvertedWarning, dict_converter
 from anndata2ri._rpy2_ext import importr
 
 
@@ -149,3 +150,25 @@ def test_df_error() -> None:
     adata.obsm['stuff'] = DataFrame(dict(a=[1, 2], b=list('ab'), c=[1.0, 2.0]), index=adata.obs_names)
     with pytest.raises(ValueError, match=r"DataFrame contains non-numeric columns \['b'\]"):
         anndata2ri.converter.py2rpy(adata)
+
+
+def test_dict_skips_unconvertible_entries() -> None:
+    payload = {
+        'bad': None,
+        'good_int': 42,
+        'nested': {'skip': object(), 'keep': 'ok'},
+        'after': 7,
+    }
+    with (
+        localconverter(anndata2ri.converter + dict_converter),
+        pytest.warns(NotConvertedWarning) as records,
+    ):
+        r_dict = conversion.get_conversion().py2rpy(payload)
+
+    assert len(records) == 2
+    assert list(r_dict.names) == ['good_int', 'nested', 'after']
+    assert r_dict.rx2('good_int')[0] == 42
+    assert r_dict.rx2('after')[0] == 7
+    nested = r_dict.rx2('nested')
+    assert list(nested.names) == ['keep']
+    assert nested.rx2('keep')[0] == 'ok'
