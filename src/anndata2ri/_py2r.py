@@ -42,11 +42,11 @@ def py2rpy_dict(obj: Mapping) -> ListVector:
     """Try converting everything. For nested dicts, this needs itself to be registered."""
     converter = conversion.get_conversion()
     converted = {}
-    try:
-        for k, v in obj.items():
+    for k, v in obj.items():
+        try:
             converted[str(k)] = converter.py2rpy(v)
-    except NotImplementedError as e:
-        warn(str(e), NotConvertedWarning, stacklevel=STACK_LEVEL)
+        except NotImplementedError as e:
+            warn(str(e), NotConvertedWarning, stacklevel=STACK_LEVEL)
     # This tries to convert everything again. This works because py2rpy(Sexp) is the identity function
     return ListVector(converted)
 
